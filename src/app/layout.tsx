@@ -13,11 +13,6 @@ export const metadata: Metadata = {
   title: "ZionShift — AI-Powered Outbound Systems",
   description:
     "ZionShift builds AI-powered outbound systems that find your ideal prospects, reach out personally, and book meetings directly on your calendar — 24/7, without spending a dollar on ads.",
-  icons: {
-    icon: "/icon.png",
-    shortcut: "/icon.png",
-    apple: "/icon.png",
-  },
 };
 
 export default function RootLayout({
