@@ -1,5 +1,20 @@
 This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
 
+## Environment Variables
+
+The contact form requires two API keys. Create a `.env.local` file in the project root:
+
+```
+ANTHROPIC_API_KEY=your_anthropic_api_key_here
+RESEND_API_KEY=your_resend_api_key_here
+```
+
+**For Vercel production deployment:**
+1. Go to your Vercel project → Settings → Environment Variables
+2. Add `ANTHROPIC_API_KEY` with your key from [console.anthropic.com](https://console.anthropic.com)
+3. Add `RESEND_API_KEY` with your key from [resend.com](https://resend.com)
+4. Redeploy for the changes to take effect
+
 ## Getting Started
 
 First, run the development server:

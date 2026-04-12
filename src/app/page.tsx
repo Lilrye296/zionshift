@@ -134,6 +134,8 @@ export default function Home() {
   /* ── Modal state ── */
   const [modalOpen, setModalOpen] = useState(false);
   const [submitted, setSubmitted] = useState(false);
+  const [loading, setLoading] = useState(false);
+  const [formError, setFormError] = useState('');
   const [form, setForm] = useState({
     name: '', email: '', phone: '', business: '', challenge: '',
   });
@@ -147,6 +149,7 @@ export default function Home() {
 
   function openModal() {
     setSubmitted(false);
+    setFormError('');
     setForm({ name: '', email: '', phone: '', business: '', challenge: '' });
     setModalOpen(true);
   }
@@ -156,10 +159,30 @@ export default function Home() {
     if (e.target === overlayRef.current) closeModal();
   }
 
-  function handleSubmit(e: React.FormEvent) {
+  async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
-    console.log('ZionShift form submission:', form);
-    setSubmitted(true);
+    setLoading(true);
+    setFormError('');
+    try {
+      const res = await fetch('/api/contact', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          name: form.name,
+          email: form.email,
+          phone: form.phone,
+          business: form.business,
+          challenge: form.challenge,
+        }),
+      });
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.error || 'Something went wrong.');
+      setSubmitted(true);
+    } catch (err) {
+      setFormError(err instanceof Error ? err.message : 'Something went wrong. Please try again.');
+    } finally {
+      setLoading(false);
+    }
   }
 
   return (
@@ -865,11 +888,18 @@ export default function Home() {
 
                   <button
                     type="submit"
-                    className="w-full py-4 rounded-full font-bold text-white text-base transition-opacity hover:opacity-90 mt-2"
+                    disabled={loading}
+                    className="w-full py-4 rounded-full font-bold text-white text-base transition-opacity hover:opacity-90 mt-2 disabled:opacity-60 disabled:cursor-not-allowed"
                     style={{ backgroundColor: '#C75B2A' }}
                   >
-                    Book Your Free Strategy Call
+                    {loading ? 'Sending...' : 'Book Your Free Strategy Call'}
                   </button>
+
+                  {formError && (
+                    <p className="text-sm text-center" style={{ color: '#C75B2A' }}>
+                      {formError}
+                    </p>
+                  )}
                 </form>
               </>
             )}
