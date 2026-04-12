@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 
 /* ── Scroll-reveal hook ──────────────────────────────────────── */
 function useScrollReveal() {
@@ -118,9 +118,49 @@ const faqs = [
 ];
 
 /* ── Component ───────────────────────────────────────────────── */
+const inputClass =
+  'w-full px-4 py-3 rounded-xl text-sm outline-none transition-colors';
+const inputStyle = {
+  backgroundColor: '#F5F0EA',
+  border: '1px solid rgba(196,184,168,0.5)',
+  color: '#1A1715',
+  fontFamily: "var(--font-barlow), 'Barlow', sans-serif",
+};
+
 export default function Home() {
   useScrollReveal();
   const [openFaq, setOpenFaq] = useState<number | null>(null);
+
+  /* ── Modal state ── */
+  const [modalOpen, setModalOpen] = useState(false);
+  const [submitted, setSubmitted] = useState(false);
+  const [form, setForm] = useState({
+    name: '', email: '', phone: '', business: '', challenge: '',
+  });
+  const overlayRef = useRef<HTMLDivElement>(null);
+
+  /* Lock body scroll when modal is open */
+  useEffect(() => {
+    document.body.style.overflow = modalOpen ? 'hidden' : '';
+    return () => { document.body.style.overflow = ''; };
+  }, [modalOpen]);
+
+  function openModal() {
+    setSubmitted(false);
+    setForm({ name: '', email: '', phone: '', business: '', challenge: '' });
+    setModalOpen(true);
+  }
+  function closeModal() { setModalOpen(false); }
+
+  function handleOverlayClick(e: React.MouseEvent<HTMLDivElement>) {
+    if (e.target === overlayRef.current) closeModal();
+  }
+
+  function handleSubmit(e: React.FormEvent) {
+    e.preventDefault();
+    console.log('ZionShift form submission:', form);
+    setSubmitted(true);
+  }
 
   return (
     <div
@@ -160,12 +200,12 @@ export default function Home() {
             })}
           </div>
 
-          <a
-            href="#book"
+          <button
+            onClick={openModal}
             className="bg-[#1A1715] text-white text-sm font-semibold px-5 py-2.5 rounded-full hover:bg-black transition-colors whitespace-nowrap flex-shrink-0"
           >
             Book a Free Call
-          </a>
+          </button>
         </div>
       </nav>
 
@@ -205,12 +245,12 @@ export default function Home() {
             </p>
 
             <div className="flex flex-col sm:flex-row gap-3 mb-5">
-              <a
-                href="#book"
+              <button
+                onClick={openModal}
                 className="bg-[#1A1715] text-white font-bold px-7 py-4 rounded-full text-center hover:bg-black transition-colors"
               >
                 Book a Free Strategy Call
-              </a>
+              </button>
               <a
                 href="#how-it-works"
                 className="border-2 border-[#1A1715] text-[#1A1715] font-bold px-7 py-4 rounded-full text-center hover:bg-[#1A1715] hover:text-white transition-colors"
@@ -685,13 +725,13 @@ export default function Home() {
               Book a free strategy call and see exactly how we&apos;d build your
               outbound system. No pitch, no pressure — just a real conversation.
             </p>
-            <a
-              href="#"
+            <button
+              onClick={openModal}
               className="inline-block text-white font-bold px-9 py-4 rounded-full text-lg transition-opacity hover:opacity-90"
               style={{ backgroundColor: '#C75B2A' }}
             >
               Book Your Free Strategy Call
-            </a>
+            </button>
             <p
               className="mt-5 text-sm"
               style={{ color: 'rgba(255,255,255,0.35)' }}
@@ -701,6 +741,141 @@ export default function Home() {
           </div>
         </div>
       </section>
+
+      {/* ═══════════════════════════════════════════════════
+          MODAL
+      ════════════════════════════════════════════════════ */}
+      {modalOpen && (
+        <div
+          ref={overlayRef}
+          onClick={handleOverlayClick}
+          className="fixed inset-0 z-[100] flex items-center justify-center px-4"
+          style={{ backgroundColor: 'rgba(0,0,0,0.5)', animation: 'fadeInOverlay 0.2s ease' }}
+        >
+          <div
+            className="relative w-full rounded-3xl p-8 shadow-2xl"
+            style={{
+              backgroundColor: '#FDFCFA',
+              maxWidth: 480,
+              animation: 'fadeInModal 0.25s ease',
+            }}
+          >
+            {/* Close button */}
+            <button
+              onClick={closeModal}
+              className="absolute top-4 right-4 w-8 h-8 flex items-center justify-center rounded-full transition-colors hover:bg-[#F5F0EA]"
+              style={{ color: '#8B7D6B' }}
+              aria-label="Close"
+            >
+              ✕
+            </button>
+
+            {submitted ? (
+              /* ── Confirmation ── */
+              <div className="text-center py-6">
+                <div
+                  className="w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-5"
+                  style={{ backgroundColor: 'rgba(91,140,90,0.12)' }}
+                >
+                  <svg className="w-8 h-8" style={{ color: '#5B8C5A' }} fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5}>
+                    <path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" />
+                  </svg>
+                </div>
+                <h3 className="text-2xl font-extrabold mb-2" style={{ color: '#1A1715' }}>You&apos;re in.</h3>
+                <p className="mb-8" style={{ color: '#8B7D6B', fontWeight: 400 }}>
+                  We&apos;ll reach out within 24 hours to schedule your call.
+                </p>
+                <button
+                  onClick={closeModal}
+                  className="w-full py-3 rounded-full font-bold text-white transition-opacity hover:opacity-90"
+                  style={{ backgroundColor: '#1A1715' }}
+                >
+                  Close
+                </button>
+              </div>
+            ) : (
+              /* ── Form ── */
+              <>
+                <h3 className="text-2xl font-extrabold mb-1" style={{ color: '#1A1715' }}>Book a Free Strategy Call</h3>
+                <p className="text-sm mb-6" style={{ color: '#8B7D6B' }}>No commitment · No sales pitch · Just a real conversation.</p>
+
+                <form onSubmit={handleSubmit} className="space-y-4">
+                  <div>
+                    <label className="block text-xs font-semibold mb-1.5 uppercase tracking-wide" style={{ color: '#8B7D6B' }}>Your Name *</label>
+                    <input
+                      type="text"
+                      required
+                      placeholder="John Smith"
+                      className={inputClass}
+                      style={inputStyle}
+                      value={form.name}
+                      onChange={e => setForm(f => ({ ...f, name: e.target.value }))}
+                    />
+                  </div>
+
+                  <div>
+                    <label className="block text-xs font-semibold mb-1.5 uppercase tracking-wide" style={{ color: '#8B7D6B' }}>Email Address *</label>
+                    <input
+                      type="email"
+                      required
+                      placeholder="john@example.com"
+                      className={inputClass}
+                      style={inputStyle}
+                      value={form.email}
+                      onChange={e => setForm(f => ({ ...f, email: e.target.value }))}
+                    />
+                  </div>
+
+                  <div>
+                    <label className="block text-xs font-semibold mb-1.5 uppercase tracking-wide" style={{ color: '#8B7D6B' }}>Phone Number *</label>
+                    <input
+                      type="tel"
+                      required
+                      placeholder="(555) 000-0000"
+                      className={inputClass}
+                      style={inputStyle}
+                      value={form.phone}
+                      onChange={e => setForm(f => ({ ...f, phone: e.target.value }))}
+                    />
+                  </div>
+
+                  <div>
+                    <label className="block text-xs font-semibold mb-1.5 uppercase tracking-wide" style={{ color: '#8B7D6B' }}>Business Name</label>
+                    <input
+                      type="text"
+                      placeholder="Your Business LLC"
+                      className={inputClass}
+                      style={inputStyle}
+                      value={form.business}
+                      onChange={e => setForm(f => ({ ...f, business: e.target.value }))}
+                    />
+                  </div>
+
+                  <div>
+                    <label className="block text-xs font-semibold mb-1.5 uppercase tracking-wide" style={{ color: '#8B7D6B' }}>What&apos;s your biggest challenge right now?</label>
+                    <textarea
+                      rows={3}
+                      placeholder="Tell us what's holding you back..."
+                      className={inputClass}
+                      style={{ ...inputStyle, resize: 'none' }}
+                      value={form.challenge}
+                      onChange={e => setForm(f => ({ ...f, challenge: e.target.value }))}
+                    />
+                  </div>
+
+                  <button
+                    type="submit"
+                    className="w-full py-4 rounded-full font-bold text-white text-base transition-opacity hover:opacity-90 mt-2"
+                    style={{ backgroundColor: '#C75B2A' }}
+                  >
+                    Book Your Free Strategy Call
+                  </button>
+                </form>
+              </>
+            )}
+          </div>
+        </div>
+      )}
 
       {/* ═══════════════════════════════════════════════════
           FOOTER
