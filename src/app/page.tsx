@@ -35,7 +35,6 @@ const stats = [
   { value: '$0',    label: 'Ad spend required' },
   { value: '<5s',   label: 'Response time' },
   { value: '100%',  label: 'Personalized' },
-  { value: '0',     label: 'Shared leads' },
 ];
 
 const problems = [
@@ -160,7 +159,7 @@ export default function Home() {
           <img
             src="/logo.png"
             alt="ZionShift"
-            width={160}
+            width={130}
             className="object-contain flex-shrink-0"
             style={{ height: 'auto' }}
           />
@@ -329,7 +328,7 @@ export default function Home() {
           borderBottom: '1px solid rgba(196,184,168,0.35)',
         }}
       >
-        <div className="max-w-6xl mx-auto grid grid-cols-2 md:grid-cols-5 gap-8 text-center">
+        <div className="max-w-6xl mx-auto grid grid-cols-2 md:grid-cols-4 gap-8 text-center">
           {stats.map((s, i) => (
             <div key={i} className={`fade-in-up delay-${i + 1}`}>
               <p className="text-2xl font-extrabold" style={{ color: '#C75B2A' }}>
@@ -728,7 +727,7 @@ export default function Home() {
           <img
             src="/logo.png"
             alt="ZionShift"
-            width={140}
+            width={120}
             className="object-contain"
             style={{ height: 'auto' }}
           />
