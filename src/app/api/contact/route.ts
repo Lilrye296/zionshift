@@ -36,7 +36,7 @@ export async function POST(req: NextRequest) {
       aiResponse.content[0].type === 'text' ? aiResponse.content[0].text : '';
 
     /* ── 2a. Send personalized reply to the lead ── */
-    await resend.emails.send({
+    const email1Result = await resend.emails.send({
       from: 'Ryan from ZionShift <ryan@zionshift.com>',
       to: email,
       replyTo: 'ryan@zionshift.com',
@@ -55,14 +55,19 @@ export async function POST(req: NextRequest) {
       `Challenge: ${challenge || '(not provided)'}`,
     ].join('\n');
 
-    await resend.emails.send({
+    const email2Result = await resend.emails.send({
       from: 'ZionShift Form <ryan@zionshift.com>',
       to: 'zionshiftai@gmail.com',
       subject: `New Lead: ${name}${business ? ` from ${business}` : ''}`,
       text: notificationBody,
     });
 
-    return NextResponse.json({ success: true });
+    return NextResponse.json({
+      success: true,
+      aiResponse: 'generated',
+      email1: email1Result,
+      email2: email2Result,
+    });
   } catch (err) {
     console.error('Contact form error:', err);
     return NextResponse.json(
