@@ -10,7 +10,7 @@ const barlow = Barlow({
 });
 
 export const metadata: Metadata = {
-  title: "ZionShift — AI-Powered Outbound Systems",
+  title: "ZionShift",
   description:
     "ZionShift builds AI-powered outbound systems that find your ideal prospects, reach out personally, and book meetings directly on your calendar — 24/7, without spending a dollar on ads.",
 };
