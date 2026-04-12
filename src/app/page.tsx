@@ -161,8 +161,9 @@ export default function Home() {
             src="/logo.png"
             alt="ZionShift"
             width={160}
-            height={40}
+            height={34}
             className="object-contain flex-shrink-0"
+            style={{ mixBlendMode: 'multiply' }}
             priority
           />
 
@@ -728,9 +729,10 @@ export default function Home() {
           <Image
             src="/logo.png"
             alt="ZionShift"
-            width={130}
-            height={34}
+            width={140}
+            height={30}
             className="object-contain"
+            style={{ mixBlendMode: 'multiply' }}
           />
           <p className="text-sm" style={{ color: '#8B7D6B' }}>
             © 2026 ZionShift. All rights reserved.
