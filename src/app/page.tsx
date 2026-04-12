@@ -1,7 +1,6 @@
 'use client';
 
 import { useEffect, useState } from 'react';
-import Image from 'next/image';
 
 /* ── Scroll-reveal hook ──────────────────────────────────────── */
 function useScrollReveal() {
@@ -157,14 +156,13 @@ export default function Home() {
           className="frosted-glass flex items-center justify-between gap-6 px-6 py-3 rounded-full shadow-lg w-full max-w-4xl"
           style={{ border: '1px solid rgba(196,184,168,0.4)' }}
         >
-          <Image
+          {/* eslint-disable-next-line @next/next/no-img-element */}
+          <img
             src="/logo.png"
             alt="ZionShift"
             width={160}
-            height={34}
             className="object-contain flex-shrink-0"
-            style={{ mixBlendMode: 'multiply' }}
-            priority
+            style={{ height: 'auto' }}
           />
 
           <div className="hidden md:flex items-center gap-7">
@@ -726,13 +724,13 @@ export default function Home() {
         style={{ borderTop: '1px solid rgba(196,184,168,0.3)' }}
       >
         <div className="max-w-7xl mx-auto flex flex-col sm:flex-row items-center justify-between gap-4">
-          <Image
+          {/* eslint-disable-next-line @next/next/no-img-element */}
+          <img
             src="/logo.png"
             alt="ZionShift"
             width={140}
-            height={30}
             className="object-contain"
-            style={{ mixBlendMode: 'multiply' }}
+            style={{ height: 'auto' }}
           />
           <p className="text-sm" style={{ color: '#8B7D6B' }}>
             © 2026 ZionShift. All rights reserved.
