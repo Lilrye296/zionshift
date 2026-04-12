@@ -240,7 +240,7 @@ export default function Home() {
             </div>
 
             <p className="text-sm" style={{ color: '#8B7D6B' }}>
-              Free 30-minute call · No commitment
+              ✦ Free 30-minute call · No commitment
             </p>
           </div>
 
