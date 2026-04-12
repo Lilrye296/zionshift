@@ -53,6 +53,11 @@ export async function POST(req: NextRequest) {
       `Phone: ${phone}`,
       `Business: ${business || '(not provided)'}`,
       `Challenge: ${challenge || '(not provided)'}`,
+      ``,
+      `---`,
+      `AI Response Sent:`,
+      ``,
+      aiText,
     ].join('\n');
 
     const email2Result = await resend.emails.send({
