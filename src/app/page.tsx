@@ -89,26 +89,6 @@ const zionItems = [
   'Runs 24/7 and gets smarter over time',
 ];
 
-const testimonials = [
-  {
-    quote:
-      '"ZionShift completely changed how I get clients. I went from chasing leads to having qualified prospects calling me. Best business decision I\'ve made this year."',
-    name: 'Mike R.',
-    location: 'Business Owner — Tampa, FL',
-  },
-  {
-    quote:
-      '"I was skeptical at first — I\'d been burned by agencies before. But ZionShift delivered real meetings within the first two weeks. No gimmicks, no shared leads."',
-    name: 'Tony S.',
-    location: 'Business Owner — Orlando, FL',
-  },
-  {
-    quote:
-      '"We were spending $4,000/month on ads and barely breaking even. ZionShift costs less and books more meetings. It\'s a no-brainer."',
-    name: 'David L.',
-    location: 'Business Owner — Miami, FL',
-  },
-];
 
 const faqs = [
   {
@@ -556,55 +536,62 @@ export default function Home() {
       </section>
 
       {/* ═══════════════════════════════════════════════════
-          TESTIMONIALS
+          WHO WE HELP
       ════════════════════════════════════════════════════ */}
-      <section className="py-24 px-4 max-w-7xl mx-auto">
-        <div className="text-center mb-14 fade-in-up">
+      <section className="py-24 px-4 max-w-5xl mx-auto">
+        <div className="text-center mb-12 fade-in-up">
           <span
             className="text-xs font-bold uppercase tracking-widest"
             style={{ color: '#C75B2A' }}
           >
-            Results
+            Who We Help
           </span>
-          <h2 className="text-4xl md:text-5xl font-extrabold mt-3">
-            What our clients are saying.
+          <h2 className="text-4xl md:text-5xl font-extrabold mt-3 mb-4">
+            Built for businesses like yours.
           </h2>
+          <p
+            className="text-lg max-w-2xl mx-auto leading-relaxed"
+            style={{ color: '#8B7D6B', fontWeight: 400 }}
+          >
+            We work with service-based businesses that close high-ticket deals
+            and need a steady pipeline of qualified meetings.
+          </p>
         </div>
 
-        <div className="grid md:grid-cols-3 gap-6">
-          {testimonials.map((t, i) => (
+        <div className="fade-in-up flex flex-wrap justify-center gap-4">
+          {[
+            { icon: '🏠', label: 'Roofing' },
+            { icon: '❄️', label: 'HVAC' },
+            { icon: '⚖️', label: 'Law Firms' },
+            { icon: '🦷', label: 'Dental Offices' },
+            { icon: '💆', label: 'Med Spas' },
+            { icon: '🛡️', label: 'Insurance' },
+            { icon: '🔨', label: 'Contractors' },
+          ].map((item) => (
             <div
-              key={i}
-              className={`fade-in-up delay-${i + 1} p-8 rounded-2xl`}
+              key={item.label}
+              className="flex items-center gap-3 px-6 py-4 rounded-2xl font-semibold"
               style={{
                 backgroundColor: '#FDFCFA',
                 border: '1px solid rgba(196,184,168,0.25)',
               }}
             >
-              {/* Stars */}
-              <div className="flex gap-1 mb-5">
-                {Array.from({ length: 5 }).map((_, j) => (
-                  <span key={j} style={{ color: '#C75B2A' }}>
-                    ★
-                  </span>
-                ))}
-              </div>
-
-              <p
-                className="italic leading-relaxed mb-6"
-                style={{ color: '#1A1715', fontWeight: 400 }}
-              >
-                {t.quote}
-              </p>
-
-              <div>
-                <p className="font-bold">{t.name}</p>
-                <p className="text-sm mt-0.5" style={{ color: '#8B7D6B' }}>
-                  {t.location}
-                </p>
-              </div>
+              <span className="text-2xl">{item.icon}</span>
+              <span style={{ color: '#1A1715' }}>{item.label}</span>
             </div>
           ))}
+
+          {/* And More — accent style */}
+          <div
+            className="flex items-center gap-3 px-6 py-4 rounded-2xl font-semibold"
+            style={{
+              backgroundColor: 'rgba(199,91,42,0.06)',
+              border: '1px solid rgba(199,91,42,0.3)',
+            }}
+          >
+            <span className="text-2xl">➕</span>
+            <span style={{ color: '#C75B2A' }}>And More</span>
+          </div>
         </div>
       </section>
 
