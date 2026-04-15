@@ -78,7 +78,6 @@ const agencyItems = [
   'Human SDRs with limited hours',
   'Weeks to onboard and launch',
   'Generic, templated outreach',
-  'Results plateau after 90 days',
 ];
 
 const diyItems = [
@@ -109,11 +108,11 @@ const faqs = [
   },
   {
     q: 'How long until I start seeing results?',
-    a: "Most clients see their first qualified meetings within 1–2 weeks of launch. The AI gets smarter over time by learning what messaging resonates best with your specific audience, so results typically improve month over month.",
+    a: "After a quick onboarding and setup period, most clients begin seeing qualified meetings within the first few weeks. The AI continuously learns what messaging resonates best with your specific audience, so results typically improve month over month.",
   },
   {
     q: 'What does it cost?',
-    a: "There is a one-time setup fee of $1,000 and a monthly retainer of $2,000. No long-term contracts — we earn your business every month based on results. Compare that to traditional agencies charging $5,000+ per month with human SDRs and no guarantees.",
+    a: "We offer a simple, transparent pricing structure with a one-time setup fee and an affordable monthly retainer — a fraction of what traditional agencies charge. No long-term contracts — we earn your business every month based on results. Book a free call and we will walk you through exactly what it costs and what you get.",
   },
   {
     q: 'What B2B industries do you work with?',
