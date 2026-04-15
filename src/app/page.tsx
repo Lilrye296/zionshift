@@ -90,7 +90,6 @@ const diyItems = [
 const zionItems = [
   'AI-powered, 24/7 autonomous operation',
   'Completely hands-free — no software to learn',
-  'Live in days, not weeks',
   'Hyper-personalized outreach at scale',
   'Gets smarter and more effective over time',
 ];
