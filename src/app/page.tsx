@@ -74,7 +74,6 @@ const steps = [
 ];
 
 const agencyItems = [
-  '$5,000+/month retainer',
   'Human SDRs with limited hours',
   'Weeks to onboard and launch',
   'Generic, templated outreach',
@@ -561,12 +560,11 @@ export default function Home() {
             >
               <p className="text-xs font-bold uppercase tracking-widest mb-2" style={{ color: '#8B7D6B' }}>Traditional Agencies</p>
               <h3
-                className="text-xl font-bold mb-2"
+                className="text-xl font-bold mb-6"
                 style={{ color: '#1A1715' }}
               >
-                $5,000+/month
+                Outdated and overpriced
               </h3>
-              <p className="text-sm mb-6" style={{ color: '#8B7D6B' }}>Human-driven, limited hours</p>
               <ul className="space-y-4">
                 {agencyItems.map((item, i) => (
                   <li key={i} className="flex items-start gap-3">
@@ -591,12 +589,11 @@ export default function Home() {
             >
               <p className="text-xs font-bold uppercase tracking-widest mb-2" style={{ color: '#8B7D6B' }}>DIY AI Tools</p>
               <h3
-                className="text-xl font-bold mb-2"
+                className="text-xl font-bold mb-6"
                 style={{ color: '#1A1715' }}
               >
-                Cheap but complex
+                Powerful but overwhelming
               </h3>
-              <p className="text-sm mb-6" style={{ color: '#8B7D6B' }}>You manage everything yourself</p>
               <ul className="space-y-4">
                 {diyItems.map((item, i) => (
                   <li key={i} className="flex items-start gap-3">
@@ -617,8 +614,7 @@ export default function Home() {
               style={{ backgroundColor: '#1A1715' }}
             >
               <p className="text-xs font-bold uppercase tracking-widest mb-2" style={{ color: '#C75B2A' }}>ZionShift</p>
-              <h3 className="text-xl font-bold mb-2 text-white">Fraction of the cost</h3>
-              <p className="text-sm mb-6" style={{ color: 'rgba(255,255,255,0.45)' }}>AI-powered, completely hands-free</p>
+              <h3 className="text-xl font-bold mb-6 text-white">AI-powered, completely hands-free</h3>
               <ul className="space-y-4">
                 {zionItems.map((item, i) => (
                   <li key={i} className="flex items-start gap-3">
