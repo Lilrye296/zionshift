@@ -34,7 +34,7 @@ const stats = [
   { value: '24/7',  label: 'Autonomous AI operation' },
   { value: '100%',  label: 'AI-personalized outreach' },
   { value: '40hrs', label: 'Saved per month per client' },
-  { value: '0',     label: 'Software to learn' },
+  { value: '100%',  label: 'Done for you' },
 ];
 
 const problems = [
