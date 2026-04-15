@@ -24,34 +24,34 @@ function useScrollReveal() {
 
 /* ── Data ────────────────────────────────────────────────────── */
 const meetings = [
-  { time: '9:00 AM',  name: 'Marcus Thompson', company: 'Thompson HVAC' },
-  { time: '10:30 AM', name: 'Sarah Mitchell',  company: 'Mitchell Law Group' },
-  { time: '1:00 PM',  name: 'James Rivera',    company: 'Rivera Roofing Co.' },
-  { time: '3:30 PM',  name: 'Amanda Chen',     company: 'Chen Dental Partners' },
+  { time: '9:00 AM',  name: 'Marcus Thompson', company: 'Apex Marketing Group' },
+  { time: '10:30 AM', name: 'Sarah Mitchell',  company: 'Mitchell IT Solutions' },
+  { time: '1:00 PM',  name: 'James Rivera',    company: 'Rivera Consulting LLC' },
+  { time: '3:30 PM',  name: 'Amanda Chen',     company: 'Chen Staffing Partners' },
 ];
 
 const stats = [
-  { value: '24/7',  label: 'Always running' },
-  { value: '$0',    label: 'Ad spend required' },
-  { value: '<5s',   label: 'Response time' },
-  { value: '100%',  label: 'Personalized' },
+  { value: '24/7',  label: 'Autonomous AI operation' },
+  { value: '100%',  label: 'AI-personalized outreach' },
+  { value: '40hrs', label: 'Saved per month per client' },
+  { value: '0',     label: 'Software to learn' },
 ];
 
 const problems = [
   {
-    icon: '💸',
-    title: 'Ads drain your budget',
-    desc: 'Spending thousands on Facebook and Google, competing with dozens of competitors bidding on the exact same keywords — with no guarantee of results.',
-  },
-  {
-    icon: '📋',
-    title: 'Shared leads go nowhere',
-    desc: "The same lead gets sold to five different businesses. By the time you call, they've already been bombarded by your competitors.",
+    icon: '📉',
+    title: 'Your pipeline keeps running dry',
+    desc: "Referrals are inconsistent. Word of mouth is unpredictable. Without a reliable outbound system, revenue stays feast-or-famine and growth feels impossible to plan.",
   },
   {
     icon: '⏰',
-    title: 'Too busy to prospect',
-    desc: "You're running your business all day. There's simply no time left to cold call, follow up, and consistently fill your pipeline.",
+    title: "You're too busy doing the work to sell the work",
+    desc: "You're delivering for current clients all day. By the time you have a free moment, prospecting is the last thing you want to do — and your pipeline suffers for it.",
+  },
+  {
+    icon: '💸',
+    title: 'Traditional agencies charge $5,000+/mo and underdeliver',
+    desc: "Old-school agencies use human SDRs, manual processes, and outdated playbooks. You pay a premium for mediocre results while they take weeks just to get started.",
   },
 ];
 
@@ -59,61 +59,69 @@ const steps = [
   {
     num: '01',
     title: 'We learn your business',
-    desc: 'One focused onboarding call. We learn your ideal client, your offer, and what makes you different from the competition.',
+    desc: 'One quick onboarding call. You tell us your ideal client profile, your offer, and your target market. That\'s it — we handle everything from there.',
   },
   {
     num: '02',
-    title: 'We build your machine',
-    desc: 'Our AI finds decision makers and reaches out personally across email, text, and voicemail — at scale, around the clock.',
+    title: 'AI builds your pipeline',
+    desc: 'Our cutting-edge AI finds decision makers showing buying signals, writes hyper-personalized outreach, and handles conversations 24/7 — completely hands-free.',
   },
   {
     num: '03',
-    title: 'You show up and close',
-    desc: 'Qualified meetings land directly on your calendar. You just show up, have the conversation, and close.',
+    title: 'Meetings appear on your calendar',
+    desc: 'Qualified B2B leads show up as booked meetings directly on your calendar. No software to learn, no manual work. Just show up and close the deal.',
   },
 ];
 
-const otherItems = [
-  'Pay for ads AND their monthly fee',
-  'Leads shared with 5+ competitors',
-  'Generic, template-based campaigns',
-  'Leads that never pick up the phone',
-  'Results stop when you stop paying',
+const agencyItems = [
+  '$5,000+/month retainer',
+  'Human SDRs with limited hours',
+  'Weeks to onboard and launch',
+  'Generic, templated outreach',
+  'Results plateau after 90 days',
+];
+
+const diyItems = [
+  'Steep learning curve',
+  'You manage everything yourself',
+  'Hours of daily manual work',
+  'No support when things break',
+  'Still need to hire someone to run it',
 ];
 
 const zionItems = [
-  'Zero ad spend. Ever.',
-  'Every meeting is exclusively yours',
-  'Personalized outreach at scale',
-  'Pre-qualified meetings on your calendar',
-  'Runs 24/7 and gets smarter over time',
+  'AI-powered, 24/7 autonomous operation',
+  'Completely hands-free — no software to learn',
+  'Live in days, not weeks',
+  'Hyper-personalized outreach at scale',
+  'Gets smarter and more effective over time',
 ];
 
 
 const faqs = [
   {
-    q: 'How is this different from buying leads?',
-    a: "Bought leads are shared with multiple competitors and are often outdated or uninterested. ZionShift builds personalized outreach to decision makers who match your ideal client profile — and every meeting booked is exclusively yours.",
+    q: 'How does the AI find qualified B2B leads?',
+    a: "Our AI scans thousands of data points to identify decision makers at companies showing active buying signals — things like recent funding, hiring patterns, technology changes, and engagement activity. It then writes and sends hyper-personalized outreach on your behalf, 24/7.",
   },
   {
-    q: 'Do I really not need to run ads?',
-    a: "Correct. Our system is entirely outbound — we find and reach out to your prospects directly. You never need to pay for clicks, impressions, or ad management. Zero ad spend, ever.",
+    q: 'Is this really completely hands-free?',
+    a: "Yes. After a quick onboarding call where you tell us your ideal client, our AI handles everything — prospect research, personalized outreach, follow-ups, and conversation management. You don't touch any software. Meetings just appear on your calendar.",
   },
   {
     q: 'How long until I start seeing results?',
-    a: "Most clients see their first qualified meetings within 1–2 weeks of launching. The system gets smarter over time, so results typically improve month over month.",
+    a: "Most clients see their first qualified meetings within 1–2 weeks of launch. The AI gets smarter over time by learning what messaging resonates best with your specific audience, so results typically improve month over month.",
   },
   {
-    q: 'What do I have to do?',
-    a: "Almost nothing. You show up to the meetings we book. We handle the entire outbound process — finding prospects, writing copy, sending messages, and following up.",
+    q: 'What does it cost?',
+    a: "There is a one-time setup fee of $1,000 and a monthly retainer of $2,000. No long-term contracts — we earn your business every month based on results. Compare that to traditional agencies charging $5,000+ per month with human SDRs and no guarantees.",
   },
   {
-    q: 'What industries do you work with?',
-    a: "We specialize in local and B2B service businesses including: Roofing, HVAC, Law Firms, Dental, Med Spas, Insurance, and Contractors. If you're not sure if we're a fit, book a free call and we'll let you know honestly.",
+    q: 'What B2B industries do you work with?',
+    a: "We work with B2B service businesses including: Marketing Agencies, IT Services, Staffing & Recruiting, Business Consulting, Web Design, Insurance Brokers, Accounting Firms, and similar professional service companies. If you're unsure if we're a fit, book a free call and we'll tell you honestly.",
   },
   {
     q: 'Can I cancel anytime?',
-    a: "Yes. We don't lock you into long-term contracts. We earn your business every month based on results.",
+    a: "Yes. No long-term contracts, no cancellation fees. We operate month-to-month because we're confident the results speak for themselves.",
   },
 ];
 
@@ -253,18 +261,18 @@ export default function Home() {
             </div>
 
             <h1 className="text-5xl md:text-[3.4rem] font-extrabold leading-tight mb-6">
-              We book{' '}
-              <span style={{ color: '#C75B2A' }}>qualified meetings</span> on
-              your calendar. No ads needed.
+              Your AI-Powered Sales Engine{' '}
+              <span style={{ color: '#C75B2A' }}>That Never Sleeps.</span>
             </h1>
 
             <p
               className="text-lg leading-relaxed mb-8"
               style={{ color: '#8B7D6B', fontWeight: 400 }}
             >
-              ZionShift builds AI-powered outbound systems that find your ideal
-              prospects, reach out personally, and book meetings directly on your
-              calendar — 24/7, without spending a dollar on ads.
+              ZionShift is a fully autonomous, 24/7 AI outbound system that finds
+              qualified B2B leads, reaches out personally, and books meetings
+              directly on your calendar — completely hands-free. No software to
+              learn. No manual work. Just meetings appearing on your calendar.
             </p>
 
             <div className="flex flex-col sm:flex-row gap-3 mb-5">
@@ -397,7 +405,7 @@ export default function Home() {
             The Problem
           </span>
           <h2 className="text-4xl md:text-5xl font-extrabold mt-3 max-w-2xl mx-auto leading-tight">
-            Great at what you do. But finding clients shouldn&apos;t be this hard.
+            Great at what you do. But growing your client base shouldn&apos;t feel impossible.
           </h2>
         </div>
 
@@ -438,7 +446,7 @@ export default function Home() {
               How It Works
             </span>
             <h2 className="text-4xl md:text-5xl font-extrabold mt-3">
-              Three steps to a full calendar.
+              Three steps to a full calendar of qualified B2B meetings.
             </h2>
           </div>
 
@@ -539,12 +547,12 @@ export default function Home() {
               Why ZionShift
             </span>
             <h2 className="text-4xl md:text-5xl font-extrabold mt-3">
-              We&apos;re not another marketing agency.
+              ZionShift vs. the alternatives.
             </h2>
           </div>
 
-          <div className="grid md:grid-cols-2 gap-6">
-            {/* Other Agencies card */}
+          <div className="grid md:grid-cols-3 gap-6">
+            {/* Traditional Agencies card */}
             <div
               className="fade-in-up p-8 rounded-2xl"
               style={{
@@ -552,14 +560,46 @@ export default function Home() {
                 border: '1px solid rgba(196,184,168,0.25)',
               }}
             >
+              <p className="text-xs font-bold uppercase tracking-widest mb-2" style={{ color: '#8B7D6B' }}>Traditional Agencies</p>
               <h3
-                className="text-xl font-bold mb-7"
-                style={{ color: '#8B7D6B' }}
+                className="text-xl font-bold mb-2"
+                style={{ color: '#1A1715' }}
               >
-                Other Agencies
+                $5,000+/month
               </h3>
+              <p className="text-sm mb-6" style={{ color: '#8B7D6B' }}>Human-driven, limited hours</p>
               <ul className="space-y-4">
-                {otherItems.map((item, i) => (
+                {agencyItems.map((item, i) => (
+                  <li key={i} className="flex items-start gap-3">
+                    <span className="text-red-500 font-bold text-base mt-0.5 flex-shrink-0">
+                      ✕
+                    </span>
+                    <span style={{ color: '#8B7D6B', fontWeight: 400 }}>
+                      {item}
+                    </span>
+                  </li>
+                ))}
+              </ul>
+            </div>
+
+            {/* DIY AI Tools card */}
+            <div
+              className="fade-in-up delay-2 p-8 rounded-2xl"
+              style={{
+                backgroundColor: '#F5F0EA',
+                border: '1px solid rgba(196,184,168,0.25)',
+              }}
+            >
+              <p className="text-xs font-bold uppercase tracking-widest mb-2" style={{ color: '#8B7D6B' }}>DIY AI Tools</p>
+              <h3
+                className="text-xl font-bold mb-2"
+                style={{ color: '#1A1715' }}
+              >
+                Cheap but complex
+              </h3>
+              <p className="text-sm mb-6" style={{ color: '#8B7D6B' }}>You manage everything yourself</p>
+              <ul className="space-y-4">
+                {diyItems.map((item, i) => (
                   <li key={i} className="flex items-start gap-3">
                     <span className="text-red-500 font-bold text-base mt-0.5 flex-shrink-0">
                       ✕
@@ -574,10 +614,12 @@ export default function Home() {
 
             {/* ZionShift card */}
             <div
-              className="fade-in-up delay-2 p-8 rounded-2xl"
+              className="fade-in-up delay-3 p-8 rounded-2xl"
               style={{ backgroundColor: '#1A1715' }}
             >
-              <h3 className="text-xl font-bold mb-7 text-white">ZionShift</h3>
+              <p className="text-xs font-bold uppercase tracking-widest mb-2" style={{ color: '#C75B2A' }}>ZionShift</p>
+              <h3 className="text-xl font-bold mb-2 text-white">$2,000/month</h3>
+              <p className="text-sm mb-6" style={{ color: 'rgba(255,255,255,0.45)' }}>AI-powered, completely hands-free</p>
               <ul className="space-y-4">
                 {zionItems.map((item, i) => (
                   <li key={i} className="flex items-start gap-3">
@@ -610,26 +652,26 @@ export default function Home() {
             Who We Help
           </span>
           <h2 className="text-4xl md:text-5xl font-extrabold mt-3 mb-4">
-            Built for businesses like yours.
+            Built For B2B Service Businesses That Need More Clients.
           </h2>
           <p
             className="text-lg max-w-2xl mx-auto leading-relaxed"
             style={{ color: '#8B7D6B', fontWeight: 400 }}
           >
-            We work with service-based businesses that close high-ticket deals
-            and need a steady pipeline of qualified meetings.
+            If you sell a B2B service and need a consistent flow of qualified
+            meetings with decision makers, ZionShift was built for you.
           </p>
         </div>
 
         <div className="fade-in-up flex flex-wrap justify-center gap-4">
           {[
-            { icon: '🏠', label: 'Roofing' },
-            { icon: '❄️', label: 'HVAC' },
-            { icon: '⚖️', label: 'Law Firms' },
-            { icon: '🦷', label: 'Dental Offices' },
-            { icon: '💆', label: 'Med Spas' },
-            { icon: '🛡️', label: 'Insurance' },
-            { icon: '🔨', label: 'Contractors' },
+            { icon: '📣', label: 'Marketing Agencies' },
+            { icon: '💻', label: 'IT Services' },
+            { icon: '🤝', label: 'Staffing & Recruiting' },
+            { icon: '📊', label: 'Business Consulting' },
+            { icon: '🌐', label: 'Web Design' },
+            { icon: '🛡️', label: 'Insurance Brokers' },
+            { icon: '🧾', label: 'Accounting Firms' },
           ].map((item) => (
             <div
               key={item.label}
@@ -739,14 +781,15 @@ export default function Home() {
 
           <div className="relative z-10">
             <h2 className="text-4xl md:text-5xl font-extrabold text-white mb-5">
-              Ready to fill your calendar?
+              Ready to put your lead generation on autopilot?
             </h2>
             <p
               className="text-lg mb-10 max-w-xl mx-auto leading-relaxed"
               style={{ color: 'rgba(255,255,255,0.55)', fontWeight: 400 }}
             >
-              Book a free strategy call and see exactly how we&apos;d build your
-              outbound system. No pitch, no pressure — just a real conversation.
+              Book a free strategy call and see exactly how our 24/7 autonomous
+              AI would build your hands-free outbound pipeline. No pitch, no
+              pressure — just a real conversation.
             </p>
             <button
               onClick={openModal}
