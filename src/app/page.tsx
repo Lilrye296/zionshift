@@ -498,31 +498,25 @@ export default function Home() {
         </div>
 
         <div
-          className="fade-in-up rounded-3xl flex flex-col items-center justify-center gap-5"
-          style={{
-            aspectRatio: '16/9',
-            backgroundColor: '#1A1715',
-          }}
+          className="fade-in-up rounded-3xl overflow-hidden"
+          style={{ position: 'relative', paddingBottom: '56.25%', height: 0 }}
         >
-          <button
-            className="w-20 h-20 rounded-full flex items-center justify-center hover:scale-105 transition-transform"
-            style={{ backgroundColor: '#C75B2A' }}
-            aria-label="Play video"
-          >
-            <svg
-              className="w-8 h-8 text-white ml-1"
-              fill="currentColor"
-              viewBox="0 0 24 24"
-            >
-              <path d="M8 5v14l11-7z" />
-            </svg>
-          </button>
-          <p
-            className="text-sm font-medium tracking-widest uppercase"
-            style={{ color: 'rgba(255,255,255,0.35)' }}
-          >
-            Coming Soon
-          </p>
+          <iframe
+            src="https://www.youtube.com/embed/xYVrAxbh_pI?rel=0&modestbranding=1&showinfo=0"
+            title="Meet Ryan, Founder of ZionShift"
+            width="100%"
+            frameBorder="0"
+            allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+            allowFullScreen
+            loading="lazy"
+            style={{
+              position: 'absolute',
+              top: 0,
+              left: 0,
+              width: '100%',
+              height: '100%',
+            }}
+          />
         </div>
       </section>
 
