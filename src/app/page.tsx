@@ -498,31 +498,44 @@ export default function Home() {
         </div>
 
         <div
-          className="fade-in-up rounded-3xl flex items-center justify-center"
+          className="fade-in-up rounded-3xl relative overflow-hidden flex items-center justify-center"
           style={{
-            backgroundColor: '#FDFCFA',
-            border: '1px solid rgba(196,184,168,0.25)',
             aspectRatio: '16/9',
+            border: '1px solid rgba(196,184,168,0.25)',
           }}
         >
+          {/* Thumbnail background */}
+          <img
+            src="/video-thumbnail.png"
+            alt="Ryan Flores — Founder of ZionShift"
+            className="absolute inset-0 w-full h-full object-cover"
+          />
+          {/* Subtle dark overlay so play button pops */}
           <div
-            className="flex flex-col items-center gap-4"
-            style={{ color: '#8B7D6B' }}
-          >
+            className="absolute inset-0"
+            style={{ background: 'rgba(26,23,21,0.28)' }}
+          />
+          {/* Play button */}
+          <div className="relative flex flex-col items-center gap-3">
             <button
-              className="w-16 h-16 rounded-full flex items-center justify-center hover:opacity-80 transition-opacity"
+              className="w-20 h-20 rounded-full flex items-center justify-center hover:scale-105 transition-transform shadow-xl"
               style={{ backgroundColor: '#C75B2A' }}
               aria-label="Play video"
             >
               <svg
-                className="w-6 h-6 text-white ml-1"
+                className="w-8 h-8 text-white ml-1"
                 fill="currentColor"
                 viewBox="0 0 24 24"
               >
                 <path d="M8 5v14l11-7z" />
               </svg>
             </button>
-            <p className="text-sm font-medium">Video coming soon</p>
+            <span
+              className="text-sm font-semibold tracking-wide"
+              style={{ color: 'rgba(255,255,255,0.85)' }}
+            >
+              Video coming soon
+            </span>
           </div>
         </div>
       </section>
