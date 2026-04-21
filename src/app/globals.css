@@ -503,7 +503,7 @@ body { font-family: var(--zs-sans); color: var(--zs-ink-2); overflow-x: hidden; 
 .portal-nav-inner { max-width: 1200px; margin: 0 auto; padding: 0 32px; height: 64px; display: flex; align-items: center; justify-content: space-between; gap: 24px; position: relative; }
 .portal-logo { height: 22px; width: auto; }
 .client-logo-slot { position: absolute; left: 50%; transform: translateX(-50%); display: flex; align-items: center; }
-.client-logo-slot img { height: 28px; width: auto; object-fit: contain; }
+.client-logo-img { height: 28px; width: auto; object-fit: contain; max-width: 160px; }
 .client-logo-text { font: 600 15px var(--zs-sans); letter-spacing: -0.02em; color: var(--zs-ink); }
 .client-logo-placeholder { font: 500 12px var(--zs-mono); color: var(--zs-ink-5); letter-spacing: 0.06em; text-transform: uppercase; border: 1px dashed var(--zs-border); border-radius: 8px; padding: 6px 14px; }
 .portal-nav-sections { display: flex; gap: 4px; background: var(--zs-mist); border-radius: 999px; padding: 4px; }

@@ -6,6 +6,7 @@ import { createClient } from '@/utils/supabase/client';
 
 interface ClientProfile {
   firm_name: string;
+  logo_url: string | null;
   emails_sent: number;
   reply_rate: number;
   meetings_booked: number;
@@ -29,7 +30,7 @@ export default function ClientPage() {
 
       const { data } = await supabase
         .from('client_stats')
-        .select('firm_name, emails_sent, reply_rate, meetings_booked, campaign_status')
+        .select('firm_name, logo_url, emails_sent, reply_rate, meetings_booked, campaign_status')
         .eq('client_id', user.id)
         .single();
 
@@ -54,7 +55,10 @@ export default function ClientPage() {
 
           {/* Client logo — center */}
           <div className="client-logo-slot">
-            {profile?.firm_name ? (
+            {profile?.logo_url ? (
+              // eslint-disable-next-line @next/next/no-img-element
+              <img src={profile.logo_url} alt={profile.firm_name ?? 'Client'} className="client-logo-img" />
+            ) : profile?.firm_name ? (
               <span className="client-logo-text">{profile.firm_name}</span>
             ) : (
               <div className="client-logo-placeholder">Client Logo</div>
