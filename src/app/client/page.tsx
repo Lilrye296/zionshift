@@ -58,7 +58,6 @@ function MiniCalendar({
         {DOW.map((d, i) => <div key={i} className="mini-cal-dow">{d}</div>)}
         {cells.map((day, i) => {
           const hasMeeting = day !== null && meetingDays.includes(day);
-          const meeting    = hasMeeting ? meetings.find(m => m.day === day) : null;
           return (
             <div
               key={i}
