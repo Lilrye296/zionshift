@@ -56,7 +56,8 @@
       "WebFetch(domain:api.anthropic.com)",
       "Read(//tmp/**)",
       "Bash(tar xf *)",
-      "Bash(npx tsc *)"
+      "Bash(npx tsc *)",
+      "mcp__Claude_in_Chrome__resize_window"
     ]
   }
 }
