@@ -279,6 +279,7 @@ export default function ClientPage() {
       case 'warming': return { label: 'Warming Up — Day 3 of 14', variant: 'warming' };
       case 'idle':    return { label: 'Idle',                      variant: 'idle'    };
       case 'paused':  return { label: 'Paused',                    variant: 'paused'  };
+      case 'error':   return { label: 'Error',                     variant: 'error'   };
       default:        return { label: 'Live — Sending',             variant: 'live'    };
     }
   }
@@ -338,12 +339,13 @@ export default function ClientPage() {
             {/* ── Overview ── */}
             {activeTab === 'overview' && (<>
 
-            {/* ── Status preview row (all 4 states) ── */}
+            {/* ── Status preview row (all 5 states) ── */}
             <div className="cd-status-preview">
               <span className="cd-status-badge live"><span className="cd-status-dot" />Live — Sending</span>
               <span className="cd-status-badge warming"><span className="cd-status-dot" />Warming Up — Day 3 of 14</span>
               <span className="cd-status-badge idle"><span className="cd-status-dot" />Idle</span>
               <span className="cd-status-badge paused"><span className="cd-status-dot" />Paused</span>
+              <span className="cd-status-badge error"><span className="cd-status-dot" />Error</span>
             </div>
 
             {/* ── Greeting row ── */}
