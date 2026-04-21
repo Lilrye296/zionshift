@@ -240,10 +240,6 @@ function Hero({ onBook }: { onBook: () => void }) {
                 <div className="ai-draft">
                   <span className="tag">To · Marcus Thompson, Owner · Thompson HVAC &amp; Plumbing</span>
                   <Typewriter text={"Hi Marcus — noticed Thompson HVAC just added two service trucks and you're hiring a third tech. Most owners at your stage end up buried in receipts and QuickBooks reconciliations instead of running the business. I help owner-operators like you hand off the books entirely — month-end closes, A/R, A/P, clean P&Ls — so you get the reports without the bookkeeping."} />
-                  <div className="line-meta">
-                    <span>Personalization · 94</span>
-                    <span>Queued · 1 of 412</span>
-                  </div>
                 </div>
               </div>
             </div>
