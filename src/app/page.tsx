@@ -631,7 +631,7 @@ function CTA({ onBook }: { onBook: () => void }) {
         <div className="cta-wrap reveal">
           <h2>Your next client is already out there.</h2>
           <p style={{ margin: '32px auto 0', maxWidth: 560, fontSize: 19, lineHeight: 1.5 }}>
-            One call. We'll show you exactly what this looks like for your business.
+            One call. We&apos;ll show you exactly what this looks like for your business.
           </p>
           <div style={{ marginTop: 40, position: 'relative', zIndex: 1 }}>
             <button className="btn btn-primary btn-lg" onClick={onBook} style={{ background: '#fff', color: 'var(--zs-ink)' }}>
