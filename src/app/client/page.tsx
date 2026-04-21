@@ -266,9 +266,25 @@ export default function ClientPage() {
     router.push('/login');
   }
 
-  const [activeTab, setActiveTab]       = useState<'overview' | 'billing'>('overview');
+  const [activeTab, setActiveTab]           = useState<'overview' | 'billing'>('overview');
   const [showLogoUpload, setShowLogoUpload] = useState(false);
   const [localLogoUrl, setLocalLogoUrl]     = useState<string | null>(null);
+  const [period, setPeriod]                 = useState<'week' | 'month' | 'alltime'>('month');
+  const [periodOpen, setPeriodOpen]         = useState(false);
+  const periodRef                           = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    function handleClick(e: MouseEvent) {
+      if (periodRef.current && !periodRef.current.contains(e.target as Node)) {
+        setPeriodOpen(false);
+      }
+    }
+    document.addEventListener('mousedown', handleClick);
+    return () => document.removeEventListener('mousedown', handleClick);
+  }, []);
+
+  const PERIOD_LABEL = { week: 'This Week', month: 'This Month', alltime: 'All Time' };
+  const PERIOD_SUB   = { week: 'this week', month: 'this month', alltime: 'all time'  };
 
   const p = profile;
   const greeting  = getGreeting();
@@ -347,6 +363,27 @@ export default function ClientPage() {
                   <span className="cd-status-dot" />
                   {statusProps.label}
                 </span>
+                <div className="cd-period-dropdown" ref={periodRef}>
+                  <button className="cd-period-btn" onClick={() => setPeriodOpen(o => !o)}>
+                    {PERIOD_LABEL[period]}
+                    <svg width="10" height="10" viewBox="0 0 10 10" fill="none" aria-hidden>
+                      <path d="M2 3.5L5 6.5L8 3.5" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
+                    </svg>
+                  </button>
+                  {periodOpen && (
+                    <div className="cd-period-menu">
+                      {(['week','month','alltime'] as const).map(p => (
+                        <button
+                          key={p}
+                          className={`cd-period-option${period === p ? ' active' : ''}`}
+                          onClick={() => { setPeriod(p); setPeriodOpen(false); }}
+                        >
+                          {PERIOD_LABEL[p]}
+                        </button>
+                      ))}
+                    </div>
+                  )}
+                </div>
               </div>
             </div>
 
@@ -355,12 +392,12 @@ export default function ClientPage() {
               <div className="cd-metric-card">
                 <div className="cd-metric-label">Emails Sent</div>
                 <div className="cd-metric-value">{p?.emails_sent ?? '—'}</div>
-                <div className="cd-metric-sub">this month</div>
+                <div className="cd-metric-sub">{PERIOD_SUB[period]}</div>
               </div>
               <div className="cd-metric-card">
                 <div className="cd-metric-label">Replies</div>
                 <div className="cd-metric-value">{p?.replies ?? '—'}</div>
-                <div className="cd-metric-sub">from prospects</div>
+                <div className="cd-metric-sub">{PERIOD_SUB[period]}</div>
               </div>
               <div className="cd-metric-card">
                 <div className="cd-metric-label">Reply Rate</div>
@@ -372,7 +409,7 @@ export default function ClientPage() {
               <div className="cd-metric-card">
                 <div className="cd-metric-label">Meetings Booked</div>
                 <div className="cd-metric-value">{p?.meetings_booked ?? '—'}</div>
-                <div className="cd-metric-sub">qualified calls</div>
+                <div className="cd-metric-sub">{PERIOD_SUB[period]}</div>
               </div>
             </div>
 
