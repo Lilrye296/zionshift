@@ -131,6 +131,7 @@ function MeetingDetailModal({ meetings, onClose }: { meetings: CalMeeting[]; onC
 
 interface CalMeeting {
   day: number;
+  month: number; // 0-indexed (0 = Jan, 3 = Apr) — used for accurate date display
   prospect: string;
   firm: string;
   time: string;
@@ -139,10 +140,10 @@ interface CalMeeting {
 }
 
 const CAL_MEETINGS: CalMeeting[] = [
-  { day: 11, prospect: 'James Rivera',    firm: 'Apex Financial Services',   time: '10:00 AM EST', status: 'Completed' },
-  { day: 17, prospect: 'Sarah Mitchell',  firm: 'Clarity Point Bookkeeping', time: '2:00 PM EST',  status: 'Completed' },
-  { day: 23, prospect: 'Marcus Thompson', firm: 'Northstar CFO Group',        time: '9:00 AM EST',  status: 'Scheduled', zoomUrl: 'https://zoom.us/j/placeholder' },
-  { day: 23, prospect: 'Linda Park',      firm: 'Summit Tax Advisors',        time: '2:00 PM EST',  status: 'Scheduled', zoomUrl: 'https://zoom.us/j/placeholder2' },
+  { day: 11, month: 3, prospect: 'James Rivera',    firm: 'Apex Financial Services',   time: '10:00 AM EST', status: 'Completed' },
+  { day: 17, month: 3, prospect: 'Sarah Mitchell',  firm: 'Clarity Point Bookkeeping', time: '2:00 PM EST',  status: 'Completed' },
+  { day: 23, month: 3, prospect: 'Marcus Thompson', firm: 'Northstar CFO Group',        time: '9:00 AM EST',  status: 'Scheduled', zoomUrl: 'https://zoom.us/j/placeholder' },
+  { day: 23, month: 3, prospect: 'Linda Park',      firm: 'Summit Tax Advisors',        time: '2:00 PM EST',  status: 'Scheduled', zoomUrl: 'https://zoom.us/j/placeholder2' },
 ];
 
 // Activity items tagged with day number for period filtering
@@ -409,12 +410,35 @@ function LogoUploadModal({
   );
 }
 
+// Period-scoped metric shape — populated from Supabase when wired up
+interface PeriodStats {
+  emails_sent: number | null;
+  replies: number | null;
+  reply_rate: number | null;
+  meetings_booked: number | null;
+}
+
 /* ── Page ── */
 export default function ClientPage() {
   const [profile, setProfile] = useState<ClientProfile | null>(null);
   const [loading, setLoading] = useState(true);
   const router = useRouter();
 
+  // ── All state declarations up front so effects can reference them ──────
+  const [activeTab, setActiveTab]               = useState<'overview' | 'billing'>('overview');
+  const [showLogoUpload, setShowLogoUpload]     = useState(false);
+  const [localLogoUrl, setLocalLogoUrl]         = useState<string | null>(null);
+  const [selectedDayMeetings, setSelectedDayMeetings] = useState<CalMeeting[] | null>(null);
+  const [period, setPeriod]                     = useState<'week' | 'month' | 'alltime'>('month');
+  const [periodOpen, setPeriodOpen]             = useState(false);
+  // Holds metric totals filtered to the selected period.
+  // Defaults to null (shows —) until Supabase query returns data.
+  const [periodStats, setPeriodStats]           = useState<PeriodStats | null>(null);
+  const periodRef                           = useRef<HTMLDivElement>(null);
+  const [connectedCal, setConnectedCal]     = useState<CalProvider>('google');
+  const [calModal, setCalModal]             = useState<CalProvider | null>(null);
+
+  // ── Load profile from Supabase on mount ───────────────────────────────
   useEffect(() => {
     async function load() {
       if (!process.env.NEXT_PUBLIC_SUPABASE_URL || !process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY) {
@@ -437,6 +461,29 @@ export default function ClientPage() {
     load();
   }, [router]);
 
+  // ── Period-scoped metrics ──────────────────────────────────────────────
+  // Fires whenever the user changes the period dropdown or profile loads.
+  // TODO (Supabase): replace setPeriodStats below with a period-filtered query, e.g.:
+  //   const { data } = await supabase
+  //     .from('client_stats_by_period')
+  //     .select('emails_sent, replies, reply_rate, meetings_booked')
+  //     .eq('client_id', user.id)
+  //     .eq('period', period)
+  //     .single();
+  //   setPeriodStats(data);
+  // The metric cards are already wired to periodStats — no further changes needed.
+  useEffect(() => {
+    if (!profile) return;
+    // Temporary: all periods show lifetime totals until Supabase is wired.
+    setPeriodStats({
+      emails_sent:     profile.emails_sent,
+      replies:         profile.replies,
+      reply_rate:      profile.reply_rate,
+      meetings_booked: profile.meetings_booked,
+    });
+  }, [period, profile]);
+  // ───────────────────────────────────────────────────────────────────────
+
   async function handleSignOut() {
     if (process.env.NEXT_PUBLIC_SUPABASE_URL && process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY) {
       const supabase = createClient();
@@ -445,16 +492,7 @@ export default function ClientPage() {
     router.push('/login');
   }
 
-  const [activeTab, setActiveTab]               = useState<'overview' | 'billing'>('overview');
-  const [showLogoUpload, setShowLogoUpload]     = useState(false);
-  const [localLogoUrl, setLocalLogoUrl]         = useState<string | null>(null);
-  const [selectedDayMeetings, setSelectedDayMeetings] = useState<CalMeeting[] | null>(null);
-  const [period, setPeriod]                 = useState<'week' | 'month' | 'alltime'>('month');
-  const [periodOpen, setPeriodOpen]         = useState(false);
-  const periodRef                           = useRef<HTMLDivElement>(null);
-  const [connectedCal, setConnectedCal]     = useState<CalProvider>('google');
-  const [calModal, setCalModal]             = useState<CalProvider | null>(null);
-
+  // ── Close period dropdown on outside click ────────────────────────────
   useEffect(() => {
     function handleClick(e: MouseEvent) {
       if (periodRef.current && !periodRef.current.contains(e.target as Node)) {
@@ -569,24 +607,26 @@ export default function ClientPage() {
             </div>
 
             {/* ── Metric cards ── */}
+            {/* Values come from periodStats, which updates with the period dropdown. */}
+            {/* When Supabase is wired, periodStats will reflect the selected time range. */}
             <div className="cd-metrics">
               <div className="cd-metric-card">
                 <div className="cd-metric-label">Emails Sent</div>
-                <div className="cd-metric-value">{p?.emails_sent ?? '—'}</div>
+                <div className="cd-metric-value">{periodStats?.emails_sent ?? '—'}</div>
               </div>
               <div className="cd-metric-card">
                 <div className="cd-metric-label">Replies</div>
-                <div className="cd-metric-value">{p?.replies ?? '—'}</div>
+                <div className="cd-metric-value">{periodStats?.replies ?? '—'}</div>
               </div>
               <div className="cd-metric-card">
                 <div className="cd-metric-label">Reply Rate</div>
                 <div className="cd-metric-value">
-                  {p?.reply_rate != null ? `${p.reply_rate}%` : '—'}
+                  {periodStats?.reply_rate != null ? `${periodStats.reply_rate}%` : '—'}
                 </div>
               </div>
               <div className="cd-metric-card">
                 <div className="cd-metric-label">Meetings Booked</div>
-                <div className="cd-metric-value">{p?.meetings_booked ?? '—'}</div>
+                <div className="cd-metric-value">{periodStats?.meetings_booked ?? '—'}</div>
               </div>
             </div>
 
@@ -665,7 +705,7 @@ export default function ClientPage() {
                               className="cd-table-row-clickable"
                               onClick={() => setSelectedDayMeetings([m])}
                             >
-                              <td className="cd-td-date">{MONTH_SHORT[new Date().getMonth()]} {m.day}</td>
+                              <td className="cd-td-date">{MONTH_SHORT[m.month]} {m.day}</td>
                               <td className="cd-td-name">{m.prospect}</td>
                               <td className="cd-td-firm">{m.firm}</td>
                               <td>
