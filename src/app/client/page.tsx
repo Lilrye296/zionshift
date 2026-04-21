@@ -347,7 +347,6 @@ export default function ClientPage() {
                   <span className="cd-status-dot" />
                   {statusProps.label}
                 </span>
-                <span className="cd-period">This month</span>
               </div>
             </div>
 
