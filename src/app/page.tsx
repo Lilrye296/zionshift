@@ -164,6 +164,7 @@ function Nav({ onBook }: { onBook: () => void }) {
         <div className="zs-nav-links">
           <a href="#how">How it works</a>
           <a href="#why">Why us</a>
+          <a href="#pricing">Pricing</a>
           <a href="#faq">FAQ</a>
         </div>
         <button className="btn btn-primary" onClick={onBook} style={{ padding: '10px 18px', fontSize: 13 }}>
@@ -320,6 +321,44 @@ function Stats() {
   );
 }
 
+/* ─── CALENDAR SLIDE ─────────────────────────────── */
+function CalendarSlide() {
+  const now = new Date();
+  const year = now.getFullYear();
+  const month = now.getMonth();
+  const today = now.getDate();
+  const daysInMonth = new Date(year, month + 1, 0).getDate();
+  const startDay = new Date(year, month, 1).getDay(); // 0=Sun
+  const monthName = now.toLocaleString('default', { month: 'long' });
+
+  // Scatter ~6 "booked" days across the month, avoiding today and day 1
+  const bookedDays = new Set<number>();
+  const seeds = [3, 7, 11, 15, 19, 24].map(d => Math.min(d, daysInMonth));
+  seeds.forEach(d => { if (d !== today) bookedDays.add(d); });
+
+  const cells: (number | null)[] = [
+    ...Array(startDay).fill(null),
+    ...Array.from({ length: daysInMonth }, (_, i) => i + 1),
+  ];
+
+  return (
+    <div className="slide-cal">
+      <div className="chdr"><span>S</span><span>M</span><span>T</span><span>W</span><span>T</span><span>F</span><span>S</span></div>
+      <div className="cgrid">
+        {cells.map((d, i) => (
+          <div key={i} className={`cd ${d && bookedDays.has(d) ? 'has' : ''} ${d === today ? 'today' : ''} ${!d ? 'empty' : ''}`}>
+            {d || ''}
+          </div>
+        ))}
+      </div>
+      <div style={{ marginTop: 14, display: 'flex', justifyContent: 'space-between', fontFamily: 'var(--zs-mono)', fontSize: 11, letterSpacing: '0.1em', textTransform: 'uppercase', color: 'var(--zs-ink-5)' }}>
+        <span>{bookedDays.size} booked</span>
+        <span>{monthName} {year}</span>
+      </div>
+    </div>
+  );
+}
+
 /* ─── PROCESS ────────────────────────────────────── */
 function Process() {
   const [step, setStep] = useState(0);
@@ -377,43 +416,38 @@ function Process() {
                   <div className="row"><span className="k">Ideal client</span><span className="v">Small business owners, owner-operated{step === 0 && <span className="cursor" />}</span></div>
                   <div className="row"><span className="k">Target geography</span><span className="v">United States · $500K–$5M revenue</span></div>
                   <div className="row"><span className="k">Offer</span><span className="v">Your service, positioned to your ICP</span></div>
-                  <div className="row"><span className="k">Your calendar</span><span className="v">Synced on setup</span></div>
                 </div>
               </div>
 
               {/* Slide 2 */}
               <div className={`process-slide ${step === 1 ? 'active' : ''}`}>
-                <div className="slide-network">
-                  <svg viewBox="0 0 400 400" preserveAspectRatio="none">
-                    <path d="M80 120 L240 200 L140 280 L288 100 L240 200" />
-                  </svg>
-                  <div className="node a" />
-                  <div className="node b" />
-                  <div className="node c" />
-                  <div className="node d" />
-                  <div style={{ position: 'absolute', bottom: 24, left: 64, right: 64, fontFamily: 'var(--zs-mono)', fontSize: 11, letterSpacing: '0.12em', textTransform: 'uppercase', color: 'var(--zs-ink-4)', display: 'flex', justifyContent: 'space-between' }}>
-                    <span>Scanning signals</span>
-                    <span>412 prospects</span>
+                {step === 1 && (
+                  <div className="prospect-feed">
+                    {[
+                      { name: 'David Okafor',    co: 'Okafor Plumbing Co.',       signal: 'Hiring · 4 roles' },
+                      { name: 'Lisa Tran',        co: 'Tran Family Dental',         signal: 'Just expanded' },
+                      { name: 'Carlos Mendez',   co: 'Mendez Construction LLC',    signal: 'Revenue growth' },
+                      { name: 'Rachel Kim',       co: 'Kim & Park Law Group',       signal: 'New entity' },
+                    ].map((p, i) => (
+                      <div key={i} className="prospect-card">
+                        <div className="pc-info">
+                          <div className="pc-name">{p.name}</div>
+                          <div className="pc-co">{p.co}</div>
+                        </div>
+                        <span className="pc-signal">{p.signal}</span>
+                      </div>
+                    ))}
+                    <div style={{ marginTop: 4, fontFamily: 'var(--zs-mono)', fontSize: 11, letterSpacing: '0.1em', textTransform: 'uppercase', color: 'var(--zs-ink-5)', display: 'flex', justifyContent: 'space-between' }}>
+                      <span>Scanning signals</span>
+                      <span>412 prospects</span>
+                    </div>
                   </div>
-                </div>
+                )}
               </div>
 
               {/* Slide 3 */}
               <div className={`process-slide ${step === 2 ? 'active' : ''}`}>
-                <div className="slide-cal">
-                  <div className="chdr"><span>M</span><span>T</span><span>W</span><span>T</span><span>F</span><span>S</span><span>S</span></div>
-                  <div className="cgrid">
-                    {Array.from({ length: 28 }).map((_, i) => {
-                      const booked = [2, 4, 8, 9, 14, 16, 17, 22, 24].includes(i);
-                      const today = i === 10;
-                      return <div key={i} className={`cd ${booked ? 'has' : ''} ${today ? 'today' : ''}`}>{i + 1}</div>;
-                    })}
-                  </div>
-                  <div style={{ marginTop: 14, display: 'flex', justifyContent: 'space-between', fontFamily: 'var(--zs-mono)', fontSize: 11, letterSpacing: '0.1em', textTransform: 'uppercase', color: 'var(--zs-ink-5)' }}>
-                    <span>9 booked</span>
-                    <span>April 2026</span>
-                  </div>
-                </div>
+                <CalendarSlide />
               </div>
             </div>
           </div>
@@ -431,7 +465,7 @@ function Bento() {
         <div className="reveal" style={{ maxWidth: 860, marginBottom: 72 }}>
           <span className="eyebrow">Why ZionShift</span>
           <h2 style={{ fontSize: 'clamp(40px,5vw,80px)', fontWeight: 700, letterSpacing: '-0.045em', lineHeight: 0.98, marginTop: 20, color: 'var(--zs-ink)' }}>
-            Sharper than an agency.<br />Easier than a tool.
+            Outbound, handled.
           </h2>
         </div>
 
@@ -439,44 +473,57 @@ function Bento() {
           <div className="tile wide reveal d1">
             <h3>Personalized outreach that reads human.</h3>
             <p>Every message is researched, written and sent for each prospect — matched to their role, their company, and the signal that made them a fit.</p>
-            <div className="bt-wave">
-              {Array.from({ length: 12 }).map((_, i) => <i key={i} />)}
+            <div className="bt-typing">
+              <div className="tl" /><div className="tl" /><div className="tl" /><div className="tl" />
             </div>
           </div>
 
           <div className="tile reveal d2">
-            <h3>24/7 operation.</h3>
-            <p>While you sleep, the AI researches, drafts, sends, and replies.</p>
-            <div className="bt-clock"><span className="twentyfour">24</span></div>
+            <h3>Never clocks out.</h3>
+            <p>While you sleep, the AI researches, drafts, and sends — at exactly the right time.</p>
+            <div className="bt-24">
+              <div className="bt-24-ring" />
+              <div className="bt-24-ring2" />
+              <div className="bt-24-hands">
+                <div className="bt-24-hand bt-24-hour" />
+                <div className="bt-24-hand bt-24-min" />
+              </div>
+            </div>
           </div>
 
           <div className="tile reveal d3">
-            <h3>Hands-free.</h3>
-            <p>No software to learn. Nothing to configure.</p>
-            <div className="bt-orbit">
-              <div className="ring" />
-              <div className="ring r2" />
-              <div className="ring r3" />
-              <div className="sat" />
+            <h3>We operate it. You own it.</h3>
+            <p>No tools. No team. No guesswork. Just results showing up on your calendar.</p>
+            <div className="bt-dots">
+              {Array.from({ length: 24 }).map((_, i) => <div key={i} className="d" />)}
             </div>
           </div>
 
           <div className="tile reveal d2" style={{ gridColumn: 'span 2' }}>
-            <h3>Gets smarter every week.</h3>
+            <h3>Learns. Adapts. Compounds.</h3>
             <p>The AI continuously learns what messaging resonates with your ideal client — so results compound month over month.</p>
             <div className="bt-graph">
               <svg viewBox="0 0 400 100" preserveAspectRatio="none">
-                <path d="M0 85 L60 78 L120 70 L180 58 L240 40 L300 28 L400 10" />
-                <circle cx="400" cy="10" r="5" />
+                <defs>
+                  <linearGradient id="graphGrad" x1="0" y1="0" x2="0" y2="1">
+                    <stop offset="0%" stopColor="#0B0B0C" stopOpacity="1" />
+                    <stop offset="100%" stopColor="#0B0B0C" stopOpacity="0" />
+                  </linearGradient>
+                </defs>
+                <path className="graph-fill" d="M0 100 L0 88 C60 85 120 75 180 60 C240 44 300 28 400 8 L400 100 Z" />
+                <path className="graph-line" d="M0 88 C60 85 120 75 180 60 C240 44 300 28 400 8" />
+                <circle className="graph-dot" cx="400" cy="8" r="5" />
               </svg>
             </div>
           </div>
 
           <div className="tile reveal d3">
             <h3>Only qualified meetings.</h3>
-            <p>The AI vets every prospect before booking. You only meet people who match.</p>
-            <div style={{ position: 'absolute', bottom: 28, right: 28, fontFamily: 'var(--zs-sans)', fontWeight: 700, fontSize: 56, letterSpacing: '-0.04em', color: 'var(--zs-ink)' }}>
-              <Counter to={94} /><span style={{ fontSize: 24 }}>%</span>
+            <p>The AI qualifies every prospect before a single meeting gets booked. You only talk to people worth your time.</p>
+            <div className="bt-check">
+              <svg viewBox="0 0 110 110">
+                <path className="ck-path" d="M18 58 L42 82 L92 28" />
+              </svg>
             </div>
           </div>
         </div>
@@ -492,7 +539,7 @@ function Video() {
       <div className="zs-container" style={{ maxWidth: 900 }}>
         <div className="reveal">
           <span className="eyebrow">Meet The Founder</span>
-          <h2>See why business owners are making the switch.</h2>
+          <h2 style={{ fontSize: 'clamp(40px,5vw,72px)', fontWeight: 700, letterSpacing: '-0.04em', lineHeight: 1, marginTop: 20, color: 'var(--zs-ink)' }}>See it for yourself.</h2>
         </div>
         <div className="video-wrap reveal d1">
           <iframe
@@ -508,14 +555,46 @@ function Video() {
   );
 }
 
+/* ─── PRICING ───────────────────────────────────── */
+function Pricing({ onBook }: { onBook: () => void }) {
+  return (
+    <section id="pricing" className="zs-section">
+      <div className="zs-narrow">
+        <div className="reveal" style={{ marginBottom: 56 }}>
+          <span className="eyebrow">Pricing</span>
+          <h2 style={{ fontSize: 'clamp(40px,5vw,72px)', fontWeight: 700, letterSpacing: '-0.04em', lineHeight: 1, marginTop: 20, color: 'var(--zs-ink)' }}>Simple, transparent pricing.</h2>
+        </div>
+        <div className="pricing-card reveal d1">
+          <div className="pricing-row">
+            <div className="pricing-item">
+              <span className="pricing-label">One-time setup</span>
+              <span className="pricing-amount">$1,000</span>
+            </div>
+            <div className="pricing-divider" />
+            <div className="pricing-item">
+              <span className="pricing-label">Monthly retainer</span>
+              <span className="pricing-amount">$2,000</span>
+            </div>
+          </div>
+          <p className="pricing-note">No contract. No hidden fees. Cancel anytime.</p>
+          <p className="pricing-note" style={{ marginTop: 10 }}>Monthly retainer starts only after your first meeting is booked.</p>
+          <button className="btn btn-primary" onClick={onBook} style={{ marginTop: 32 }}>
+            Book a free call<span className="chev">→</span>
+          </button>
+        </div>
+      </div>
+    </section>
+  );
+}
+
 /* ─── FAQ ────────────────────────────────────────── */
 function FAQ() {
   const [open, setOpen] = useState(0);
   const faqs = [
     { q: 'How does the AI find qualified leads?', a: 'Our AI scans thousands of signals to identify decision makers at companies showing active buying intent — recent hiring, revenue growth, new entity formations, funding, tech changes, engagement activity. It writes and sends personalized outreach on your behalf, 24/7.' },
-    { q: 'Is this really hands-free?', a: "Yes. After a quick onboarding call where you tell us your ideal client, the AI handles everything — prospect research, personalized outreach, follow-ups, conversation management. You don't touch any software." },
-    { q: 'How long until I see booked calls?', a: 'Most clients begin seeing qualified meetings within the first 2–3 weeks. The AI continuously learns which industries and messaging resonate best with your offer, so results typically compound month over month.' },
-    { q: 'What does it cost?', a: 'A simple, transparent structure: a one-time setup fee and a monthly retainer — a fraction of what a human SDR or traditional agency would cost. No long-term contracts. Book a free call and we\'ll walk through numbers specific to your business.' },
+    { q: 'Is this really hands-free?', a: "Yes. After a quick onboarding call where you tell us your ideal client, the AI handles everything — prospect research, personalized outreach, follow-ups, and conversation management." },
+    { q: 'How long until I see booked calls?', a: 'After a quick onboarding and setup period, most clients begin seeing qualified meetings within the first few weeks. The AI continuously learns what messaging resonates best with your specific audience, so results typically improve month over month.' },
+    { q: 'What does it cost?', a: 'Simple and transparent: a one-time $1,000 setup fee and a $2,000 monthly retainer — a fraction of what a human SDR or traditional agency would cost. No contract. Book a call and we\'ll walk through everything.' },
     { q: 'What kinds of businesses do you work with?', a: 'Any B2B or owner-operated service business selling into small-to-mid-sized companies: trades, professional services, agencies, consultancies, e-commerce brands, medical and dental practices, law firms, real estate teams, and more.' },
     { q: 'Can I cancel anytime?', a: 'Yes. Month-to-month. No long-term contracts. No cancellation fees.' },
   ];
@@ -530,7 +609,7 @@ function FAQ() {
         </div>
         <div className="reveal d1">
           {faqs.map((f, i) => (
-            <div key={i} className={`faq-item ${open === i ? 'open' : ''}`}>
+            <div key={i} className="faq-item" data-open={open === i ? true : undefined}>
               <button className="faq-q" onClick={() => setOpen(open === i ? -1 : i)}>
                 <span>{f.q}</span>
                 <span className="faq-plus">+</span>
@@ -550,13 +629,13 @@ function CTA({ onBook }: { onBook: () => void }) {
     <section className="zs-section">
       <div className="zs-container">
         <div className="cta-wrap reveal">
-          <h2>Put your lead generation<br />on autopilot.</h2>
+          <h2>Your next client is already out there.</h2>
           <p style={{ margin: '32px auto 0', maxWidth: 560, fontSize: 19, lineHeight: 1.5 }}>
-            Book a free strategy call and see exactly how our 24/7 AI would build your hands-free outbound pipeline. No pitch. No pressure.
+            One call. We'll show you exactly what this looks like for your business.
           </p>
           <div style={{ marginTop: 40, position: 'relative', zIndex: 1 }}>
             <button className="btn btn-primary btn-lg" onClick={onBook} style={{ background: '#fff', color: 'var(--zs-ink)' }}>
-              Book your free strategy call<span className="chev">→</span>
+              Book a free call<span className="chev">→</span>
             </button>
           </div>
           <p style={{ marginTop: 20, fontSize: 13, color: 'rgba(255,255,255,0.5)', position: 'relative', zIndex: 1 }}>
@@ -681,6 +760,7 @@ export default function Home() {
       <Process />
       <Bento />
       <Video />
+      <Pricing onBook={openModal} />
       <FAQ />
       <CTA onBook={openModal} />
       <Footer />
