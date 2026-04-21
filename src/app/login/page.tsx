@@ -69,6 +69,10 @@ export default function LoginPage() {
             />
           </div>
 
+          <div style={{ textAlign: 'right', marginTop: 8 }}>
+            <a href="#" className="login-forgot">Forgot password?</a>
+          </div>
+
           {error && <p className="login-error">{error}</p>}
 
           <button

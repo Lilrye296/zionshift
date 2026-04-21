@@ -494,6 +494,8 @@ body { font-family: var(--zs-sans); color: var(--zs-ink-2); overflow-x: hidden; 
 .login-note { font: 400 11px var(--zs-mono); color: var(--zs-ink-6); text-align: center; margin: 28px 0 0; letter-spacing: 0.06em; text-transform: uppercase; }
 .login-logo { transition: opacity 200ms, transform 200ms; }
 .login-logo:hover { opacity: 0.6; transform: scale(0.96); }
+.login-forgot { font: 400 13px var(--zs-mono); color: var(--zs-ink-4); text-decoration: none; transition: color 160ms; }
+.login-forgot:hover { color: var(--zs-ink); }
 
 /* ─── PORTAL SHARED ───────────────────────────────── */
 .portal-page { min-height: 100vh; background: var(--zs-paper); }
