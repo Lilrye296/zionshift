@@ -492,8 +492,8 @@ body { font-family: var(--zs-sans); color: var(--zs-ink-2); overflow-x: hidden; 
 .login-sub { font: 400 14px var(--zs-mono); color: var(--zs-ink-4); margin: 0 0 32px; letter-spacing: 0.01em; }
 .login-error { font: 400 13px var(--zs-mono); color: #c0392b; margin: 10px 0 0; }
 .login-note { font: 400 11px var(--zs-mono); color: var(--zs-ink-6); text-align: center; margin: 28px 0 0; letter-spacing: 0.06em; text-transform: uppercase; }
-.login-back { display: inline-flex; align-items: center; gap: 6px; font: 500 13px var(--zs-mono); color: var(--zs-ink-4); text-decoration: none; margin-bottom: 28px; transition: color 160ms; }
-.login-back:hover { color: var(--zs-ink); }
+.login-logo { transition: opacity 200ms, transform 200ms; }
+.login-logo:hover { opacity: 0.6; transform: scale(0.96); }
 
 /* ─── PORTAL SHARED ───────────────────────────────── */
 .portal-page { min-height: 100vh; background: var(--zs-paper); }
