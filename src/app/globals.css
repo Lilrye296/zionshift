@@ -578,8 +578,7 @@ body { font-family: var(--zs-sans); color: var(--zs-ink-2); overflow-x: hidden; 
 .cd-activity-scroll::-webkit-scrollbar-thumb:hover { background: var(--zs-ink-5); }
 .cd-activity-list { list-style: none; padding: 0; margin: 0; display: flex; flex-direction: column; gap: 20px; }
 .cd-activity-item { display: flex; flex-direction: column; gap: 3px; padding-left: 18px; position: relative; }
-.cd-activity-item::before { content: ''; position: absolute; left: 0; top: 5px; width: 7px; height: 7px; border-radius: 50%; background: var(--zs-border); }
-.cd-activity-item.strong::before { background: var(--zs-ink); }
+.cd-activity-item::before { content: ''; position: absolute; left: 0; top: 5px; width: 7px; height: 7px; border-radius: 50%; background: var(--zs-ink); }
 .cd-activity-text { font: 400 14px var(--zs-sans); color: var(--zs-ink); line-height: 1.4; }
 .cd-activity-sub { font: 400 12px var(--zs-mono); color: var(--zs-ink-5); }
 
