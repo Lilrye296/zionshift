@@ -29,12 +29,12 @@ export async function middleware(request: NextRequest) {
   const { data: { user } } = await supabase.auth.getUser()
   const path = request.nextUrl.pathname
 
-  // Protect portal and client routes — redirect to login if not authenticated
-  if ((path.startsWith('/portal') || path.startsWith('/client')) && !user) {
+  // Protect admin and client routes — redirect to login if not authenticated
+  if ((path.startsWith('/admin') || path.startsWith('/client')) && !user) {
     return NextResponse.redirect(new URL('/login', request.url))
   }
 
-  // Already logged in — redirect away from login page to correct portal
+  // Already logged in — redirect away from login page to correct dashboard
   if (path === '/login' && user) {
     const { data: profile } = await supabase
       .from('profiles')
@@ -42,7 +42,7 @@ export async function middleware(request: NextRequest) {
       .eq('id', user.id)
       .single()
 
-    const dest = profile?.role === 'admin' ? '/portal' : '/client'
+    const dest = profile?.role === 'admin' ? '/admin' : '/client'
     return NextResponse.redirect(new URL(dest, request.url))
   }
 
@@ -50,5 +50,5 @@ export async function middleware(request: NextRequest) {
 }
 
 export const config = {
-  matcher: ['/login', '/portal/:path*', '/client/:path*'],
+  matcher: ['/login', '/admin/:path*', '/client/:path*'],
 }

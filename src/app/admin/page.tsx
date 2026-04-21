@@ -6,7 +6,7 @@ import { createClient } from '@/utils/supabase/client';
 
 const OPS_TABS = ['Pending Replies', 'Opt-Out Log', 'Future Pipeline', 'Website Inbound'];
 
-export default function PortalPage() {
+export default function AdminPage() {
   const [activeSection, setActiveSection] = useState<'ops' | 'business'>('ops');
   const [activeTab, setActiveTab] = useState(0);
   const router = useRouter();
@@ -21,7 +21,7 @@ export default function PortalPage() {
 
   return (
     <div className="portal-page">
-      {/* Portal Nav */}
+      {/* Admin Nav */}
       <header className="portal-nav">
         <div className="portal-nav-inner">
           {/* eslint-disable-next-line @next/next/no-img-element */}

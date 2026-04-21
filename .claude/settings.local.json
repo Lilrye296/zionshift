@@ -57,7 +57,8 @@
       "Read(//tmp/**)",
       "Bash(tar xf *)",
       "Bash(npx tsc *)",
-      "mcp__Claude_in_Chrome__resize_window"
+      "mcp__Claude_in_Chrome__resize_window",
+      "Bash(npx vercel *)"
     ]
   }
 }

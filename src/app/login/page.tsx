@@ -34,7 +34,7 @@ export default function LoginPage() {
       .eq('id', data.user.id)
       .single();
 
-    router.push(profile?.role === 'admin' ? '/portal' : '/client');
+    router.push(profile?.role === 'admin' ? '/admin' : '/client');
   }
 
   return (
