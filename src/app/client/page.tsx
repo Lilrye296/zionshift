@@ -762,10 +762,112 @@ export default function ClientPage() {
             {/* ── Billing ── */}
             {activeTab === 'billing' && (
               <>
-                <div className="portal-empty" style={{ minHeight: 400 }}>
-                  <p>Billing coming soon.</p>
-                  <span>Your invoices and plan details will appear here.</span>
+                <div className="bl-heading-row">
+                  <h2 className="bl-heading">Billing</h2>
+                  <p className="bl-sub">Your plan details and payment information.</p>
                 </div>
+
+                <div className="bl-grid">
+
+                  {/* ── Left column ── */}
+                  <div className="bl-col">
+
+                    {/* Plan Details */}
+                    <div className="cd-card bl-card">
+                      <div className="bl-section-label">Plan Details</div>
+                      <div className="bl-row">
+                        <span className="bl-row-key">Plan</span>
+                        <span className="bl-row-val">ZionShift</span>
+                      </div>
+                      <div className="bl-divider" />
+                      <div className="bl-row">
+                        <span className="bl-row-key">Status</span>
+                        <span className="bl-status-pill">● Active</span>
+                      </div>
+                      <div className="bl-divider" />
+                      <div className="bl-row">
+                        <span className="bl-row-key">Monthly retainer</span>
+                        <span className="bl-row-val">$2,000 / mo</span>
+                      </div>
+                      <div className="bl-divider" />
+                      <div className="bl-row">
+                        <span className="bl-row-key">Billing started</span>
+                        <span className="bl-row-mono">Apr 11, 2026</span>
+                      </div>
+                      <div className="bl-divider" />
+                      <div className="bl-row">
+                        <span className="bl-row-key">Next invoice</span>
+                        <span className="bl-row-mono">May 11, 2026</span>
+                      </div>
+                    </div>
+
+                    {/* Payment Method */}
+                    <div className="cd-card bl-card" style={{ marginTop: 16 }}>
+                      <div className="bl-section-label">Payment Method</div>
+                      <div className="bl-row">
+                        <span className="bl-row-key">Card on file</span>
+                        <span className="bl-row-val">Visa •••• 4821</span>
+                      </div>
+                      <div className="bl-divider" />
+                      <div className="bl-row">
+                        <span className="bl-row-key">Expires</span>
+                        <span className="bl-row-mono">09 / 28</span>
+                      </div>
+                      <div className="bl-divider" />
+                      <a
+                        href="https://billing.stripe.com"
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="bl-stripe-btn"
+                      >
+                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" aria-hidden>
+                          <rect x="1" y="4" width="22" height="16" rx="3" stroke="currentColor" strokeWidth="1.8"/>
+                          <path d="M1 9h22" stroke="currentColor" strokeWidth="1.8"/>
+                        </svg>
+                        Update payment method
+                        <span className="bl-stripe-via">via Stripe →</span>
+                      </a>
+                    </div>
+
+                  </div>
+
+                  {/* ── Right column ── */}
+                  <div className="bl-col">
+
+                    {/* Invoice History */}
+                    <div className="cd-card bl-card">
+                      <div className="bl-section-label">Invoice History</div>
+                      <div className="bl-invoice-row">
+                        <span className="bl-inv-date">Apr 11, 2026</span>
+                        <span className="bl-inv-desc">Monthly retainer</span>
+                        <span className="bl-inv-amount">$2,000</span>
+                        <span className="bl-inv-paid">Paid</span>
+                      </div>
+                      <div className="bl-divider" />
+                      <div className="bl-invoice-row">
+                        <span className="bl-inv-date">Mar 29, 2026</span>
+                        <span className="bl-inv-desc">Setup fee</span>
+                        <span className="bl-inv-amount">$1,000</span>
+                        <span className="bl-inv-paid">Paid</span>
+                      </div>
+                    </div>
+
+                    {/* Need to make changes */}
+                    <div className="cd-card bl-card bl-changes-card" style={{ marginTop: 16 }}>
+                      <div className="bl-changes-title">Need to make changes?</div>
+                      <p className="bl-changes-body">
+                        To update your plan or cancel your subscription, reach out directly at{' '}
+                        <a href="mailto:ryan@zionshift.com" className="bl-changes-link">ryan@zionshift.com</a>.
+                        {' '}We&apos;ll take care of it within one business day.
+                      </p>
+                      <p className="bl-changes-note">
+                        No long-term contracts. Your retainer only continues as long as you&apos;re seeing results.
+                      </p>
+                    </div>
+
+                  </div>
+                </div>
+
                 <div className="cd-support-footer">
                   Questions? Reach out anytime at <a href="mailto:ryan@zionshift.com">ryan@zionshift.com</a>
                 </div>
