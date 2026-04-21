@@ -169,10 +169,10 @@ function Nav({ onBook }: { onBook: () => void }) {
           <a href="#pricing">Pricing</a>
           <a href="#faq">FAQ</a>
         </div>
-        <a href="/login" className="btn btn-ghost" style={{ padding: '10px 18px', fontSize: 13 }}>Log in</a>
         <button className="btn btn-primary" onClick={onBook} style={{ padding: '10px 18px', fontSize: 13 }}>
           Book a call<span className="chev">→</span>
         </button>
+        <a href="/login" className="btn btn-ghost" style={{ padding: '10px 18px', fontSize: 13, textDecoration: 'none' }}>Log in</a>
         <button className="hamburger" onClick={() => setMenuOpen(o => !o)} aria-label="Toggle menu">
           <span className={menuOpen ? 'x' : ''} />
           <span className={menuOpen ? 'x' : ''} />

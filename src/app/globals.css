@@ -148,7 +148,7 @@ body { font-family: var(--zs-sans); color: var(--zs-ink-2); overflow-x: hidden; 
 .zs-nav-wrap.scrolled .zs-nav { box-shadow: 0 12px 36px rgba(11,11,12,0.08); max-width: 860px; border-color: rgba(11,11,12,0.12); }
 .zs-nav img { height: 22px; width: auto; transition: transform 300ms; }
 .zs-nav:hover img { transform: scale(1.03); }
-.zs-nav-links { display: flex; gap: 28px; }
+.zs-nav-links { display: flex; gap: 18px; }
 .zs-nav-links a { font: 500 14px var(--zs-sans); color: var(--zs-ink-2); letter-spacing: -0.005em; transition: color 160ms; cursor: pointer; position: relative; text-decoration: none; }
 .zs-nav-links a::after { content: ''; position: absolute; left: 50%; right: 50%; bottom: -3px; height: 1px; background: currentColor; transition: left 320ms var(--zs-ease), right 320ms var(--zs-ease); }
 .zs-nav-links a:hover { color: var(--zs-ink); }
