@@ -237,7 +237,7 @@ export default function AdminPage() {
                     {/* Their message */}
                     <div className="ad-reply-their">
                       <span className="ad-reply-label">Their reply</span>
-                      <p className="ad-reply-quote">"{r.theirMessage}"</p>
+                      <p className="ad-reply-quote">&ldquo;{r.theirMessage}&rdquo;</p>
                     </div>
 
                     {/* AI draft */}
@@ -344,7 +344,7 @@ export default function AdminPage() {
                     <tr key={p.id}>
                       <td className="ad-td-bold">{p.name}</td>
                       <td className="ad-td-muted">{p.firm}</td>
-                      <td className="ad-td-italic">"{p.whatTheySaid}"</td>
+                      <td className="ad-td-italic">&ldquo;{p.whatTheySaid}&rdquo;</td>
                       <td className="ad-td-muted">{p.reEntryDate}</td>
                       <td><span className="ad-pill-amber">Scheduled</span></td>
                     </tr>
