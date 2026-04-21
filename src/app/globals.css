@@ -537,9 +537,18 @@ body { font-family: var(--zs-sans); color: var(--zs-ink-2); overflow-x: hidden; 
 .cd-greeting-row { display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 16px; margin-bottom: 28px; }
 .cd-greeting { font: 700 clamp(22px,3vw,38px) var(--zs-sans); letter-spacing: -0.03em; color: var(--zs-ink); margin: 0; }
 .cd-greeting-right { display: flex; align-items: center; gap: 10px; }
-.cd-live-badge { display: flex; align-items: center; gap: 7px; font: 500 13px var(--zs-sans); color: #16a34a; background: #f0fdf4; border: 1px solid #bbf7d0; border-radius: 999px; padding: 5px 13px; }
-.cd-live-dot { width: 6px; height: 6px; border-radius: 50%; background: #16a34a; flex-shrink: 0; animation: pulse 2s ease-in-out infinite; }
+.cd-status-badge { display: inline-flex; align-items: center; gap: 7px; font: 500 13px var(--zs-sans); border-radius: 999px; padding: 5px 13px; border: 1px solid transparent; }
+.cd-status-badge.live    { color: #16a34a; background: #f0fdf4; border-color: #bbf7d0; }
+.cd-status-badge.warming { color: #b45309; background: #fffbeb; border-color: #fde68a; }
+.cd-status-badge.idle    { color: #9ca3af; background: #f9fafb; border-color: #e5e7eb; }
+.cd-status-badge.paused  { color: #e11d48; background: #fff1f2; border-color: #fecdd3; }
+.cd-status-dot { width: 6px; height: 6px; border-radius: 50%; flex-shrink: 0; }
+.cd-status-badge.live    .cd-status-dot { background: #16a34a; animation: pulse 2s ease-in-out infinite; }
+.cd-status-badge.warming .cd-status-dot { background: #f59e0b; animation: pulse 3s ease-in-out infinite; }
+.cd-status-badge.idle    .cd-status-dot { background: #d1d5db; }
+.cd-status-badge.paused  .cd-status-dot { background: #fb7185; }
 @keyframes pulse { 0%,100% { opacity: 1; } 50% { opacity: 0.4; } }
+.cd-status-preview { display: flex; flex-wrap: wrap; gap: 10px; margin-bottom: 24px; }
 .cd-period { font: 500 13px var(--zs-sans); color: var(--zs-ink-4); background: #fff; border: 1px solid var(--zs-border); border-radius: 999px; padding: 5px 14px; }
 
 .cd-metrics { display: grid; grid-template-columns: repeat(4,1fr); gap: 14px; margin-bottom: 16px; }

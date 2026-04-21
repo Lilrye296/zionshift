@@ -274,6 +274,16 @@ export default function ClientPage() {
   const greeting  = getGreeting();
   const firstName = p?.client_name ?? 'there';
 
+  function getStatusProps(status: string | null) {
+    switch (status) {
+      case 'warming': return { label: 'Warming Up — Day 3 of 14', variant: 'warming' };
+      case 'idle':    return { label: 'Idle',                      variant: 'idle'    };
+      case 'paused':  return { label: 'Paused',                    variant: 'paused'  };
+      default:        return { label: 'Live — Sending',             variant: 'live'    };
+    }
+  }
+  const statusProps = getStatusProps(p?.campaign_status ?? null);
+
   return (
     <div className="portal-page">
 
@@ -328,13 +338,21 @@ export default function ClientPage() {
             {/* ── Overview ── */}
             {activeTab === 'overview' && (<>
 
+            {/* ── Status preview row (all 4 states) ── */}
+            <div className="cd-status-preview">
+              <span className="cd-status-badge live"><span className="cd-status-dot" />Live — Sending</span>
+              <span className="cd-status-badge warming"><span className="cd-status-dot" />Warming Up — Day 3 of 14</span>
+              <span className="cd-status-badge idle"><span className="cd-status-dot" />Idle</span>
+              <span className="cd-status-badge paused"><span className="cd-status-dot" />Paused</span>
+            </div>
+
             {/* ── Greeting row ── */}
             <div className="cd-greeting-row">
               <h1 className="cd-greeting">{greeting}, {firstName}.</h1>
               <div className="cd-greeting-right">
-                <span className="cd-live-badge">
-                  <span className="cd-live-dot" />
-                  {p?.campaign_status ?? 'Live — Sending'}
+                <span className={`cd-status-badge ${statusProps.variant}`}>
+                  <span className="cd-status-dot" />
+                  {statusProps.label}
                 </span>
                 <span className="cd-period">This month</span>
               </div>
