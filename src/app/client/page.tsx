@@ -145,6 +145,8 @@ export default function ClientPage() {
     router.push('/login');
   }
 
+  const [activeTab, setActiveTab] = useState<'overview' | 'billing'>('overview');
+
   const p = profile;
   const greeting  = getGreeting();
   const firstName = p?.client_name ?? 'there';
@@ -180,6 +182,25 @@ export default function ClientPage() {
           <div className="portal-empty"><p>Loading your dashboard…</p></div>
         ) : (
           <>
+
+            {/* ── Tab pills ── */}
+            <div className="cd-tabs">
+              <button
+                className={`cd-tab${activeTab === 'overview' ? ' active' : ''}`}
+                onClick={() => setActiveTab('overview')}
+              >
+                Overview
+              </button>
+              <button
+                className={`cd-tab${activeTab === 'billing' ? ' active' : ''}`}
+                onClick={() => setActiveTab('billing')}
+              >
+                Billing
+              </button>
+            </div>
+
+            {/* ── Overview ── */}
+            {activeTab === 'overview' && (<>
 
             {/* ── Greeting row ── */}
             <div className="cd-greeting-row">
@@ -294,6 +315,16 @@ export default function ClientPage() {
                 </div>
               </div>
             </div>
+
+            </>)}
+
+            {/* ── Billing ── */}
+            {activeTab === 'billing' && (
+              <div className="portal-empty" style={{ minHeight: 400 }}>
+                <p>Billing coming soon.</p>
+                <span>Your invoices and plan details will appear here.</span>
+              </div>
+            )}
 
           </>
         )}
