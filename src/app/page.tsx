@@ -596,7 +596,7 @@ function FAQ() {
     { q: 'How long until I see booked calls?', a: 'After a quick onboarding and setup period, most clients begin seeing qualified meetings within the first few weeks. The AI continuously learns what messaging resonates best with your specific audience, so results typically improve month over month.' },
     { q: 'What does it cost?', a: 'Simple and transparent: a one-time $1,000 setup fee and a $2,000 monthly retainer — a fraction of what a human SDR or traditional agency would cost. No contract. Book a call and we\'ll walk through everything.' },
     { q: 'What kinds of businesses do you work with?', a: 'Any B2B or owner-operated service business selling into small-to-mid-sized companies: trades, professional services, agencies, consultancies, e-commerce brands, medical and dental practices, law firms, real estate teams, and more.' },
-    { q: 'Can I cancel anytime?', a: 'Yes. Month-to-month. No long-term contracts. No cancellation fees.' },
+    { q: 'Can I cancel anytime?', a: 'Yes. Month-to-month. No contract. No cancellation fees.' },
   ];
   return (
     <section id="faq" className="zs-section">
