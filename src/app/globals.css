@@ -537,6 +537,7 @@ footer.zs-footer { padding: 40px 0; border-top: 1px solid var(--zs-border); }
   .stats-row .stat:nth-child(4) { border-top: 1px solid var(--zs-border); }
   .stat { padding: 28px 20px; }
   .stat .val { font-size: clamp(32px, 8vw, 52px); }
+  .stat:first-child .idx { width: min-content; }
 
   /* Process — swap to stacked cards on mobile */
   .process { min-height: auto; }
@@ -548,6 +549,10 @@ footer.zs-footer { padding: 40px 0; border-top: 1px solid var(--zs-border); }
   .bento > * { grid-column: 1 / 2 !important; }
   .tile { padding: 28px 24px; min-height: 200px; }
   .bento .wide { padding-bottom: 136px; min-height: 260px; }
+  .bt-graph svg .graph-dot { display: none; }
+
+  /* Calendar */
+  .slide-cal .cd.has::after { width: 4px; height: 4px; top: 2px; right: 2px; }
 
   /* Pricing */
   .pricing-card { padding: 36px 24px; }
