@@ -63,7 +63,6 @@ export default function ClientPage() {
         ) : (
           <>
             <div className="portal-section-header">
-              <span className="eyebrow">Client Portal</span>
               <h2 className="portal-heading">{profile?.firm_name ?? 'Your Dashboard'}</h2>
             </div>
 
