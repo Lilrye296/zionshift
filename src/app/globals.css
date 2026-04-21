@@ -584,7 +584,7 @@ body { font-family: var(--zs-sans); color: var(--zs-ink-2); overflow-x: hidden; 
 
 .mini-cal-header { font: 500 11px var(--zs-mono); letter-spacing: 0.08em; text-transform: uppercase; color: var(--zs-ink-5); margin-bottom: 16px; }
 .mini-cal-grid { display: grid; grid-template-columns: repeat(7,1fr); gap: 2px; }
-.mini-cal-dow { font: 500 11px var(--zs-mono); color: var(--zs-ink-5); text-align: center; padding: 0 0 8px; }
+.mini-cal-dow { font: 700 11px var(--zs-mono); color: var(--zs-ink); text-align: center; padding: 0 0 8px; }
 .mini-cal-day { font: 400 13px var(--zs-sans); color: var(--zs-ink-4); text-align: center; padding: 4px 2px; border-radius: 8px; display: flex; flex-direction: column; align-items: center; gap: 3px; min-height: 32px; justify-content: center; }
 .mini-cal-day.today { background: var(--zs-ink); color: #fff; font-weight: 600; border-radius: 8px; }
 .mini-cal-dot { width: 4px; height: 4px; border-radius: 50%; background: var(--zs-ink-4); flex-shrink: 0; }
