@@ -775,34 +775,36 @@ function Modal({ open, onClose }: { open: boolean; onClose: () => void }) {
     >
       <div className="modal">
         <button className="modal-close" onClick={close} aria-label="Close">✕</button>
-        {submitted ? (
-          <div style={{ textAlign: 'center', padding: '8px 0' }}>
-            <div style={{ width: 56, height: 56, borderRadius: 999, background: '#E8F1EA', display: 'flex', alignItems: 'center', justifyContent: 'center', margin: '0 auto 20px' }}>
-              <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="#1F6B3A" strokeWidth="2.5">
-                <path d="M5 13l4 4L19 7" />
-              </svg>
+        <div className="modal-scroll">
+          {submitted ? (
+            <div style={{ textAlign: 'center', padding: '8px 0' }}>
+              <div style={{ width: 56, height: 56, borderRadius: 999, background: '#E8F1EA', display: 'flex', alignItems: 'center', justifyContent: 'center', margin: '0 auto 20px' }}>
+                <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="#1F6B3A" strokeWidth="2.5">
+                  <path d="M5 13l4 4L19 7" />
+                </svg>
+              </div>
+              <h3 style={{ fontSize: 24, fontWeight: 700, letterSpacing: '-0.025em', margin: 0 }}>You&apos;re in.</h3>
+              <p style={{ color: 'var(--zs-ink-4)', marginTop: 10 }}>We&apos;ll reach out within 24 hours to schedule your call.</p>
+              <button className="btn btn-primary" style={{ marginTop: 28, width: '100%' }} onClick={close}>Close</button>
             </div>
-            <h3 style={{ fontSize: 24, fontWeight: 700, letterSpacing: '-0.025em', margin: 0 }}>You&apos;re in.</h3>
-            <p style={{ color: 'var(--zs-ink-4)', marginTop: 10 }}>We&apos;ll reach out within 24 hours to schedule your call.</p>
-            <button className="btn btn-primary" style={{ marginTop: 28, width: '100%' }} onClick={close}>Close</button>
-          </div>
-        ) : (
-          <>
-            <h3 style={{ fontSize: 22, fontWeight: 700, letterSpacing: '-0.025em', margin: 0 }}>Book a free strategy call</h3>
-            <p style={{ fontSize: 14, color: 'var(--zs-ink-4)', marginTop: 6, marginBottom: 24 }}>No commitment · No sales pitch · Just a real conversation.</p>
-            <form onSubmit={handleSubmit}>
-              <div className="field"><label>Your name</label><input required value={form.name} onChange={(e) => setForm({ ...form, name: e.target.value })} placeholder="Jane Rivera" /></div>
-              <div className="field"><label>Email</label><input type="email" required value={form.email} onChange={(e) => setForm({ ...form, email: e.target.value })} placeholder="jane@firm.com" /></div>
-              <div className="field"><label>Phone</label><input type="tel" required value={form.phone} onChange={(e) => setForm({ ...form, phone: e.target.value })} placeholder="(555) 000-0000" /></div>
-              <div className="field"><label>Business</label><input value={form.business} onChange={(e) => setForm({ ...form, business: e.target.value })} placeholder="Rivera Consulting LLC" /></div>
-              <div className="field"><label>Biggest challenge</label><textarea value={form.challenge} onChange={(e) => setForm({ ...form, challenge: e.target.value })} placeholder="Tell us what's holding you back…" /></div>
-              <button type="submit" disabled={loading} className="btn btn-primary" style={{ marginTop: 20, width: '100%', padding: '14px' }}>
-                {loading ? 'Sending…' : <>Book your free strategy call<span className="chev">→</span></>}
-              </button>
-              {formError && <p style={{ marginTop: 12, fontSize: 13, color: 'var(--zs-signal)', textAlign: 'center' }}>{formError}</p>}
-            </form>
-          </>
-        )}
+          ) : (
+            <>
+              <h3 style={{ fontSize: 22, fontWeight: 700, letterSpacing: '-0.025em', margin: 0 }}>Book a free strategy call</h3>
+              <p style={{ fontSize: 14, color: 'var(--zs-ink-4)', marginTop: 6, marginBottom: 24 }}>No commitment · No sales pitch · Just a real conversation.</p>
+              <form onSubmit={handleSubmit}>
+                <div className="field"><label>Your name</label><input required value={form.name} onChange={(e) => setForm({ ...form, name: e.target.value })} placeholder="Jane Rivera" /></div>
+                <div className="field"><label>Email</label><input type="email" required value={form.email} onChange={(e) => setForm({ ...form, email: e.target.value })} placeholder="jane@firm.com" /></div>
+                <div className="field"><label>Phone</label><input type="tel" required value={form.phone} onChange={(e) => setForm({ ...form, phone: e.target.value })} placeholder="(555) 000-0000" /></div>
+                <div className="field"><label>Business</label><input value={form.business} onChange={(e) => setForm({ ...form, business: e.target.value })} placeholder="Rivera Consulting LLC" /></div>
+                <div className="field"><label>Biggest challenge</label><textarea value={form.challenge} onChange={(e) => setForm({ ...form, challenge: e.target.value })} placeholder="Tell us what's holding you back…" /></div>
+                <button type="submit" disabled={loading} className="btn btn-primary" style={{ marginTop: 20, width: '100%', padding: '14px' }}>
+                  {loading ? 'Sending…' : <>Book your free strategy call<span className="chev">→</span></>}
+                </button>
+                {formError && <p style={{ marginTop: 12, fontSize: 13, color: 'var(--zs-signal)', textAlign: 'center' }}>{formError}</p>}
+              </form>
+            </>
+          )}
+        </div>
       </div>
     </div>
   );
