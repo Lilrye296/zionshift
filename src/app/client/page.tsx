@@ -498,9 +498,16 @@ export default function ClientPage() {
                 <MiniCalendar
                   meetings={CAL_MEETINGS}
                   onDayClick={(day) => {
+                    const parseTime = (t: string) => {
+                      const [time, period] = t.split(' ');
+                      const [h, m] = time.split(':').map(Number);
+                      const hour = period === 'PM' && h !== 12 ? h + 12
+                                 : period === 'AM' && h === 12 ? 0 : h;
+                      return hour * 60 + m;
+                    };
                     const dayMeetings = CAL_MEETINGS
                       .filter(m => m.day === day)
-                      .sort((a, b) => a.time.localeCompare(b.time));
+                      .sort((a, b) => parseTime(a.time) - parseTime(b.time));
                     setSelectedDayMeetings(dayMeetings);
                   }}
                 />
