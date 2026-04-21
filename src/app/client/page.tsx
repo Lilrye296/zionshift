@@ -19,6 +19,10 @@ export default function ClientPage() {
 
   useEffect(() => {
     async function load() {
+      if (!process.env.NEXT_PUBLIC_SUPABASE_URL || !process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY) {
+        setLoading(false);
+        return;
+      }
       const supabase = createClient();
       const { data: { user } } = await supabase.auth.getUser();
       if (!user) { router.push('/login'); return; }

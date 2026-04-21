@@ -11,8 +11,11 @@ export default function LoginPage() {
   const [error, setError]       = useState('');
   const router = useRouter();
 
+  const configured = !!(process.env.NEXT_PUBLIC_SUPABASE_URL && process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY);
+
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
+    if (!configured) return;
     setLoading(true);
     setError('');
 
