@@ -405,7 +405,9 @@ function Process() {
 
   return (
     <section id="how" className="process" ref={wrapRef as React.RefObject<HTMLElement>}>
-      <div className="process-sticky">
+
+      {/* Desktop: sticky scroll animation */}
+      <div className="process-sticky process-desktop">
         <div className="zs-container">
           <div className="process-grid">
             <div className="process-copy">
@@ -427,8 +429,6 @@ function Process() {
               <div className="process-track">
                 {[0, 1, 2].map((i) => <div key={i} className={`dot ${i === step ? 'active' : ''}`} />)}
               </div>
-
-              {/* Slide 1 */}
               <div className={`process-slide ${step === 0 ? 'active' : ''}`}>
                 <div className="slide-form">
                   <div className="row"><span className="k">Ideal client</span><span className="v">Small business owners, owner-operated{step === 0 && <span className="cursor" />}</span></div>
@@ -436,8 +436,6 @@ function Process() {
                   <div className="row"><span className="k">Offer</span><span className="v">Your service, positioned to your ICP</span></div>
                 </div>
               </div>
-
-              {/* Slide 2 */}
               <div className={`process-slide ${step === 1 ? 'active' : ''}`}>
                 {step === 1 && (
                   <div className="prospect-feed">
@@ -462,8 +460,6 @@ function Process() {
                   </div>
                 )}
               </div>
-
-              {/* Slide 3 */}
               <div className={`process-slide ${step === 2 ? 'active' : ''}`}>
                 <CalendarSlide />
               </div>
@@ -471,6 +467,21 @@ function Process() {
           </div>
         </div>
       </div>
+
+      {/* Mobile: stacked step cards */}
+      <div className="process-mobile">
+        <div className="zs-container">
+          <div className="eyebrow reveal" style={{ marginBottom: 32 }}>How it works</div>
+          {steps.map((s, i) => (
+            <div key={i} className="process-card reveal" style={{ transitionDelay: `${i * 120}ms` }}>
+              <div className="step-num">{s.num}</div>
+              <h3>{s.h}</h3>
+              <p>{s.p}</p>
+            </div>
+          ))}
+        </div>
+      </div>
+
     </section>
   );
 }

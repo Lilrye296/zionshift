@@ -289,6 +289,11 @@ body { font-family: var(--zs-sans); color: var(--zs-ink-2); overflow-x: hidden; 
 
 /* ─── PROCESS (pinned stepper) ────────────────────── */
 .process { position: relative; min-height: 230vh; }
+.process-mobile { display: none; padding: 80px 0; }
+.process-card { background: var(--zs-paper); border: 1px solid var(--zs-border); border-radius: 20px; padding: 32px; margin-bottom: 16px; }
+.process-card:last-child { margin-bottom: 0; }
+.process-card h3 { font-size: 24px; font-weight: 700; letter-spacing: -0.03em; color: var(--zs-ink); margin: 12px 0 10px; line-height: 1.15; }
+.process-card p { font-size: 15px; line-height: 1.6; color: var(--zs-ink-4); margin: 0; }
 .process-sticky { position: sticky; top: 0; height: 100vh; display: flex; align-items: center; overflow: hidden; }
 .process-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 80px; align-items: center; width: 100%; }
 .process-copy h2 { font-size: clamp(40px,5vw,72px); font-weight: 700; letter-spacing: -0.04em; line-height: 1; margin: 0; }
@@ -530,14 +535,10 @@ footer.zs-footer { padding: 40px 0; border-top: 1px solid var(--zs-border); }
   .stat { padding: 28px 20px; }
   .stat .val { font-size: clamp(32px, 8vw, 52px); }
 
-  /* Process — sticky scroll preserved, stage made taller, slides less padded */
-  .process-sticky { height: 100svh; overflow: visible; }
-  .process-grid { grid-template-columns: 1fr; gap: 20px; }
-  .process-copy h2 { font-size: clamp(26px, 7vw, 44px); }
-  .process-copy p { font-size: 15px; margin-top: 12px; }
-  .process-stage { aspect-ratio: 1 / 1; }
-  .process-slide { padding: 24px 24px 24px 40px; }
-  .process-track { left: 12px; gap: 10px; }
+  /* Process — swap to stacked cards on mobile */
+  .process { min-height: auto; }
+  .process-desktop { display: none; }
+  .process-mobile { display: block; padding: 64px 0; }
 
   /* Bento */
   .bento { grid-template-columns: 1fr !important; gap: 12px; }
