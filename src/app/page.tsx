@@ -234,7 +234,7 @@ function Hero({ onBook }: { onBook: () => void }) {
                 <span className="h-panel-title">
                   <span className="live" />ZionShift · composing
                 </span>
-                <span style={{ font: '500 11px var(--zs-mono)', color: 'rgba(255,255,255,0.4)', letterSpacing: '0.1em' }}>03:42 AM</span>
+                <span style={{ font: '500 11px var(--zs-mono)', color: 'rgba(255,255,255,0.4)', letterSpacing: '0.1em' }}>03:42 PM</span>
               </div>
               <div className="h-panel-body">
                 <div className="ai-draft">
