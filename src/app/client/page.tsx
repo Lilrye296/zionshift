@@ -190,16 +190,13 @@ function AppleIcon() {
 
 function OutlookIcon() {
   return (
-    <svg width="30" height="30" viewBox="0 0 24 24" aria-hidden>
-      {/* Blue rounded background */}
-      <rect width="24" height="24" rx="4" fill="#0078D4"/>
-      {/* White envelope body */}
-      <rect x="3" y="8" width="18" height="11" rx="1" fill="white"/>
-      {/* Sealed flap — darker blue triangle, peak pointing down */}
-      <path fill="#004E96" d="M3 8 12 14.5 21 8z"/>
-      {/* Bottom corner fold lines */}
-      <path stroke="#C8D8EA" strokeWidth="0.75" fill="none" d="M3 19 9.5 13.5M21 19 14.5 13.5"/>
-    </svg>
+    // eslint-disable-next-line @next/next/no-img-element
+    <img
+      src="https://img.icons8.com/fluency/48/microsoft-outlook-2019.png"
+      width="30"
+      height="30"
+      alt="Outlook"
+    />
   );
 }
 
