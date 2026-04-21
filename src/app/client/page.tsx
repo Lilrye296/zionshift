@@ -97,7 +97,13 @@ function MeetingDetailModal({ meetings, onClose }: { meetings: CalMeeting[]; onC
       <div className="modal" style={{ maxWidth: 400 }} onClick={e => e.stopPropagation()}>
         <button className="modal-close" onClick={onClose}>✕</button>
         <div className="modal-scroll">
-          <div className="mdm-eyebrow">{meetings.length > 1 ? `${meetings.length} Meetings` : 'Scheduled Meeting'} · {month} {day}</div>
+          <div className="mdm-eyebrow">
+            {meetings.length > 1
+              ? `${meetings.length} ${isPast(day) ? 'Completed' : 'Scheduled'} Meetings`
+              : isPast(day) ? 'Completed Meeting'
+              : 'Scheduled Meeting'
+            } · {month} {day}
+          </div>
           {meetings.map((meeting, i) => (
             <div key={i}>
               {i > 0 && <div className="mdm-divider" />}
