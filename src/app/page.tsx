@@ -156,6 +156,8 @@ function WordReveal({ children, className = '', style }: { children: ReactNode; 
 
 /* ─── NAV ────────────────────────────────────────── */
 function Nav({ onBook }: { onBook: () => void }) {
+  const [menuOpen, setMenuOpen] = useState(false);
+  const close = () => setMenuOpen(false);
   return (
     <div className="zs-nav-wrap">
       <div className="zs-nav">
@@ -170,7 +172,23 @@ function Nav({ onBook }: { onBook: () => void }) {
         <button className="btn btn-primary" onClick={onBook} style={{ padding: '10px 18px', fontSize: 13 }}>
           Book a call<span className="chev">→</span>
         </button>
+        <button className="hamburger" onClick={() => setMenuOpen(o => !o)} aria-label="Toggle menu">
+          <span className={menuOpen ? 'x' : ''} />
+          <span className={menuOpen ? 'x' : ''} />
+          <span className={menuOpen ? 'x' : ''} />
+        </button>
       </div>
+      {menuOpen && (
+        <div className="mobile-menu">
+          <a href="#how" onClick={close}>How it works</a>
+          <a href="#why" onClick={close}>Why us</a>
+          <a href="#pricing" onClick={close}>Pricing</a>
+          <a href="#faq" onClick={close}>FAQ</a>
+          <button className="btn btn-primary" onClick={() => { close(); onBook(); }} style={{ width: '100%', marginTop: 16 }}>
+            Book a call<span className="chev">→</span>
+          </button>
+        </div>
+      )}
     </div>
   );
 }
