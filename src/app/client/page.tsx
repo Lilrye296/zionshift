@@ -529,7 +529,9 @@ export default function ClientPage() {
       stripe_portal_url: 'https://billing.stripe.com',
       invoices: [
         { date: 'Apr 11, 2026', description: 'Monthly retainer', amount: 2000, status: 'paid'   },
-        { date: 'Mar 29, 2026', description: 'Setup fee',         amount: 1000, status: 'paid'   },
+        { date: 'Mar 29, 2026', description: 'Monthly retainer', amount: 2000, status: 'open'   },
+        { date: 'Mar 11, 2026', description: 'Monthly retainer', amount: 2000, status: 'failed' },
+        { date: 'Feb 11, 2026', description: 'Setup fee',         amount: 1000, status: 'paid'   },
       ],
     });
   }, []);
