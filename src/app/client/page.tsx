@@ -224,9 +224,6 @@ function LogoUploadModal({
           >
             Save logo →
           </button>
-          <p className="lu-note">
-            Logo saves locally for this session. Permanent saving activates once your account is fully connected.
-          </p>
         </div>
       </div>
     </div>
