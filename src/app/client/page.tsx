@@ -85,12 +85,6 @@ function MeetingDetailModal({ meetings, onClose }: { meetings: CalMeeting[]; onC
   const month = MONTH_NAMES[now.getMonth()];
   const day   = meetings[0].day;
 
-  function isPast(meetingDay: number) {
-    const today = new Date();
-    today.setHours(0, 0, 0, 0);
-    const meetingDate = new Date(today.getFullYear(), today.getMonth(), meetingDay);
-    return meetingDate < today;
-  }
 
   return (
     <div className="modal-overlay" onClick={onClose}>
@@ -99,8 +93,8 @@ function MeetingDetailModal({ meetings, onClose }: { meetings: CalMeeting[]; onC
         <div className="modal-scroll">
           <div className="mdm-eyebrow">
             {meetings.length > 1
-              ? `${meetings.length} ${isPast(day) ? 'Completed' : 'Scheduled'} Meetings`
-              : isPast(day) ? 'Completed Meeting'
+              ? `${meetings.length} ${isMeetingPast(meetings[0].day, meetings[0].time) ? 'Completed' : 'Scheduled'} Meetings`
+              : isMeetingPast(meetings[0].day, meetings[0].time) ? 'Completed Meeting'
               : 'Scheduled Meeting'
             } · {month} {day}
           </div>
@@ -113,7 +107,7 @@ function MeetingDetailModal({ meetings, onClose }: { meetings: CalMeeting[]; onC
                 <span className="mdm-icon">🕐</span>
                 <span>{meeting.time}</span>
               </div>
-              {!isPast(meeting.day) && (
+              {!isMeetingPast(meeting.day, meeting.time) && (
                 <div className="mdm-row">
                   <span className="mdm-icon">📹</span>
                   {meeting.zoomUrl ? (
@@ -161,6 +155,18 @@ const ACTIVITY = [
 ];
 
 const MONTH_SHORT = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
+
+// Returns true if the meeting day+time has already passed
+function isMeetingPast(day: number, time: string): boolean {
+  const now = new Date();
+  const [timePart, period] = time.split(' ');
+  const [h, m] = timePart.split(':').map(Number);
+  let hour = h;
+  if (period === 'PM' && h !== 12) hour += 12;
+  if (period === 'AM' && h === 12) hour = 0;
+  const meetingDate = new Date(now.getFullYear(), now.getMonth(), day, hour, m);
+  return now > meetingDate;
+}
 
 /* ── Icons ── */
 function GoogleIcon() {
@@ -570,7 +576,9 @@ export default function ClientPage() {
                               <td className="cd-td-name">{m.prospect}</td>
                               <td className="cd-td-firm">{m.firm}</td>
                               <td>
-                                <span className={`cd-pill ${m.status.toLowerCase()}`}>{m.status}</span>
+                                <span className={`cd-pill ${isMeetingPast(m.day, m.time) ? 'completed' : 'scheduled'}`}>
+                                  {isMeetingPast(m.day, m.time) ? 'Completed' : 'Scheduled'}
+                                </span>
                               </td>
                             </tr>
                           ))}
