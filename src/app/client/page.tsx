@@ -412,14 +412,16 @@ export default function ClientPage() {
             <div className="cd-mid-row">
               <div className="cd-card">
                 <div className="cd-card-label">Recent Activity</div>
-                <ul className="cd-activity-list">
-                  {ACTIVITY.map((a, i) => (
-                    <li key={i} className={`cd-activity-item${a.strong ? ' strong' : ''}`}>
-                      <span className="cd-activity-text">{a.label}</span>
-                      <span className="cd-activity-sub">{a.sub}</span>
-                    </li>
-                  ))}
-                </ul>
+                <div className="cd-activity-scroll">
+                  <ul className="cd-activity-list">
+                    {ACTIVITY.map((a, i) => (
+                      <li key={i} className={`cd-activity-item${a.strong ? ' strong' : ''}`}>
+                        <span className="cd-activity-text">{a.label}</span>
+                        <span className="cd-activity-sub">{a.sub}</span>
+                      </li>
+                    ))}
+                  </ul>
+                </div>
               </div>
 
               <div className="cd-card">

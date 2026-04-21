@@ -571,6 +571,11 @@ body { font-family: var(--zs-sans); color: var(--zs-ink-2); overflow-x: hidden; 
 .cd-card { background: #fff; border: 1px solid var(--zs-border); border-radius: 18px; padding: 28px; }
 .cd-card-label { font: 500 11px var(--zs-mono); letter-spacing: 0.08em; text-transform: uppercase; color: var(--zs-ink-5); margin-bottom: 20px; }
 
+.cd-activity-scroll { max-height: 260px; overflow-y: auto; padding-right: 4px; }
+.cd-activity-scroll::-webkit-scrollbar { width: 4px; }
+.cd-activity-scroll::-webkit-scrollbar-track { background: transparent; }
+.cd-activity-scroll::-webkit-scrollbar-thumb { background: var(--zs-border); border-radius: 999px; }
+.cd-activity-scroll::-webkit-scrollbar-thumb:hover { background: var(--zs-ink-5); }
 .cd-activity-list { list-style: none; padding: 0; margin: 0; display: flex; flex-direction: column; gap: 20px; }
 .cd-activity-item { display: flex; flex-direction: column; gap: 3px; padding-left: 18px; position: relative; }
 .cd-activity-item::before { content: ''; position: absolute; left: 0; top: 5px; width: 7px; height: 7px; border-radius: 50%; background: var(--zs-border); }
