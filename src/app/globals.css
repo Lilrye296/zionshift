@@ -622,15 +622,12 @@ body { font-family: var(--zs-sans); color: var(--zs-ink-2); overflow-x: hidden; 
 .cd-pill.scheduled { color: #16a34a; border: 1px solid #bbf7d0; background: #f0fdf4; }
 .cd-pill.completed  { color: var(--zs-ink-4); border: 1px solid var(--zs-border); background: var(--zs-mist); }
 
-.cd-cal-sync-top { display: flex; align-items: flex-start; justify-content: space-between; gap: 16px; margin-bottom: 24px; flex-wrap: wrap; }
-.cd-cal-sync-title { font: 600 16px var(--zs-sans); letter-spacing: -0.02em; color: var(--zs-ink); margin-bottom: 5px; }
-.cd-cal-sync-sub { font: 400 13px var(--zs-sans); color: var(--zs-ink-4); line-height: 1.6; max-width: 380px; }
-.cd-connected-badge { font: 500 12px var(--zs-sans); color: #16a34a; background: #f0fdf4; border: 1px solid #bbf7d0; border-radius: 999px; padding: 5px 13px; white-space: nowrap; flex-shrink: 0; }
+.cd-cal-sync-top { margin-bottom: 18px; }
+.cd-cal-sync-title { font: 600 16px var(--zs-sans); letter-spacing: -0.02em; color: var(--zs-ink); margin-bottom: 4px; }
+.cd-cal-sync-sub { font: 400 13px var(--zs-sans); color: var(--zs-ink-4); white-space: nowrap; }
 .cd-cal-options { display: grid; grid-template-columns: repeat(3,1fr); gap: 14px; }
-.cd-cal-option { border: 1px solid var(--zs-border); border-radius: 14px; padding: 22px 16px; display: flex; flex-direction: column; align-items: center; gap: 8px; }
+.cd-cal-option { border: 1px solid var(--zs-border); border-radius: 14px; padding: 18px 16px; display: flex; flex-direction: column; align-items: center; gap: 8px; }
 .cd-cal-option-name { font: 500 14px var(--zs-sans); color: var(--zs-ink); letter-spacing: -0.01em; }
-.cd-cal-connected    { font: 500 12px var(--zs-sans); color: #16a34a; }
-.cd-cal-disconnected { font: 400 12px var(--zs-sans); color: var(--zs-ink-5); }
 .cd-support-footer { text-align: center; font: 400 13px var(--zs-sans); color: var(--zs-ink-5); margin-top: 32px; padding-bottom: 8px; }
 .cd-support-footer a { color: var(--zs-ink-4); text-decoration: none; border-bottom: 1px solid var(--zs-border); transition: color 160ms, border-color 160ms; }
 .cd-support-footer a:hover { color: var(--zs-ink); border-color: var(--zs-ink); }

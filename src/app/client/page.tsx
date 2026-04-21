@@ -599,26 +599,22 @@ export default function ClientPage() {
                 <div>
                   <div className="cd-cal-sync-title">Sync to your calendar</div>
                   <div className="cd-cal-sync-sub">
-                    Your ZionShift meetings will appear automatically on your personal calendar.
+                    Your ZionShift meetings will appear automatically on your calendar.
                   </div>
                 </div>
-                <span className="cd-connected-badge">● Google connected</span>
               </div>
               <div className="cd-cal-options">
                 <div className="cd-cal-option">
                   <GoogleIcon />
                   <span className="cd-cal-option-name">Google Calendar</span>
-                  <span className="cd-cal-connected">Connected</span>
                 </div>
                 <div className="cd-cal-option">
                   <OutlookIcon />
                   <span className="cd-cal-option-name">Outlook / Microsoft 365</span>
-                  <span className="cd-cal-disconnected">Not connected</span>
                 </div>
                 <div className="cd-cal-option">
                   <AppleIcon />
                   <span className="cd-cal-option-name">Apple Calendar</span>
-                  <span className="cd-cal-disconnected">Not connected</span>
                 </div>
               </div>
             </div>
