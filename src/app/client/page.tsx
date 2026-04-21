@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useRef, useState } from 'react';
+import { Fragment, useEffect, useRef, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { createClient } from '@/utils/supabase/client';
 
@@ -834,7 +834,10 @@ export default function ClientPage() {
                       <div className="bl-row">
                         <span className="bl-row-key">Status</span>
                         {billingData
-                          ? <span className={`bl-status-pill${billingData.status !== 'active' ? ' bl-status-paused' : ''}`}>
+                          ? <span className={`bl-status-pill${
+                              billingData.status === 'paused'    ? ' bl-status-paused'    :
+                              billingData.status === 'cancelled' ? ' bl-status-cancelled' : ''
+                            }`}>
                               ● {billingData.status.charAt(0).toUpperCase() + billingData.status.slice(1)}
                             </span>
                           : <span className="bl-row-val">—</span>
@@ -897,16 +900,18 @@ export default function ClientPage() {
                     {/* Invoice History */}
                     <div className="cd-card bl-card">
                       <div className="bl-section-label">Invoice History</div>
-                      {(billingData?.invoices ?? []).map((inv, i) => (
-                        <>
-                          {i > 0 && <div key={`d-${i}`} className="bl-divider" />}
-                          <div key={i} className="bl-invoice-row">
+                      {!billingData || billingData.invoices.length === 0 ? (
+                        <p className="bl-inv-empty">No invoices on record yet.</p>
+                      ) : billingData.invoices.map((inv, i) => (
+                        <Fragment key={i}>
+                          {i > 0 && <div className="bl-divider" />}
+                          <div className="bl-invoice-row">
                             <span className="bl-inv-date">{inv.date}</span>
                             <span className="bl-inv-desc">{inv.description}</span>
                             <span className="bl-inv-amount">${inv.amount.toLocaleString()}</span>
                             {inv.paid && <span className="bl-inv-paid">Paid</span>}
                           </div>
-                        </>
+                        </Fragment>
                       ))}
                     </div>
 
