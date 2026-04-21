@@ -17,7 +17,7 @@ function useReveal() {
     requestAnimationFrame(() => {
       document.querySelectorAll(sel).forEach((el) => {
         const r = el.getBoundingClientRect();
-        if (r.top < window.innerHeight * 0.92 && r.bottom > 0) {
+        if (r.top < window.innerHeight && r.bottom > 0) {
           el.classList.add('in');
           if (el.classList.contains('hero-visual')) el.classList.add('in-view');
         }

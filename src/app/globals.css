@@ -511,8 +511,12 @@ footer.zs-footer { padding: 40px 0; border-top: 1px solid var(--zs-border); }
   .hamburger { display: flex; }
   .mobile-menu { display: block; }
 
-  /* Hero */
+  /* Hero — show CTAs faster on mobile */
   .hero { padding: 110px 0 60px; }
+  .hero .reveal { transition-duration: 500ms; }
+  .hero .reveal.d3 { transition-delay: 0ms; }
+  .hero .reveal.d4 { transition-delay: 80ms; }
+  .hero .reveal.d5 { transition-delay: 160ms; }
   .hero-visual { margin-top: 60px; overflow: hidden; }
   .visual-grid { grid-template-columns: 1fr; gap: 16px; }
   .hero-badge-1 { display: none; }
@@ -526,16 +530,20 @@ footer.zs-footer { padding: 40px 0; border-top: 1px solid var(--zs-border); }
   .stat { padding: 28px 20px; }
   .stat .val { font-size: clamp(32px, 8vw, 52px); }
 
-  /* Process — keep sticky scroll on mobile, stack to 1 column */
-  .process-grid { grid-template-columns: 1fr; gap: 24px; }
-  .process-copy h2 { font-size: clamp(28px, 7vw, 48px); }
-  .process-copy p { font-size: 16px; margin-top: 16px; }
-  .process-stage { aspect-ratio: 4/3; }
+  /* Process — sticky scroll preserved, stage made taller, slides less padded */
+  .process-sticky { height: 100svh; overflow: visible; }
+  .process-grid { grid-template-columns: 1fr; gap: 20px; }
+  .process-copy h2 { font-size: clamp(26px, 7vw, 44px); }
+  .process-copy p { font-size: 15px; margin-top: 12px; }
+  .process-stage { aspect-ratio: 1 / 1; }
+  .process-slide { padding: 24px 24px 24px 40px; }
+  .process-track { left: 12px; gap: 10px; }
 
   /* Bento */
   .bento { grid-template-columns: 1fr !important; gap: 12px; }
   .bento > * { grid-column: 1 / 2 !important; }
   .tile { padding: 28px 24px; min-height: 200px; }
+  .bento .wide { padding-bottom: 136px; min-height: 260px; }
 
   /* Pricing */
   .pricing-card { padding: 36px 24px; }
