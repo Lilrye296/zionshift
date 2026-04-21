@@ -40,6 +40,7 @@ export default function LoginPage() {
   return (
     <div className="login-page">
       <div className="login-card">
+        <a href="/" className="login-back">← Back to site</a>
         {/* eslint-disable-next-line @next/next/no-img-element */}
         <img src="/logo.png" alt="ZionShift" className="login-logo" />
         <h1 className="login-heading">Welcome back.</h1>
