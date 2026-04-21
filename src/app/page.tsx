@@ -184,9 +184,6 @@ function Nav({ onBook }: { onBook: () => void }) {
           <a href="#why" onClick={close}>Why us</a>
           <a href="#pricing" onClick={close}>Pricing</a>
           <a href="#faq" onClick={close}>FAQ</a>
-          <button className="btn btn-primary" onClick={() => { close(); onBook(); }} style={{ width: '100%', marginTop: 16 }}>
-            Book a call<span className="chev">→</span>
-          </button>
         </div>
       )}
     </div>

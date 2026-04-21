@@ -512,8 +512,8 @@ footer.zs-footer { padding: 40px 0; border-top: 1px solid var(--zs-border); }
 @media (max-width: 900px) {
   /* Nav */
   .zs-nav-links { display: none; }
-  .zs-nav > .btn { display: none; }
-  .zs-nav { padding: 0 16px; gap: 12px; }
+  .zs-nav { padding: 0 16px; gap: 8px; }
+  .zs-nav > .btn { padding: 9px 14px; font-size: 12px; }
   .hamburger { display: flex; }
   .mobile-menu { display: block; }
 
