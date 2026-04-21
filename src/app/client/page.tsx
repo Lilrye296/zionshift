@@ -85,6 +85,13 @@ function MeetingDetailModal({ meetings, onClose }: { meetings: CalMeeting[]; onC
   const month = MONTH_NAMES[now.getMonth()];
   const day   = meetings[0].day;
 
+  function isPast(meetingDay: number) {
+    const today = new Date();
+    today.setHours(0, 0, 0, 0);
+    const meetingDate = new Date(today.getFullYear(), today.getMonth(), meetingDay);
+    return meetingDate < today;
+  }
+
   return (
     <div className="modal-overlay" onClick={onClose}>
       <div className="modal" style={{ maxWidth: 400 }} onClick={e => e.stopPropagation()}>
@@ -100,16 +107,18 @@ function MeetingDetailModal({ meetings, onClose }: { meetings: CalMeeting[]; onC
                 <span className="mdm-icon">🕐</span>
                 <span>{meeting.time}</span>
               </div>
-              <div className="mdm-row">
-                <span className="mdm-icon">📹</span>
-                {meeting.zoomUrl ? (
-                  <a href={meeting.zoomUrl} target="_blank" rel="noopener noreferrer" className="mdm-zoom-link">
-                    Join Zoom Call →
-                  </a>
-                ) : (
-                  <span className="mdm-zoom-pending">Zoom link will appear here</span>
-                )}
-              </div>
+              {!isPast(meeting.day) && (
+                <div className="mdm-row">
+                  <span className="mdm-icon">📹</span>
+                  {meeting.zoomUrl ? (
+                    <a href={meeting.zoomUrl} target="_blank" rel="noopener noreferrer" className="mdm-zoom-link">
+                      Join Zoom Call →
+                    </a>
+                  ) : (
+                    <span className="mdm-zoom-pending">Zoom link will appear here</span>
+                  )}
+                </div>
+              )}
             </div>
           ))}
         </div>
