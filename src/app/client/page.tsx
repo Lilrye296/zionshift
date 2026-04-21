@@ -682,7 +682,6 @@ export default function ClientPage() {
             </div>
 
             {/* ── Activity + Calendar ── */}
-            {/* ── Activity + Calendar ── */}
             {(() => {
               const today = new Date().getDate();
               const filteredActivity = ACTIVITY.filter(a => {
