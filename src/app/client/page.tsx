@@ -117,10 +117,9 @@ function LogoUploadModal({
   onClose: () => void;
   onSave: (url: string) => void;
 }) {
-  const [dragging, setDragging]   = useState(false);
-  const [preview, setPreview]     = useState<string | null>(null);
-  const [fileName, setFileName]   = useState<string | null>(null);
-  const [error, setError]         = useState('');
+  const [dragging, setDragging] = useState(false);
+  const [preview, setPreview]   = useState<string | null>(null);
+  const [error, setError]       = useState('');
   const inputRef = useRef<HTMLInputElement>(null);
 
   const ACCEPTED = ['image/png', 'image/svg+xml', 'image/jpeg'];
@@ -136,7 +135,6 @@ function LogoUploadModal({
       setError(`File must be under ${MAX_MB}MB.`);
       return;
     }
-    setFileName(file.name);
     setPreview(URL.createObjectURL(file));
   }
 
