@@ -500,8 +500,12 @@ body { font-family: var(--zs-sans); color: var(--zs-ink-2); overflow-x: hidden; 
 /* ─── PORTAL SHARED ───────────────────────────────── */
 .portal-page { min-height: 100vh; background: var(--zs-paper); }
 .portal-nav { position: sticky; top: 0; z-index: 80; background: rgba(255,255,255,0.92); backdrop-filter: blur(12px); border-bottom: 1px solid var(--zs-border); }
-.portal-nav-inner { max-width: 1200px; margin: 0 auto; padding: 0 32px; height: 64px; display: flex; align-items: center; justify-content: space-between; gap: 24px; }
+.portal-nav-inner { max-width: 1200px; margin: 0 auto; padding: 0 32px; height: 64px; display: flex; align-items: center; justify-content: space-between; gap: 24px; position: relative; }
 .portal-logo { height: 22px; width: auto; }
+.client-logo-slot { position: absolute; left: 50%; transform: translateX(-50%); display: flex; align-items: center; }
+.client-logo-slot img { height: 28px; width: auto; object-fit: contain; }
+.client-logo-text { font: 600 15px var(--zs-sans); letter-spacing: -0.02em; color: var(--zs-ink); }
+.client-logo-placeholder { font: 500 12px var(--zs-mono); color: var(--zs-ink-5); letter-spacing: 0.06em; text-transform: uppercase; border: 1px dashed var(--zs-border); border-radius: 8px; padding: 6px 14px; }
 .portal-nav-sections { display: flex; gap: 4px; background: var(--zs-mist); border-radius: 999px; padding: 4px; }
 .portal-section-btn { font: 500 13px var(--zs-sans); color: var(--zs-ink-4); background: transparent; border: none; cursor: pointer; padding: 7px 18px; border-radius: 999px; transition: all 200ms; }
 .portal-section-btn.active { background: #fff; color: var(--zs-ink); box-shadow: 0 1px 4px rgba(11,11,12,0.08); }

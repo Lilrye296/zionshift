@@ -51,6 +51,16 @@ export default function ClientPage() {
         <div className="portal-nav-inner">
           {/* eslint-disable-next-line @next/next/no-img-element */}
           <img src="/logo.png" alt="ZionShift" className="portal-logo" />
+
+          {/* Client logo — center */}
+          <div className="client-logo-slot">
+            {profile?.firm_name ? (
+              <span className="client-logo-text">{profile.firm_name}</span>
+            ) : (
+              <div className="client-logo-placeholder">Client Logo</div>
+            )}
+          </div>
+
           <button className="btn btn-ghost" onClick={handleSignOut} style={{ fontSize: 13, padding: '8px 16px' }}>
             Sign out
           </button>

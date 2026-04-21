@@ -25,7 +25,7 @@ export default function PortalPage() {
       <header className="portal-nav">
         <div className="portal-nav-inner">
           {/* eslint-disable-next-line @next/next/no-img-element */}
-          <img src="/logo.png" alt="ZionShift" className="portal-logo" />
+          <a href="/"><img src="/logo.png" alt="ZionShift" className="portal-logo" /></a>
           <div className="portal-nav-sections">
             <button
               className={`portal-section-btn ${activeSection === 'ops' ? 'active' : ''}`}
