@@ -134,13 +134,6 @@ function MeetingDetailModal({ meetings, onClose }: { meetings: CalMeeting[]; onC
 }
 
 /* ── Placeholder data (replaced by Supabase per-client data later) ── */
-const ACTIVITY = [
-  { label: 'Meeting booked — Marcus T., Northstar CFO', sub: 'Today, 9:14am', strong: true },
-  { label: '6 new replies received this week',           sub: 'This week',     strong: true },
-  { label: 'Email 2 delivered to 104 prospects',         sub: 'Apr 18',        strong: false },
-  { label: 'Campaign entered Week 3',                    sub: 'Apr 15',        strong: false },
-  { label: 'Initial outreach sent to 98 prospects',      sub: 'Apr 8',         strong: false },
-];
 
 interface CalMeeting {
   day: number;
@@ -158,11 +151,16 @@ const CAL_MEETINGS: CalMeeting[] = [
   { day: 23, prospect: 'Linda Park',      firm: 'Summit Tax Advisors',        time: '2:00 PM EST',  status: 'Scheduled', zoomUrl: 'https://zoom.us/j/placeholder2' },
 ];
 
-const MEETINGS = [
-  { date: 'Apr 23', prospect: 'Marcus Thompson', firm: 'Northstar CFO Group',        status: 'Scheduled' },
-  { date: 'Apr 17', prospect: 'Sarah Mitchell',  firm: 'Clarity Point Bookkeeping',  status: 'Completed' },
-  { date: 'Apr 11', prospect: 'James Rivera',    firm: 'Apex Financial Services',    status: 'Completed' },
+// Activity items tagged with day number for period filtering
+const ACTIVITY = [
+  { label: 'Meeting booked — Marcus T., Northstar CFO', sub: 'Today, 9:14am', day: 21 },
+  { label: '6 new replies received this week',           sub: 'This week',     day: 18 },
+  { label: 'Email 2 delivered to 104 prospects',         sub: 'Apr 18',        day: 18 },
+  { label: 'Campaign entered Week 3',                    sub: 'Apr 15',        day: 15 },
+  { label: 'Initial outreach sent to 98 prospects',      sub: 'Apr 8',         day: 8  },
 ];
+
+const MONTH_SHORT = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
 
 /* ── Icons ── */
 function GoogleIcon() {
@@ -494,67 +492,95 @@ export default function ClientPage() {
             </div>
 
             {/* ── Activity + Calendar ── */}
-            <div className="cd-mid-row">
-              <div className="cd-card">
-                <div className="cd-card-label">Recent Activity</div>
-                <div className="cd-activity-scroll">
-                  <ul className="cd-activity-list">
-                    {ACTIVITY.map((a, i) => (
-                      <li key={i} className={`cd-activity-item${a.strong ? ' strong' : ''}`}>
-                        <span className="cd-activity-text">{a.label}</span>
-                        <span className="cd-activity-sub">{a.sub}</span>
-                      </li>
-                    ))}
-                  </ul>
-                </div>
-              </div>
+            {/* ── Activity + Calendar ── */}
+            {(() => {
+              const today = new Date().getDate();
+              const filteredActivity = ACTIVITY.filter(a => {
+                if (period === 'alltime') return true;
+                if (period === 'week')  return a.day >= today - 7;
+                return true; // month — all in same month
+              });
+              const parseTime = (t: string) => {
+                const [time, pd] = t.split(' ');
+                const [h, m] = time.split(':').map(Number);
+                const hour = pd === 'PM' && h !== 12 ? h + 12 : pd === 'AM' && h === 12 ? 0 : h;
+                return hour * 60 + m;
+              };
+              const sortedMeetings = [...CAL_MEETINGS].sort((a, b) => b.day - a.day || parseTime(b.time) - parseTime(a.time));
+              const filteredMeetings = sortedMeetings.filter(m => {
+                if (period === 'alltime') return true;
+                if (period === 'week')  return m.day >= today - 7;
+                return true;
+              });
+              return (
+                <>
+                  <div className="cd-mid-row">
+                    <div className="cd-card">
+                      <div className="cd-card-label">Recent Activity</div>
+                      <div className="cd-activity-scroll">
+                        <ul className="cd-activity-list">
+                          {filteredActivity.length === 0 ? (
+                            <li className="cd-empty-state">No activity this period.</li>
+                          ) : filteredActivity.map((a, i) => (
+                            <li key={i} className="cd-activity-item">
+                              <span className="cd-activity-text">{a.label}</span>
+                              <span className="cd-activity-sub">{a.sub}</span>
+                            </li>
+                          ))}
+                        </ul>
+                      </div>
+                    </div>
 
-              <div className="cd-card">
-                <MiniCalendar
-                  meetings={CAL_MEETINGS}
-                  onDayClick={(day) => {
-                    const parseTime = (t: string) => {
-                      const [time, period] = t.split(' ');
-                      const [h, m] = time.split(':').map(Number);
-                      const hour = period === 'PM' && h !== 12 ? h + 12
-                                 : period === 'AM' && h === 12 ? 0 : h;
-                      return hour * 60 + m;
-                    };
-                    const dayMeetings = CAL_MEETINGS
-                      .filter(m => m.day === day)
-                      .sort((a, b) => parseTime(a.time) - parseTime(b.time));
-                    setSelectedDayMeetings(dayMeetings);
-                  }}
-                />
-              </div>
-            </div>
+                    <div className="cd-card">
+                      <MiniCalendar
+                        meetings={CAL_MEETINGS}
+                        onDayClick={(day) => {
+                          const dayMeetings = CAL_MEETINGS
+                            .filter(m => m.day === day)
+                            .sort((a, b) => parseTime(a.time) - parseTime(b.time));
+                          setSelectedDayMeetings(dayMeetings);
+                        }}
+                      />
+                    </div>
+                  </div>
 
-            {/* ── Meeting Log ── */}
-            <div className="cd-card" style={{ marginBottom: 20 }}>
-              <div className="cd-card-label" style={{ marginBottom: 18 }}>Meeting Log</div>
-              <table className="cd-table">
-                <thead>
-                  <tr>
-                    <th>Date</th>
-                    <th>Prospect</th>
-                    <th>Firm</th>
-                    <th>Status</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {MEETINGS.map((m, i) => (
-                    <tr key={i}>
-                      <td className="cd-td-date">{m.date}</td>
-                      <td className="cd-td-name">{m.prospect}</td>
-                      <td className="cd-td-firm">{m.firm}</td>
-                      <td>
-                        <span className={`cd-pill ${m.status.toLowerCase()}`}>{m.status}</span>
-                      </td>
-                    </tr>
-                  ))}
-                </tbody>
-              </table>
-            </div>
+                  {/* ── Meeting Log ── */}
+                  <div className="cd-card" style={{ marginBottom: 20 }}>
+                    <div className="cd-card-label" style={{ marginBottom: 18 }}>Meeting Log</div>
+                    <div className="cd-table-scroll">
+                      <table className="cd-table">
+                        <thead>
+                          <tr>
+                            <th>Date</th>
+                            <th>Prospect</th>
+                            <th>Firm</th>
+                            <th>Status</th>
+                          </tr>
+                        </thead>
+                        <tbody>
+                          {filteredMeetings.length === 0 ? (
+                            <tr><td colSpan={4} className="cd-empty-state" style={{ textAlign: 'center', padding: '24px 0' }}>No meetings this period.</td></tr>
+                          ) : filteredMeetings.map((m, i) => (
+                            <tr
+                              key={i}
+                              className="cd-table-row-clickable"
+                              onClick={() => setSelectedDayMeetings([m])}
+                            >
+                              <td className="cd-td-date">{MONTH_SHORT[new Date().getMonth()]} {m.day}</td>
+                              <td className="cd-td-name">{m.prospect}</td>
+                              <td className="cd-td-firm">{m.firm}</td>
+                              <td>
+                                <span className={`cd-pill ${m.status.toLowerCase()}`}>{m.status}</span>
+                              </td>
+                            </tr>
+                          ))}
+                        </tbody>
+                      </table>
+                    </div>
+                  </div>
+                </>
+              );
+            })()}
 
             {/* ── Calendar Sync ── */}
             <div className="cd-card cd-cal-sync">
