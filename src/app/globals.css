@@ -599,6 +599,9 @@ body { font-family: var(--zs-sans); color: var(--zs-ink-2); overflow-x: hidden; 
 .mdm-divider { border: none; border-top: 1px solid var(--zs-border); margin: 20px 0; }
 .mdm-row { display: flex; align-items: center; gap: 12px; font: 400 14px var(--zs-sans); color: var(--zs-ink); margin-bottom: 12px; }
 .mdm-icon { font-size: 16px; width: 20px; text-align: center; flex-shrink: 0; }
+.mdm-zoom-link { font: 500 14px var(--zs-sans); color: #2563eb; text-decoration: none; border-bottom: 1px solid #bfdbfe; transition: color 160ms, border-color 160ms; }
+.mdm-zoom-link:hover { color: #1d4ed8; border-color: #1d4ed8; }
+.mdm-zoom-pending { font: 400 13px var(--zs-sans); color: var(--zs-ink-5); font-style: italic; }
 
 .cd-table { width: 100%; border-collapse: collapse; }
 .cd-table th { font: 500 11px var(--zs-mono); letter-spacing: 0.08em; text-transform: uppercase; color: var(--zs-ink-5); text-align: left; padding: 0 16px 14px 0; border-bottom: 1px solid var(--zs-border); }

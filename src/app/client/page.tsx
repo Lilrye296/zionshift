@@ -104,12 +104,14 @@ function MeetingDetailModal({ meeting, onClose }: { meeting: CalMeeting; onClose
           </div>
           <div className="mdm-row">
             <span className="mdm-icon">📹</span>
-            <span>Zoom call</span>
+            {meeting.zoomUrl ? (
+              <a href={meeting.zoomUrl} target="_blank" rel="noopener noreferrer" className="mdm-zoom-link">
+                Join Zoom Call →
+              </a>
+            ) : (
+              <span className="mdm-zoom-pending">Zoom link will appear here</span>
+            )}
           </div>
-          <div className="mdm-divider" />
-          <span className={`cd-pill ${meeting.status.toLowerCase()}`} style={{ marginTop: 4 }}>
-            {meeting.status}
-          </span>
         </div>
       </div>
     </div>
@@ -131,12 +133,13 @@ interface CalMeeting {
   firm: string;
   time: string;
   status: string;
+  zoomUrl?: string;
 }
 
 const CAL_MEETINGS: CalMeeting[] = [
   { day: 11, prospect: 'James Rivera',    firm: 'Apex Financial Services',   time: '10:00 AM EST', status: 'Completed' },
   { day: 17, prospect: 'Sarah Mitchell',  firm: 'Clarity Point Bookkeeping', time: '2:00 PM EST',  status: 'Completed' },
-  { day: 23, prospect: 'Marcus Thompson', firm: 'Northstar CFO Group',        time: '9:00 AM EST',  status: 'Scheduled' },
+  { day: 23, prospect: 'Marcus Thompson', firm: 'Northstar CFO Group',        time: '9:00 AM EST',  status: 'Scheduled', zoomUrl: 'https://zoom.us/j/placeholder' },
 ];
 
 const MEETINGS = [
