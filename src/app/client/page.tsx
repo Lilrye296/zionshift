@@ -418,6 +418,27 @@ interface PeriodStats {
   meetings_booked: number | null;
 }
 
+// Billing data — populated from Stripe + Supabase when wired up
+// TODO (Stripe): fetch via Stripe Customer object + subscription + invoice list
+// TODO (Supabase): plan name and billing_started stored in client_stats table
+interface BillingData {
+  plan_name: string;          // e.g. "ZionShift", "ZionShift Growth"
+  status: 'active' | 'paused' | 'cancelled';
+  monthly_amount: number;     // in dollars, e.g. 2000
+  billing_started: string;    // formatted date string, e.g. "Apr 11, 2026"
+  next_invoice: string;       // formatted date string, e.g. "May 11, 2026"
+  card_brand: string;         // e.g. "Visa"
+  card_last4: string;         // e.g. "4821"
+  card_expires: string;       // e.g. "09 / 28"
+  stripe_portal_url: string;  // Stripe Customer Portal link for card updates only
+  invoices: {
+    date: string;
+    description: string;
+    amount: number;
+    paid: boolean;
+  }[];
+}
+
 /* ── Page ── */
 export default function ClientPage() {
   const [profile, setProfile] = useState<ClientProfile | null>(null);
@@ -434,6 +455,9 @@ export default function ClientPage() {
   // Holds metric totals filtered to the selected period.
   // Defaults to null (shows —) until Supabase query returns data.
   const [periodStats, setPeriodStats]           = useState<PeriodStats | null>(null);
+  // Billing data — null until Stripe + Supabase are wired up (shows — placeholders).
+  // TODO (Stripe/Supabase): replace BILLING_PLACEHOLDER below with a real fetch.
+  const [billingData, setBillingData]           = useState<BillingData | null>(null);
   const periodRef                           = useRef<HTMLDivElement>(null);
   const [connectedCal, setConnectedCal]     = useState<CalProvider>('google');
   const [calModal, setCalModal]             = useState<CalProvider | null>(null);
@@ -482,6 +506,33 @@ export default function ClientPage() {
       meetings_booked: profile.meetings_booked,
     });
   }, [period, profile]);
+  // ───────────────────────────────────────────────────────────────────────
+
+  // ── Billing data ──────────────────────────────────────────────────────
+  // TODO (Stripe + Supabase): replace this placeholder block with real fetches:
+  //   1. GET /api/billing?clientId=user.id  (server route that calls Stripe API)
+  //      → returns subscription, latest invoices, and card details
+  //   2. Supabase: pull plan_name and billing_started from client_stats
+  // All JSX fields below already read from billingData — swap in real data
+  // and the page updates automatically with no further changes needed.
+  useEffect(() => {
+    // Placeholder — remove this block and replace with real Stripe fetch
+    setBillingData({
+      plan_name:        'ZionShift',
+      status:           'active',
+      monthly_amount:   2000,
+      billing_started:  'Apr 11, 2026',
+      next_invoice:     'May 11, 2026',
+      card_brand:       'Visa',
+      card_last4:       '4821',
+      card_expires:     '09 / 28',
+      stripe_portal_url: 'https://billing.stripe.com',
+      invoices: [
+        { date: 'Apr 11, 2026', description: 'Monthly retainer', amount: 2000, paid: true },
+        { date: 'Mar 29, 2026', description: 'Setup fee',         amount: 1000, paid: true },
+      ],
+    });
+  }, []);
   // ───────────────────────────────────────────────────────────────────────
 
   async function handleSignOut() {
@@ -777,27 +828,34 @@ export default function ClientPage() {
                       <div className="bl-section-label">Plan Details</div>
                       <div className="bl-row">
                         <span className="bl-row-key">Plan</span>
-                        <span className="bl-row-val">ZionShift</span>
+                        <span className="bl-row-val">{billingData?.plan_name ?? '—'}</span>
                       </div>
                       <div className="bl-divider" />
                       <div className="bl-row">
                         <span className="bl-row-key">Status</span>
-                        <span className="bl-status-pill">● Active</span>
+                        {billingData
+                          ? <span className={`bl-status-pill${billingData.status !== 'active' ? ' bl-status-paused' : ''}`}>
+                              ● {billingData.status.charAt(0).toUpperCase() + billingData.status.slice(1)}
+                            </span>
+                          : <span className="bl-row-val">—</span>
+                        }
                       </div>
                       <div className="bl-divider" />
                       <div className="bl-row">
                         <span className="bl-row-key">Monthly retainer</span>
-                        <span className="bl-row-val">$2,000 / mo</span>
+                        <span className="bl-row-val">
+                          {billingData ? `$${billingData.monthly_amount.toLocaleString()} / mo` : '—'}
+                        </span>
                       </div>
                       <div className="bl-divider" />
                       <div className="bl-row">
                         <span className="bl-row-key">Billing started</span>
-                        <span className="bl-row-mono">Apr 11, 2026</span>
+                        <span className="bl-row-mono">{billingData?.billing_started ?? '—'}</span>
                       </div>
                       <div className="bl-divider" />
                       <div className="bl-row">
                         <span className="bl-row-key">Next invoice</span>
-                        <span className="bl-row-mono">May 11, 2026</span>
+                        <span className="bl-row-mono">{billingData?.next_invoice ?? '—'}</span>
                       </div>
                     </div>
 
@@ -806,16 +864,18 @@ export default function ClientPage() {
                       <div className="bl-section-label">Payment Method</div>
                       <div className="bl-row">
                         <span className="bl-row-key">Card on file</span>
-                        <span className="bl-row-val">Visa •••• 4821</span>
+                        <span className="bl-row-val">
+                          {billingData ? `${billingData.card_brand} •••• ${billingData.card_last4}` : '—'}
+                        </span>
                       </div>
                       <div className="bl-divider" />
                       <div className="bl-row">
                         <span className="bl-row-key">Expires</span>
-                        <span className="bl-row-mono">09 / 28</span>
+                        <span className="bl-row-mono">{billingData?.card_expires ?? '—'}</span>
                       </div>
                       <div className="bl-divider" />
                       <a
-                        href="https://billing.stripe.com"
+                        href={billingData?.stripe_portal_url ?? '#'}
                         target="_blank"
                         rel="noopener noreferrer"
                         className="bl-stripe-btn"
@@ -837,19 +897,17 @@ export default function ClientPage() {
                     {/* Invoice History */}
                     <div className="cd-card bl-card">
                       <div className="bl-section-label">Invoice History</div>
-                      <div className="bl-invoice-row">
-                        <span className="bl-inv-date">Apr 11, 2026</span>
-                        <span className="bl-inv-desc">Monthly retainer</span>
-                        <span className="bl-inv-amount">$2,000</span>
-                        <span className="bl-inv-paid">Paid</span>
-                      </div>
-                      <div className="bl-divider" />
-                      <div className="bl-invoice-row">
-                        <span className="bl-inv-date">Mar 29, 2026</span>
-                        <span className="bl-inv-desc">Setup fee</span>
-                        <span className="bl-inv-amount">$1,000</span>
-                        <span className="bl-inv-paid">Paid</span>
-                      </div>
+                      {(billingData?.invoices ?? []).map((inv, i) => (
+                        <>
+                          {i > 0 && <div key={`d-${i}`} className="bl-divider" />}
+                          <div key={i} className="bl-invoice-row">
+                            <span className="bl-inv-date">{inv.date}</span>
+                            <span className="bl-inv-desc">{inv.description}</span>
+                            <span className="bl-inv-amount">${inv.amount.toLocaleString()}</span>
+                            {inv.paid && <span className="bl-inv-paid">Paid</span>}
+                          </div>
+                        </>
+                      ))}
                     </div>
 
                     {/* Need to make changes */}
@@ -861,7 +919,7 @@ export default function ClientPage() {
                         {' '}We&apos;ll take care of it within one business day.
                       </p>
                       <p className="bl-changes-note">
-                        No long-term contracts. Your retainer only continues as long as you&apos;re seeing results.
+                        No contracts. Your retainer only continues as long as you&apos;re seeing results.
                       </p>
                     </div>
 
