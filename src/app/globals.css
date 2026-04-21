@@ -627,7 +627,28 @@ body { font-family: var(--zs-sans); color: var(--zs-ink-2); overflow-x: hidden; 
 .cd-cal-sync-sub { font: 400 13px var(--zs-sans); color: var(--zs-ink-4); white-space: nowrap; }
 .cd-cal-options { display: grid; grid-template-columns: repeat(3,1fr); gap: 14px; }
 .cd-cal-option { border: 1px solid var(--zs-border); border-radius: 14px; padding: 18px 16px; display: flex; flex-direction: column; align-items: center; gap: 8px; }
-.cd-cal-option-name { font: 500 14px var(--zs-sans); color: var(--zs-ink); letter-spacing: -0.01em; }
+.cd-cal-option-btn { cursor: pointer; transition: border-color 160ms, background 160ms; }
+.cd-cal-option-btn:hover { border-color: var(--zs-ink); background: var(--zs-mist); }
+.cd-cal-option-active { border-color: #16a34a !important; background: #f0fdf4; }
+.cd-cal-option-name { font: 500 14px var(--zs-sans); color: var(--zs-ink); letter-spacing: -0.01em; text-align: center; }
+.cd-cal-connected { font: 500 12px var(--zs-sans); color: #16a34a; }
+.cd-cal-tap { font: 400 12px var(--zs-sans); color: var(--zs-ink-5); }
+
+/* ─── CALENDAR CONNECT MODAL ──────────────────────── */
+.ccm-header { display: flex; align-items: center; gap: 14px; margin-bottom: 24px; }
+.ccm-title { font: 700 18px var(--zs-sans); letter-spacing: -0.02em; color: var(--zs-ink); }
+.ccm-connected-label { font: 500 12px var(--zs-sans); color: #16a34a; margin-top: 3px; }
+.ccm-steps-label { font: 600 12px var(--zs-mono); letter-spacing: 0.06em; text-transform: uppercase; color: var(--zs-ink-4); margin-bottom: 10px; }
+.ccm-steps { margin: 0 0 20px 18px; padding: 0; display: flex; flex-direction: column; gap: 8px; }
+.ccm-steps li { font: 400 14px var(--zs-sans); color: var(--zs-ink); line-height: 1.5; }
+.ccm-note { font: 400 12px var(--zs-sans); color: var(--zs-ink-5); background: var(--zs-mist); border-radius: 8px; padding: 10px 14px; margin-bottom: 24px; line-height: 1.5; }
+.ccm-actions { display: flex; gap: 10px; }
+.ccm-btn-connect { flex: 1; padding: 11px 0; border-radius: 10px; border: none; background: var(--zs-ink); color: #fff; font: 600 14px var(--zs-sans); cursor: pointer; transition: opacity 160ms; }
+.ccm-btn-connect:hover { opacity: 0.85; }
+.ccm-btn-disconnect { flex: 1; padding: 11px 0; border-radius: 10px; border: 1.5px solid #fca5a5; background: #fff1f2; color: #dc2626; font: 600 14px var(--zs-sans); cursor: pointer; transition: opacity 160ms; }
+.ccm-btn-disconnect:hover { opacity: 0.8; }
+.ccm-btn-cancel { padding: 11px 20px; border-radius: 10px; border: 1px solid var(--zs-border); background: transparent; color: var(--zs-ink-4); font: 500 14px var(--zs-sans); cursor: pointer; transition: border-color 160ms; }
+.ccm-btn-cancel:hover { border-color: var(--zs-ink); }
 .cd-support-footer { text-align: center; font: 400 13px var(--zs-sans); color: var(--zs-ink-5); margin-top: 32px; padding-bottom: 8px; }
 .cd-support-footer a { color: var(--zs-ink-4); text-decoration: none; border-bottom: 1px solid var(--zs-border); transition: color 160ms, border-color 160ms; }
 .cd-support-footer a:hover { color: var(--zs-ink); border-color: var(--zs-ink); }

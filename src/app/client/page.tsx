@@ -200,6 +200,94 @@ function OutlookIcon() {
   );
 }
 
+/* ── Calendar Connect Modal ── */
+type CalProvider = 'google' | 'outlook' | 'apple';
+
+const CAL_INFO: Record<CalProvider, { name: string; icon: () => JSX.Element; steps: string[] }> = {
+  google: {
+    name: 'Google Calendar',
+    icon: GoogleIcon,
+    steps: [
+      'Click Connect below to authorize with your Google account.',
+      'Choose the Google account you want to sync with.',
+      'Allow ZionShift to view your calendar availability.',
+      'Your meetings will appear in Google Calendar automatically.',
+    ],
+  },
+  outlook: {
+    name: 'Outlook / Microsoft 365',
+    icon: OutlookIcon,
+    steps: [
+      'Click Connect below to authorize with your Microsoft account.',
+      'Sign in with the Microsoft 365 or Outlook account you use.',
+      'Grant calendar access when prompted.',
+      'Your meetings will appear in Outlook automatically.',
+    ],
+  },
+  apple: {
+    name: 'Apple Calendar',
+    icon: AppleIcon,
+    steps: [
+      'Open your Apple ID settings at appleid.apple.com.',
+      'Under Sign-In & Security, generate an App-Specific Password.',
+      'Click Connect below and enter that password when prompted.',
+      'Your meetings will sync to Apple Calendar automatically.',
+    ],
+  },
+};
+
+function CalendarConnectModal({
+  provider,
+  isConnected,
+  onConnect,
+  onDisconnect,
+  onClose,
+}: {
+  provider: CalProvider;
+  isConnected: boolean;
+  onConnect: () => void;
+  onDisconnect: () => void;
+  onClose: () => void;
+}) {
+  const info = CAL_INFO[provider];
+  const Icon = info.icon;
+  return (
+    <div className="modal-overlay" onClick={onClose}>
+      <div className="modal" style={{ maxWidth: 420 }} onClick={e => e.stopPropagation()}>
+        <button className="modal-close" onClick={onClose}>✕</button>
+        <div className="modal-scroll">
+          <div className="ccm-header">
+            <Icon />
+            <div>
+              <div className="ccm-title">{info.name}</div>
+              {isConnected && <div className="ccm-connected-label">● Connected</div>}
+            </div>
+          </div>
+          <div className="ccm-steps-label">How it works</div>
+          <ol className="ccm-steps">
+            {info.steps.map((s, i) => <li key={i}>{s}</li>)}
+          </ol>
+          <div className="ccm-note">
+            Full OAuth integration coming soon. Connection state is saved for this session.
+          </div>
+          <div className="ccm-actions">
+            {isConnected ? (
+              <button className="ccm-btn-disconnect" onClick={() => { onDisconnect(); onClose(); }}>
+                Disconnect
+              </button>
+            ) : (
+              <button className="ccm-btn-connect" onClick={() => { onConnect(); onClose(); }}>
+                Connect {info.name}
+              </button>
+            )}
+            <button className="ccm-btn-cancel" onClick={onClose}>Cancel</button>
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+}
+
 /* ── Logo Upload Modal ── */
 function LogoUploadModal({
   onClose,
@@ -364,6 +452,8 @@ export default function ClientPage() {
   const [period, setPeriod]                 = useState<'week' | 'month' | 'alltime'>('month');
   const [periodOpen, setPeriodOpen]         = useState(false);
   const periodRef                           = useRef<HTMLDivElement>(null);
+  const [connectedCal, setConnectedCal]     = useState<CalProvider>('google');
+  const [calModal, setCalModal]             = useState<CalProvider | null>(null);
 
   useEffect(() => {
     function handleClick(e: MouseEvent) {
@@ -604,18 +694,22 @@ export default function ClientPage() {
                 </div>
               </div>
               <div className="cd-cal-options">
-                <div className="cd-cal-option">
-                  <GoogleIcon />
-                  <span className="cd-cal-option-name">Google Calendar</span>
-                </div>
-                <div className="cd-cal-option">
-                  <OutlookIcon />
-                  <span className="cd-cal-option-name">Outlook / Microsoft 365</span>
-                </div>
-                <div className="cd-cal-option">
-                  <AppleIcon />
-                  <span className="cd-cal-option-name">Apple Calendar</span>
-                </div>
+                {(['google', 'outlook', 'apple'] as CalProvider[]).map(p => (
+                  <div
+                    key={p}
+                    className={`cd-cal-option cd-cal-option-btn${connectedCal === p ? ' cd-cal-option-active' : ''}`}
+                    onClick={() => setCalModal(p)}
+                  >
+                    {p === 'google'  && <GoogleIcon />}
+                    {p === 'outlook' && <OutlookIcon />}
+                    {p === 'apple'   && <AppleIcon />}
+                    <span className="cd-cal-option-name">{CAL_INFO[p].name}</span>
+                    {connectedCal === p
+                      ? <span className="cd-cal-connected">● Connected</span>
+                      : <span className="cd-cal-tap">Tap to connect</span>
+                    }
+                  </div>
+                ))}
               </div>
             </div>
 
@@ -653,6 +747,16 @@ export default function ClientPage() {
         <MeetingDetailModal
           meetings={selectedDayMeetings}
           onClose={() => setSelectedDayMeetings(null)}
+        />
+      )}
+
+      {calModal && (
+        <CalendarConnectModal
+          provider={calModal}
+          isConnected={connectedCal === calModal}
+          onConnect={() => setConnectedCal(calModal)}
+          onDisconnect={() => setConnectedCal('google')}
+          onClose={() => setCalModal(null)}
         />
       )}
     </div>
