@@ -712,8 +712,11 @@ body { font-family: var(--zs-sans); color: var(--zs-ink-2); overflow-x: hidden; 
 .bl-inv-date { font: 500 12px var(--zs-mono); color: var(--zs-ink-4); letter-spacing: 0.02em; white-space: nowrap; }
 .bl-inv-desc { font: 500 14px var(--zs-sans); color: var(--zs-ink); }
 .bl-inv-amount { font: 600 14px var(--zs-sans); color: var(--zs-ink); }
-.bl-inv-paid { font: 600 12px var(--zs-sans); color: #16a34a; background: #f0fdf4; border: 1px solid #bbf7d0; border-radius: 999px; padding: 3px 10px; white-space: nowrap; }
-.bl-inv-empty { font: 400 13px var(--zs-sans); color: var(--zs-ink-5); margin: 12px 0 4px; }
+.bl-inv-status  { font: 600 12px var(--zs-sans); border-radius: 999px; padding: 3px 10px; white-space: nowrap; }
+.bl-inv-paid    { color: #16a34a; background: #f0fdf4; border: 1px solid #bbf7d0; }
+.bl-inv-open    { color: #b45309; background: #fffbeb; border: 1px solid #fde68a; }
+.bl-inv-failed  { color: #dc2626; background: #fff1f2; border: 1px solid #fecaca; }
+.bl-inv-empty   { font: 400 13px var(--zs-sans); color: var(--zs-ink-5); margin: 12px 0 4px; }
 
 .bl-changes-card { }
 .bl-changes-title { font: 700 16px var(--zs-sans); letter-spacing: -0.02em; color: var(--zs-ink); margin-bottom: 10px; }

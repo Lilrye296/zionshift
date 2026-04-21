@@ -435,7 +435,7 @@ interface BillingData {
     date: string;
     description: string;
     amount: number;
-    paid: boolean;
+    status: 'paid' | 'open' | 'failed'; // maps directly to Stripe invoice status
   }[];
 }
 
@@ -528,8 +528,8 @@ export default function ClientPage() {
       card_expires:     '09 / 28',
       stripe_portal_url: 'https://billing.stripe.com',
       invoices: [
-        { date: 'Apr 11, 2026', description: 'Monthly retainer', amount: 2000, paid: true },
-        { date: 'Mar 29, 2026', description: 'Setup fee',         amount: 1000, paid: true },
+        { date: 'Apr 11, 2026', description: 'Monthly retainer', amount: 2000, status: 'paid'   },
+        { date: 'Mar 29, 2026', description: 'Setup fee',         amount: 1000, status: 'paid'   },
       ],
     });
   }, []);
@@ -909,7 +909,9 @@ export default function ClientPage() {
                             <span className="bl-inv-date">{inv.date}</span>
                             <span className="bl-inv-desc">{inv.description}</span>
                             <span className="bl-inv-amount">${inv.amount.toLocaleString()}</span>
-                            {inv.paid && <span className="bl-inv-paid">Paid</span>}
+                            <span className={`bl-inv-status bl-inv-${inv.status}`}>
+                              {inv.status.charAt(0).toUpperCase() + inv.status.slice(1)}
+                            </span>
                           </div>
                         </Fragment>
                       ))}
