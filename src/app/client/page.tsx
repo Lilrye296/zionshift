@@ -81,10 +81,8 @@ function MiniCalendar({
 
 /* ── Meeting Detail Modal ── */
 function MeetingDetailModal({ meetings, onClose }: { meetings: CalMeeting[]; onClose: () => void }) {
-  const now   = new Date();
-  const month = MONTH_NAMES[now.getMonth()];
-  const day   = meetings[0].day;
-
+  const first = meetings[0];
+  const monthName = MONTH_NAMES[first.month];
 
   return (
     <div className="modal-overlay" onClick={onClose}>
@@ -93,10 +91,10 @@ function MeetingDetailModal({ meetings, onClose }: { meetings: CalMeeting[]; onC
         <div className="modal-scroll">
           <div className="mdm-eyebrow">
             {meetings.length > 1
-              ? `${meetings.length} ${isMeetingPast(meetings[0].day, meetings[0].time) ? 'Completed' : 'Scheduled'} Meetings`
-              : isMeetingPast(meetings[0].day, meetings[0].time) ? 'Completed Meeting'
+              ? `${meetings.length} ${isMeetingPast(first.day, first.time, first.month) ? 'Completed' : 'Scheduled'} Meetings`
+              : isMeetingPast(first.day, first.time, first.month) ? 'Completed Meeting'
               : 'Scheduled Meeting'
-            } · {month} {day}
+            } · {monthName} {first.day}
           </div>
           {meetings.map((meeting, i) => (
             <div key={i}>
@@ -107,7 +105,7 @@ function MeetingDetailModal({ meetings, onClose }: { meetings: CalMeeting[]; onC
                 <span className="mdm-icon">🕐</span>
                 <span>{meeting.time}</span>
               </div>
-              {!isMeetingPast(meeting.day, meeting.time) && (
+              {!isMeetingPast(meeting.day, meeting.time, meeting.month) && (
                 <div className="mdm-row">
                   <span className="mdm-icon">📹</span>
                   {meeting.zoomUrl ? (
@@ -157,15 +155,17 @@ const ACTIVITY = [
 
 const MONTH_SHORT = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
 
-// Returns true if the meeting day+time has already passed
-function isMeetingPast(day: number, time: string): boolean {
+// Returns true if the meeting month/day/time has already passed
+function isMeetingPast(day: number, time: string, month?: number): boolean {
   const now = new Date();
   const [timePart, period] = time.split(' ');
   const [h, m] = timePart.split(':').map(Number);
   let hour = h;
   if (period === 'PM' && h !== 12) hour += 12;
   if (period === 'AM' && h === 12) hour = 0;
-  const meetingDate = new Date(now.getFullYear(), now.getMonth(), day, hour, m);
+  // Use the meeting's actual month if provided, otherwise fall back to current month
+  const meetingMonth = month ?? now.getMonth();
+  const meetingDate = new Date(now.getFullYear(), meetingMonth, day, hour, m);
   return now > meetingDate;
 }
 
@@ -507,7 +507,7 @@ export default function ClientPage() {
 
   const p = profile;
   const greeting  = getGreeting();
-  const firstName = p?.client_name ?? 'there';
+  const firstName = p?.client_name ?? null;
 
   function getStatusProps(status: string | null) {
     switch (status) {
@@ -576,7 +576,7 @@ export default function ClientPage() {
 
             {/* ── Greeting row ── */}
             <div className="cd-greeting-row">
-              <h1 className="cd-greeting">{greeting}, {firstName}.</h1>
+              <h1 className="cd-greeting">{greeting}{firstName ? `, ${firstName}` : ''}.</h1>
               <div className="cd-greeting-right">
                 <span className={`cd-status-badge ${statusProps.variant}`}>
                   <span className="cd-status-dot" />
@@ -709,8 +709,8 @@ export default function ClientPage() {
                               <td className="cd-td-name">{m.prospect}</td>
                               <td className="cd-td-firm">{m.firm}</td>
                               <td>
-                                <span className={`cd-pill ${isMeetingPast(m.day, m.time) ? 'completed' : 'scheduled'}`}>
-                                  {isMeetingPast(m.day, m.time) ? 'Completed' : 'Scheduled'}
+                                <span className={`cd-pill ${isMeetingPast(m.day, m.time, m.month) ? 'completed' : 'scheduled'}`}>
+                                  {isMeetingPast(m.day, m.time, m.month) ? 'Completed' : 'Scheduled'}
                                 </span>
                               </td>
                             </tr>
