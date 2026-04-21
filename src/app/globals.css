@@ -506,6 +506,10 @@ body { font-family: var(--zs-sans); color: var(--zs-ink-2); overflow-x: hidden; 
 .client-logo-img { height: 28px; width: auto; object-fit: contain; max-width: 160px; }
 .client-logo-text { font: 600 15px var(--zs-sans); letter-spacing: -0.02em; color: var(--zs-ink); }
 .client-logo-placeholder { font: 500 12px var(--zs-mono); color: var(--zs-ink-5); letter-spacing: 0.06em; text-transform: uppercase; border: 1px dashed var(--zs-border); border-radius: 8px; padding: 6px 14px; }
+.client-logo-clickable { position: relative; cursor: pointer; border-radius: 8px; display: flex; align-items: center; transition: opacity 180ms; }
+.client-logo-clickable:hover { opacity: 0.7; }
+.client-logo-edit-badge { position: absolute; top: -7px; right: -9px; background: var(--zs-ink); color: #fff; border-radius: 999px; width: 18px; height: 18px; display: flex; align-items: center; justify-content: center; font-size: 9px; opacity: 0; transition: opacity 180ms; pointer-events: none; border: 1.5px solid #fff; }
+.client-logo-clickable:hover .client-logo-edit-badge { opacity: 1; }
 .portal-nav-sections { display: flex; gap: 4px; background: var(--zs-mist); border-radius: 999px; padding: 4px; }
 .portal-section-btn { font: 500 13px var(--zs-sans); color: var(--zs-ink-4); background: transparent; border: none; cursor: pointer; padding: 7px 18px; border-radius: 999px; transition: all 200ms; }
 .portal-section-btn.active { background: #fff; color: var(--zs-ink); box-shadow: 0 1px 4px rgba(11,11,12,0.08); }
@@ -584,6 +588,27 @@ body { font-family: var(--zs-sans); color: var(--zs-ink-2); overflow-x: hidden; 
 .cd-cal-option-name { font: 500 14px var(--zs-sans); color: var(--zs-ink); letter-spacing: -0.01em; }
 .cd-cal-connected    { font: 500 12px var(--zs-sans); color: #16a34a; }
 .cd-cal-disconnected { font: 400 12px var(--zs-sans); color: var(--zs-ink-5); }
+
+/* ─── LOGO UPLOAD MODAL ───────────────────────────── */
+.lu-heading { font: 700 22px var(--zs-sans); letter-spacing: -0.03em; color: var(--zs-ink); margin: 0 0 6px; }
+.lu-sub { font: 400 14px var(--zs-sans); color: var(--zs-ink-4); margin: 0 0 24px; }
+.lu-dropzone { border: 1.5px dashed var(--zs-border); border-radius: 16px; padding: 40px 24px; display: flex; flex-direction: column; align-items: center; gap: 8px; cursor: pointer; transition: border-color 180ms, background 180ms; background: var(--zs-paper); text-align: center; }
+.lu-dropzone:hover, .lu-dropzone.dragging { border-color: var(--zs-ink); background: var(--zs-mist); }
+.lu-dropzone.has-preview { padding: 20px; border-style: solid; border-color: var(--zs-border); }
+.lu-upload-icon { color: var(--zs-ink-4); margin-bottom: 4px; }
+.lu-drop-label { font: 600 15px var(--zs-sans); color: var(--zs-ink); }
+.lu-drop-sub { font: 400 13px var(--zs-sans); color: var(--zs-ink-4); }
+.lu-browse { color: var(--zs-ink); text-decoration: underline; text-underline-offset: 2px; }
+.lu-preview { max-height: 80px; max-width: 100%; object-fit: contain; border-radius: 8px; }
+.lu-reselect { display: block; margin: 10px auto 0; font: 400 12px var(--zs-mono); color: var(--zs-ink-4); background: none; border: none; cursor: pointer; text-decoration: underline; text-underline-offset: 2px; }
+.lu-reselect:hover { color: var(--zs-ink); }
+.lu-error { font: 500 13px var(--zs-sans); color: #dc2626; margin: 10px 0 0; }
+.lu-reqs { margin-top: 20px; border: 1px solid var(--zs-border); border-radius: 12px; overflow: hidden; }
+.lu-req-row { display: flex; justify-content: space-between; align-items: center; padding: 11px 16px; border-bottom: 1px solid var(--zs-border); gap: 16px; }
+.lu-req-row:last-child { border-bottom: none; }
+.lu-req-key { font: 500 12px var(--zs-mono); letter-spacing: 0.04em; color: var(--zs-ink-5); text-transform: uppercase; white-space: nowrap; }
+.lu-req-val { font: 400 13px var(--zs-sans); color: var(--zs-ink); text-align: right; }
+.lu-note { font: 400 12px var(--zs-sans); color: var(--zs-ink-5); text-align: center; margin: 12px 0 0; line-height: 1.5; }
 
 /* ─── MODAL ───────────────────────────────────────── */
 .modal-overlay { position: fixed; inset: 0; z-index: 100; background: rgba(11,11,12,0.55); backdrop-filter: blur(8px); -webkit-backdrop-filter: blur(8px); display: flex; align-items: center; justify-content: center; padding: 16px; animation: fadeIn 240ms ease; }

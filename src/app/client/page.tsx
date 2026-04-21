@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { createClient } from '@/utils/supabase/client';
 
@@ -109,6 +109,132 @@ function OutlookIcon() {
   );
 }
 
+/* ── Logo Upload Modal ── */
+function LogoUploadModal({
+  onClose,
+  onSave,
+}: {
+  onClose: () => void;
+  onSave: (url: string) => void;
+}) {
+  const [dragging, setDragging]   = useState(false);
+  const [preview, setPreview]     = useState<string | null>(null);
+  const [fileName, setFileName]   = useState<string | null>(null);
+  const [error, setError]         = useState('');
+  const inputRef = useRef<HTMLInputElement>(null);
+
+  const ACCEPTED = ['image/png', 'image/svg+xml', 'image/jpeg'];
+  const MAX_MB   = 2;
+
+  function handleFile(file: File) {
+    setError('');
+    if (!ACCEPTED.includes(file.type)) {
+      setError('Please upload a PNG, SVG, or JPG file.');
+      return;
+    }
+    if (file.size > MAX_MB * 1024 * 1024) {
+      setError(`File must be under ${MAX_MB}MB.`);
+      return;
+    }
+    setFileName(file.name);
+    setPreview(URL.createObjectURL(file));
+  }
+
+  function handleDrop(e: React.DragEvent) {
+    e.preventDefault();
+    setDragging(false);
+    const file = e.dataTransfer.files[0];
+    if (file) handleFile(file);
+  }
+
+  function handleSave() {
+    if (preview) { onSave(preview); onClose(); }
+  }
+
+  return (
+    <div className="modal-overlay" onClick={onClose}>
+      <div className="modal" style={{ maxWidth: 460 }} onClick={e => e.stopPropagation()}>
+        <button className="modal-close" onClick={onClose}>✕</button>
+        <div className="modal-scroll">
+          <h2 className="lu-heading">Upload your logo</h2>
+          <p className="lu-sub">This appears in the top center of your dashboard.</p>
+
+          {/* Drop zone */}
+          <div
+            className={`lu-dropzone${dragging ? ' dragging' : ''}${preview ? ' has-preview' : ''}`}
+            onClick={() => inputRef.current?.click()}
+            onDragOver={e => { e.preventDefault(); setDragging(true); }}
+            onDragLeave={() => setDragging(false)}
+            onDrop={handleDrop}
+          >
+            {preview ? (
+              // eslint-disable-next-line @next/next/no-img-element
+              <img src={preview} alt="Preview" className="lu-preview" />
+            ) : (
+              <>
+                <div className="lu-upload-icon">
+                  <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
+                    <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/>
+                  </svg>
+                </div>
+                <div className="lu-drop-label">Drop your file here</div>
+                <div className="lu-drop-sub">or <span className="lu-browse">click to browse</span></div>
+              </>
+            )}
+            <input
+              ref={inputRef}
+              type="file"
+              accept=".png,.svg,.jpg,.jpeg"
+              style={{ display: 'none' }}
+              onChange={e => { const f = e.target.files?.[0]; if (f) handleFile(f); }}
+            />
+          </div>
+
+          {preview && (
+            <button className="lu-reselect" onClick={() => inputRef.current?.click()}>
+              Choose a different file
+            </button>
+          )}
+
+          {error && <p className="lu-error">{error}</p>}
+
+          {/* Requirements */}
+          <div className="lu-reqs">
+            <div className="lu-req-row">
+              <span className="lu-req-key">Formats</span>
+              <span className="lu-req-val">PNG, SVG, JPG</span>
+            </div>
+            <div className="lu-req-row">
+              <span className="lu-req-key">Recommended size</span>
+              <span className="lu-req-val">400 × 120 px or wider</span>
+            </div>
+            <div className="lu-req-row">
+              <span className="lu-req-key">Max file size</span>
+              <span className="lu-req-val">2 MB</span>
+            </div>
+            <div className="lu-req-row">
+              <span className="lu-req-key">Background</span>
+              <span className="lu-req-val">Transparent preferred (PNG or SVG)</span>
+            </div>
+          </div>
+
+          <button
+            className="btn btn-primary"
+            style={{ width: '100%', marginTop: 20, padding: '14px' }}
+            disabled={!preview}
+            onClick={handleSave}
+          >
+            Save logo →
+          </button>
+          <p className="lu-note">
+            Logo saves locally for this session. Permanent saving activates once your account is fully connected.
+          </p>
+        </div>
+      </div>
+    </div>
+  );
+}
+
 /* ── Page ── */
 export default function ClientPage() {
   const [profile, setProfile] = useState<ClientProfile | null>(null);
@@ -145,7 +271,9 @@ export default function ClientPage() {
     router.push('/login');
   }
 
-  const [activeTab, setActiveTab] = useState<'overview' | 'billing'>('overview');
+  const [activeTab, setActiveTab]       = useState<'overview' | 'billing'>('overview');
+  const [showLogoUpload, setShowLogoUpload] = useState(false);
+  const [localLogoUrl, setLocalLogoUrl]     = useState<string | null>(null);
 
   const p = profile;
   const greeting  = getGreeting();
@@ -161,14 +289,17 @@ export default function ClientPage() {
           <img src="/logo.png" alt="ZionShift" className="portal-logo" />
 
           <div className="client-logo-slot">
-            {p?.logo_url ? (
-              // eslint-disable-next-line @next/next/no-img-element
-              <img src={p.logo_url} alt={p.firm_name ?? 'Client'} className="client-logo-img" />
-            ) : p?.firm_name ? (
-              <span className="client-logo-text">{p.firm_name}</span>
-            ) : (
-              <div className="client-logo-placeholder">Client Logo</div>
-            )}
+            <div className="client-logo-clickable" onClick={() => setShowLogoUpload(true)} title="Upload your logo">
+              {localLogoUrl || p?.logo_url ? (
+                // eslint-disable-next-line @next/next/no-img-element
+                <img src={localLogoUrl ?? p!.logo_url!} alt={p?.firm_name ?? 'Client'} className="client-logo-img" />
+              ) : p?.firm_name ? (
+                <span className="client-logo-text">{p.firm_name}</span>
+              ) : (
+                <div className="client-logo-placeholder">Client Logo</div>
+              )}
+              <div className="client-logo-edit-badge" aria-hidden>✎</div>
+            </div>
           </div>
 
           <button className="btn btn-ghost" onClick={handleSignOut} style={{ fontSize: 13, padding: '8px 16px' }}>
@@ -329,6 +460,13 @@ export default function ClientPage() {
           </>
         )}
       </main>
+
+      {showLogoUpload && (
+        <LogoUploadModal
+          onClose={() => setShowLogoUpload(false)}
+          onSave={(url) => setLocalLogoUrl(url)}
+        />
+      )}
     </div>
   );
 }
