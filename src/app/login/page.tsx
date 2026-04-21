@@ -81,7 +81,6 @@ export default function LoginPage() {
           </button>
         </form>
 
-        <p className="login-note">ZionShift client portal · Authorized access only</p>
       </div>
     </div>
   );
