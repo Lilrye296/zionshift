@@ -72,6 +72,7 @@ const ACTIVITY = [
   { label: '6 new replies received this week',           sub: 'This week',     strong: true },
   { label: 'Email 2 delivered to 104 prospects',         sub: 'Apr 18',        strong: false },
   { label: 'Campaign entered Week 3',                    sub: 'Apr 15',        strong: false },
+  { label: 'Initial outreach sent to 98 prospects',      sub: 'Apr 8',         strong: false },
 ];
 
 const MEETINGS = [
