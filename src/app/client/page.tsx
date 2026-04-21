@@ -487,14 +487,23 @@ export default function ClientPage() {
               </div>
             </div>
 
+            <div className="cd-support-footer">
+              Questions? Reach out anytime at <a href="mailto:ryan@zionshift.com">ryan@zionshift.com</a>
+            </div>
+
             </>)}
 
             {/* ── Billing ── */}
             {activeTab === 'billing' && (
-              <div className="portal-empty" style={{ minHeight: 400 }}>
-                <p>Billing coming soon.</p>
-                <span>Your invoices and plan details will appear here.</span>
-              </div>
+              <>
+                <div className="portal-empty" style={{ minHeight: 400 }}>
+                  <p>Billing coming soon.</p>
+                  <span>Your invoices and plan details will appear here.</span>
+                </div>
+                <div className="cd-support-footer">
+                  Questions? Reach out anytime at <a href="mailto:ryan@zionshift.com">ryan@zionshift.com</a>
+                </div>
+              </>
             )}
 
           </>

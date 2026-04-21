@@ -610,6 +610,9 @@ body { font-family: var(--zs-sans); color: var(--zs-ink-2); overflow-x: hidden; 
 .cd-cal-option-name { font: 500 14px var(--zs-sans); color: var(--zs-ink); letter-spacing: -0.01em; }
 .cd-cal-connected    { font: 500 12px var(--zs-sans); color: #16a34a; }
 .cd-cal-disconnected { font: 400 12px var(--zs-sans); color: var(--zs-ink-5); }
+.cd-support-footer { text-align: center; font: 400 13px var(--zs-sans); color: var(--zs-ink-5); margin-top: 32px; padding-bottom: 8px; }
+.cd-support-footer a { color: var(--zs-ink-4); text-decoration: none; border-bottom: 1px solid var(--zs-border); transition: color 160ms, border-color 160ms; }
+.cd-support-footer a:hover { color: var(--zs-ink); border-color: var(--zs-ink); }
 
 /* ─── LOGO UPLOAD MODAL ───────────────────────────── */
 .lu-heading { font: 700 22px var(--zs-sans); letter-spacing: -0.03em; color: var(--zs-ink); margin: 0 0 6px; }
