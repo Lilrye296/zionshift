@@ -501,7 +501,7 @@ footer.zs-footer { padding: 40px 0; border-top: 1px solid var(--zs-border); }
   .hero-visual { margin-top: 60px; overflow: hidden; }
   .visual-grid { grid-template-columns: 1fr; gap: 16px; }
   .h-panel:last-child { display: none; }
-  .hero-badge-1 { top: -12px; right: 4px; }
+  .hero-badge-1 { display: none; }
   .hero-badge-2 { display: none; }
 
   /* Stats */
@@ -520,8 +520,8 @@ footer.zs-footer { padding: 40px 0; border-top: 1px solid var(--zs-border); }
   .process-stage { aspect-ratio: 4/3; }
 
   /* Bento */
-  .bento { grid-template-columns: 1fr; gap: 12px; }
-  .bento .wide { grid-column: span 1; }
+  .bento { grid-template-columns: 1fr !important; gap: 12px; }
+  .bento > * { grid-column: 1 / 2 !important; }
   .tile { padding: 28px 24px; min-height: 200px; }
 
   /* Pricing */
