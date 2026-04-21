@@ -191,12 +191,14 @@ function AppleIcon() {
 function OutlookIcon() {
   return (
     <svg width="30" height="30" viewBox="0 0 24 24" aria-hidden>
-      {/* Microsoft Outlook — blue envelope */}
+      {/* Blue rounded background */}
       <rect width="24" height="24" rx="4" fill="#0078D4"/>
-      {/* envelope body */}
-      <rect x="3.5" y="7.5" width="17" height="11" rx="1.5" fill="white"/>
-      {/* envelope flap chevron */}
-      <path fill="none" stroke="#0078D4" strokeWidth="1.4" strokeLinejoin="round" d="M3.5 9 12 14.5 20.5 9"/>
+      {/* White envelope body */}
+      <rect x="3" y="8" width="18" height="11" rx="1" fill="white"/>
+      {/* Sealed flap — darker blue triangle, peak pointing down */}
+      <path fill="#004E96" d="M3 8 12 14.5 21 8z"/>
+      {/* Bottom corner fold lines */}
+      <path stroke="#C8D8EA" strokeWidth="0.75" fill="none" d="M3 19 9.5 13.5M21 19 14.5 13.5"/>
     </svg>
   );
 }
