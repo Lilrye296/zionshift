@@ -1,168 +1,604 @@
 'use client';
 
-import { useEffect, useRef, useState } from 'react';
+import { useEffect, useRef, useState, useCallback, ReactNode, RefObject } from 'react';
 
-/* ── Scroll-reveal hook ──────────────────────────────────────── */
-function useScrollReveal() {
+/* ─── HOOKS ─────────────────────────────────────────────────── */
+function useReveal() {
   useEffect(() => {
-    const observer = new IntersectionObserver(
-      (entries) => {
-        entries.forEach((entry) => {
-          if (entry.isIntersecting) {
-            entry.target.classList.add('visible');
-          }
-        });
-      },
-      { threshold: 0.1, rootMargin: '0px 0px -40px 0px' }
-    );
-
-    const els = document.querySelectorAll('.fade-in-up');
-    els.forEach((el) => observer.observe(el));
-    return () => observer.disconnect();
+    const sel = '.reveal, .reveal-blur, .headline-words, .stat, .faq-item, .hero-visual';
+    const io = new IntersectionObserver((entries) => {
+      entries.forEach((e) => {
+        if (e.isIntersecting) {
+          e.target.classList.add('in');
+          if (e.target.classList.contains('hero-visual')) e.target.classList.add('in-view');
+        }
+      });
+    }, { threshold: 0.12, rootMargin: '0px 0px -60px 0px' });
+    requestAnimationFrame(() => {
+      document.querySelectorAll(sel).forEach((el) => {
+        const r = el.getBoundingClientRect();
+        if (r.top < window.innerHeight * 0.92 && r.bottom > 0) {
+          el.classList.add('in');
+          if (el.classList.contains('hero-visual')) el.classList.add('in-view');
+        }
+        io.observe(el);
+      });
+    });
+    return () => io.disconnect();
   }, []);
 }
 
-/* ── Data ────────────────────────────────────────────────────── */
-const meetings = [
-  { time: '9:00 AM',  name: 'Marcus Thompson', company: 'Apex Marketing Group' },
-  { time: '10:30 AM', name: 'Sarah Mitchell',  company: 'Mitchell IT Solutions' },
-  { time: '1:00 PM',  name: 'James Rivera',    company: 'Rivera Consulting LLC' },
-  { time: '3:30 PM',  name: 'Amanda Chen',     company: 'Chen Staffing Partners' },
-];
+function useScrollProgress() {
+  useEffect(() => {
+    const bar = document.querySelector('.scroll-progress');
+    const nav = document.querySelector('.zs-nav-wrap');
+    const onScroll = () => {
+      const h = document.documentElement;
+      const pct = h.scrollTop / (h.scrollHeight - h.clientHeight);
+      if (bar) (bar as HTMLElement).style.width = (pct * 100) + '%';
+      if (nav) nav.classList.toggle('scrolled', h.scrollTop > 40);
+    };
+    window.addEventListener('scroll', onScroll, { passive: true });
+    onScroll();
+    return () => window.removeEventListener('scroll', onScroll);
+  }, []);
+}
 
-const stats = [
-  { value: '24/7',  label: 'Autonomous AI operation' },
-  { value: 'Hands-Free', label: 'Zero manual prospecting' },
-  { value: '40hrs', label: 'Saved per month per client' },
-  { value: '100%',  label: 'Done for you' },
-];
+function useCursorOrb() {
+  useEffect(() => {
+    const orb = document.querySelector('.hero-orb') as HTMLElement | null;
+    const hero = document.querySelector('.hero') as HTMLElement | null;
+    if (!orb || !hero) return;
+    let rafId: number;
+    const onMove = (e: MouseEvent) => {
+      const rect = hero.getBoundingClientRect();
+      const x = e.clientX - rect.left;
+      const y = e.clientY - rect.top;
+      cancelAnimationFrame(rafId);
+      rafId = requestAnimationFrame(() => {
+        orb.style.transform = `translate(${x}px, ${y}px)`;
+      });
+    };
+    hero.addEventListener('mousemove', onMove);
+    orb.style.transform = `translate(${window.innerWidth * 0.6}px, 320px)`;
+    return () => hero.removeEventListener('mousemove', onMove);
+  }, []);
+}
 
-const problems = [
-  {
-    icon: '📉',
-    title: 'Your pipeline keeps running dry',
-    desc: "Referrals are inconsistent. Word of mouth is unpredictable. Without a reliable outbound system, revenue stays feast-or-famine and growth feels impossible to plan.",
-  },
-  {
-    icon: '⏰',
-    title: "You're too busy doing the work to sell the work",
-    desc: "You're delivering for current clients all day. By the time you have a free moment, prospecting is the last thing you want to do — and your pipeline suffers for it.",
-  },
-  {
-    icon: '💸',
-    title: 'Traditional agencies charge $5,000+/mo and underdeliver',
-    desc: "Old-school agencies use human SDRs, manual processes, and outdated playbooks. You pay a premium for mediocre results while they take weeks just to get started.",
-  },
-];
+function useTilt(ref: RefObject<HTMLElement | null>) {
+  useEffect(() => {
+    const el = ref.current;
+    if (!el) return;
+    const onMove = (e: MouseEvent) => {
+      const r = el.getBoundingClientRect();
+      const x = (e.clientX - r.left) / r.width - 0.5;
+      const y = (e.clientY - r.top) / r.height - 0.5;
+      el.style.transform = `translateY(-4px) rotateY(${x * 6}deg) rotateX(${-y * 6}deg)`;
+    };
+    const onLeave = () => { el.style.transform = ''; };
+    el.addEventListener('mousemove', onMove);
+    el.addEventListener('mouseleave', onLeave);
+    return () => {
+      el.removeEventListener('mousemove', onMove);
+      el.removeEventListener('mouseleave', onLeave);
+    };
+  }, [ref]);
+}
 
-const steps = [
-  {
-    num: '01',
-    title: 'We learn your business',
-    desc: 'One quick onboarding call. You tell us your ideal client profile, your offer, and your target market. That\'s it — we handle everything from there.',
-  },
-  {
-    num: '02',
-    title: 'AI builds your pipeline',
-    desc: 'Our cutting-edge AI finds decision makers showing buying signals, writes hyper-personalized outreach, and handles conversations 24/7 — completely hands-free.',
-  },
-  {
-    num: '03',
-    title: 'Meetings appear on your calendar',
-    desc: 'Qualified B2B leads show up as booked meetings directly on your calendar. No software to learn, no manual work. Just show up and close the deal.',
-  },
-];
+/* ─── ANIMATED COUNTER ───────────────────────────── */
+function Counter({ to, suffix = '', duration = 1800 }: { to: number; suffix?: string; duration?: number }) {
+  const [val, setVal] = useState(0);
+  const ref = useRef<HTMLSpanElement>(null);
+  const started = useRef(false);
+  useEffect(() => {
+    const io = new IntersectionObserver((entries) => {
+      entries.forEach((e) => {
+        if (e.isIntersecting && !started.current) {
+          started.current = true;
+          const start = performance.now();
+          const tick = (now: number) => {
+            const t = Math.min(1, (now - start) / duration);
+            const eased = 1 - Math.pow(1 - t, 3);
+            setVal(Math.round(to * eased));
+            if (t < 1) requestAnimationFrame(tick);
+          };
+          requestAnimationFrame(tick);
+        }
+      });
+    }, { threshold: 0.4 });
+    if (ref.current) io.observe(ref.current);
+    return () => io.disconnect();
+  }, [to, duration]);
+  return <span ref={ref}>{val}{suffix}</span>;
+}
 
-const agencyItems = [
-  'Human SDRs with limited hours',
-  'Weeks to onboard and launch',
-  'Generic, templated outreach',
-];
+/* ─── TYPEWRITER ─────────────────────────────────── */
+function Typewriter({ text, speed = 30, startDelay = 800 }: { text: string; speed?: number; startDelay?: number }) {
+  const [out, setOut] = useState('');
+  useEffect(() => {
+    let i = 0;
+    let timeout: ReturnType<typeof setTimeout>;
+    const tick = () => {
+      if (i <= text.length) {
+        setOut(text.slice(0, i));
+        i++;
+        timeout = setTimeout(tick, speed);
+      } else {
+        timeout = setTimeout(() => { i = 0; tick(); }, 4000);
+      }
+    };
+    timeout = setTimeout(tick, startDelay);
+    return () => clearTimeout(timeout);
+  }, [text, speed, startDelay]);
+  return <>{out}<span className="caret" /></>;
+}
 
-const diyItems = [
-  'Steep learning curve',
-  'You manage everything yourself',
-  'Hours of daily manual work',
-  'No support when things break',
-  'Still need to hire someone to run it',
-];
+/* ─── WORD REVEAL ────────────────────────────────── */
+function WordReveal({ children, className = '', style }: { children: ReactNode; className?: string; style?: React.CSSProperties }) {
+  const out: ReactNode[] = [];
+  let key = 0;
+  const process = (child: ReactNode) => {
+    if (typeof child === 'string') {
+      const parts = child.split(/(\s+)/);
+      parts.forEach((p) => {
+        if (p === '') return;
+        if (p.trim() === '') out.push(<span key={key++}>{p}</span>);
+        else out.push(<span key={key++} className="w"><span>{p}</span></span>);
+      });
+    } else if (child != null && child !== false) {
+      out.push(<span key={key++} className="w"><span>{child}</span></span>);
+    }
+  };
+  if (Array.isArray(children)) children.forEach(process);
+  else process(children);
+  return <span className={`headline-words ${className}`} style={style}>{out}</span>;
+}
 
-const zionItems = [
-  'AI-powered, 24/7 autonomous operation',
-  'Completely hands-free — no software to learn',
-  'Hyper-personalized outreach at scale',
-  'Gets smarter and more effective over time',
-];
+/* ─── NAV ────────────────────────────────────────── */
+function Nav({ onBook }: { onBook: () => void }) {
+  return (
+    <div className="zs-nav-wrap">
+      <div className="zs-nav">
+        {/* eslint-disable-next-line @next/next/no-img-element */}
+        <img src="/logo.png" alt="ZionShift" />
+        <div className="zs-nav-links">
+          <a href="#how">How it works</a>
+          <a href="#why">Why us</a>
+          <a href="#faq">FAQ</a>
+        </div>
+        <button className="btn btn-primary" onClick={onBook} style={{ padding: '10px 18px', fontSize: 13 }}>
+          Book a call<span className="chev">→</span>
+        </button>
+      </div>
+    </div>
+  );
+}
 
+/* ─── HERO ───────────────────────────────────────── */
+function Hero({ onBook }: { onBook: () => void }) {
+  const panelRef = useRef<HTMLDivElement>(null);
+  useTilt(panelRef);
+  useCursorOrb();
 
-const faqs = [
-  {
-    q: 'How does the AI find qualified B2B leads?',
-    a: "Our AI scans thousands of data points to identify decision makers at companies showing active buying signals — things like recent funding, hiring patterns, technology changes, and engagement activity. It then writes and sends hyper-personalized outreach on your behalf, 24/7.",
-  },
-  {
-    q: 'Is this really completely hands-free?',
-    a: "Yes. After a quick onboarding call where you tell us your ideal client, our AI handles everything — prospect research, personalized outreach, follow-ups, and conversation management. You don't touch any software. Meetings just appear on your calendar.",
-  },
-  {
-    q: 'How long until I start seeing results?',
-    a: "After a quick onboarding and setup period, most clients begin seeing qualified meetings within the first few weeks. The AI continuously learns what messaging resonates best with your specific audience, so results typically improve month over month.",
-  },
-  {
-    q: 'What does it cost?',
-    a: "We offer a simple, transparent pricing structure with a one-time setup fee and an affordable monthly retainer — a fraction of what traditional agencies charge. No long-term contracts — we earn your business every month based on results. Book a free call and we will walk you through exactly what it costs and what you get.",
-  },
-  {
-    q: 'What B2B industries do you work with?',
-    a: "We work with B2B service businesses including: Marketing Agencies, IT Services, Staffing & Recruiting, Business Consulting, Web Design, Insurance Brokers, Accounting Firms, and similar professional service companies. If you're unsure if we're a fit, book a free call and we'll tell you honestly.",
-  },
-  {
-    q: 'Can I cancel anytime?',
-    a: "Yes. No long-term contracts, no cancellation fees. We operate month-to-month because we're confident the results speak for themselves.",
-  },
-];
+  const meetings = [
+    { time: '09:00', name: 'Marcus Thompson',  co: 'Thompson HVAC & Plumbing' },
+    { time: '10:30', name: 'Sarah Mitchell',   co: 'Mitchell Dental Practice' },
+    { time: '13:00', name: 'James Rivera',     co: 'Rivera Law Offices' },
+    { time: '15:30', name: 'Amanda Chen',      co: 'Chen Design Studio' },
+  ];
 
-/* ── Component ───────────────────────────────────────────────── */
-const inputClass =
-  'w-full px-4 py-3 rounded-xl text-sm outline-none transition-colors';
-const inputStyle = {
-  backgroundColor: '#F5F0EA',
-  border: '1px solid rgba(196,184,168,0.5)',
-  color: '#1A1715',
-  fontFamily: "var(--font-barlow), 'Barlow', sans-serif",
-};
+  return (
+    <section className="hero">
+      <div className="hero-orb" />
+      <div className="zs-container hero-inner">
+        <h1 style={{ marginTop: 28 }}>
+          <WordReveal className="d0">A sales engine</WordReveal><br />
+          <WordReveal className="d1">that <em>never sleeps.</em></WordReveal>
+        </h1>
+        <p className="lead reveal-blur d3">
+          ZionShift is a fully autonomous AI that finds small business owners who need what you offer, reaches out personally, and books them onto your calendar — while you focus on the work.
+        </p>
+        <div className="reveal d4" style={{ marginTop: 40, display: 'flex', gap: 12, flexWrap: 'wrap' }}>
+          <button className="btn btn-primary btn-lg" onClick={onBook}>
+            Book a free strategy call<span className="chev">→</span>
+          </button>
+          <a href="#how" className="btn btn-ghost btn-lg">See how it works</a>
+        </div>
+        <div className="trust-row reveal d5">
+          <span className="chip-mini">24/7 autonomous</span>
+          <span className="chip-mini">No software to learn</span>
+          <span className="chip-mini">Cancel anytime</span>
+        </div>
 
-export default function Home() {
-  useScrollReveal();
-  const [openFaq, setOpenFaq] = useState<number | null>(null);
+        <div className="hero-visual">
+          <div className="visual-grid">
+            {/* LEFT — AI composing */}
+            <div className="h-panel h-panel-dark" ref={panelRef}>
+              <div className="h-panel-head">
+                <span className="h-panel-title">
+                  <span className="live" />ZionShift · composing
+                </span>
+                <span style={{ font: '500 11px var(--zs-mono)', color: 'rgba(255,255,255,0.4)', letterSpacing: '0.1em' }}>03:42 AM</span>
+              </div>
+              <div className="h-panel-body">
+                <div className="ai-draft">
+                  <span className="tag">To · Marcus Thompson, Owner · Thompson HVAC &amp; Plumbing</span>
+                  <Typewriter text={"Hi Marcus — noticed Thompson HVAC just added two service trucks and you're hiring a third tech. Most owners at your stage end up buried in receipts and QuickBooks reconciliations instead of running the business. I help owner-operators like you hand off the books entirely — month-end closes, A/R, A/P, clean P&Ls — so you get the reports without the bookkeeping."} />
+                  <div className="line-meta">
+                    <span>Personalization · 94</span>
+                    <span>Queued · 1 of 412</span>
+                  </div>
+                </div>
+              </div>
+            </div>
 
-  /* ── Modal state ── */
-  const [modalOpen, setModalOpen] = useState(false);
+            {/* RIGHT — calendar */}
+            <div className="h-panel">
+              <div className="h-panel-head">
+                <span className="h-panel-title">
+                  <span className="live" />This week · booked by AI
+                </span>
+                <span style={{ font: '500 11px var(--zs-mono)', color: 'var(--zs-ink-5)', letterSpacing: '0.1em' }}>4 QUALIFIED</span>
+              </div>
+              <div className="h-panel-body" style={{ padding: '4px 22px 22px' }}>
+                {meetings.map((m, i) => (
+                  <div key={i} className="cal-day">
+                    <span className="cal-time">{m.time}</span>
+                    <div className="cal-who">
+                      <div className="cal-name">{m.name}</div>
+                      <div className="cal-co">{m.co}</div>
+                    </div>
+                    <span className="cal-pill">Qualified</span>
+                  </div>
+                ))}
+              </div>
+            </div>
+          </div>
+
+          <div className="hero-badge hero-badge-1">
+            <div>
+              <div className="lbl">New clients this mo.</div>
+              <div className="n"><Counter to={6} /></div>
+            </div>
+          </div>
+          <div className="hero-badge hero-badge-2 ink">
+            <div>
+              <div className="lbl">Avg. retainer</div>
+              <div className="n" style={{ color: '#fff' }}>$<Counter to={850} /></div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+  );
+}
+
+/* ─── MARQUEE ────────────────────────────────────── */
+function Marquee() {
+  return (
+    <div className="marquee">
+      <div className="marquee-track">
+        {Array.from({ length: 2 }).map((_, k) => (
+          <>
+            <span key={`${k}-1`}>HVAC &amp; plumbing shops</span>
+            <span key={`${k}-2`}>Dental practices</span>
+            <span key={`${k}-3`}>Law firms</span>
+            <span key={`${k}-4`}>Design studios</span>
+            <span key={`${k}-5`}>E-commerce brands</span>
+            <span key={`${k}-6`}>Medical clinics</span>
+            <span key={`${k}-7`}>Real estate teams</span>
+            <span key={`${k}-8`}>Trades &amp; contractors</span>
+          </>
+        ))}
+      </div>
+    </div>
+  );
+}
+
+/* ─── STATS ──────────────────────────────────────── */
+function Stats() {
+  const stats = [
+    { idx: 'Always on',         val: '24/7',                                                                              lbl: 'Autonomous AI operation' },
+    { idx: 'No learning curve', val: 'Zero',                                                                              lbl: 'Software for you to learn' },
+    { idx: 'Time reclaimed',    val: <><Counter to={40} /><span className="unit">hrs</span></>,                           lbl: 'Saved per month, per client' },
+    { idx: 'Fully managed',     val: <><Counter to={100} /><span className="unit">%</span></>,                            lbl: 'Done for you, end to end' },
+  ];
+  return (
+    <section className="zs-section-sm" style={{ borderBottom: '1px solid var(--zs-border)', borderTop: '1px solid var(--zs-border)' }}>
+      <div className="zs-container">
+        <div className="stats-row">
+          {stats.map((s, i) => (
+            <div key={i} className={`stat reveal d${i + 1}`}>
+              <div className="idx">{s.idx}</div>
+              <div className="val"><span className="val-mask"><span>{s.val}</span></span></div>
+              <div className="lbl">{s.lbl}</div>
+            </div>
+          ))}
+        </div>
+      </div>
+    </section>
+  );
+}
+
+/* ─── PROCESS ────────────────────────────────────── */
+function Process() {
+  const [step, setStep] = useState(0);
+  const wrapRef = useRef<HTMLElement>(null);
+
+  useEffect(() => {
+    const onScroll = () => {
+      const el = wrapRef.current;
+      if (!el) return;
+      const r = el.getBoundingClientRect();
+      const total = el.offsetHeight - window.innerHeight;
+      const scrolled = Math.max(0, -r.top);
+      const pct = Math.min(1, Math.max(0, scrolled / total));
+      setStep(Math.min(2, Math.floor(pct * 3)));
+    };
+    window.addEventListener('scroll', onScroll, { passive: true });
+    onScroll();
+    return () => window.removeEventListener('scroll', onScroll);
+  }, []);
+
+  const steps = [
+    { num: '01 / 03', h: 'You tell us who you want.', p: 'One onboarding call. Share your ideal client, offer, and target market. We handle everything after that.' },
+    { num: '02 / 03', h: 'The AI builds your pipeline.', p: 'We find decision makers showing buying signals, write personalized outreach that reads human, and handle entire conversations 24/7 — even while you sleep.' },
+    { num: '03 / 03', h: 'Meetings land on your calendar.', p: 'Qualified prospects show up as booked calls. You open your calendar, see who\'s next, and close. That\'s the whole interaction.' },
+  ];
+
+  return (
+    <section id="how" className="process" ref={wrapRef as React.RefObject<HTMLElement>}>
+      <div className="process-sticky">
+        <div className="zs-container">
+          <div className="process-grid">
+            <div className="process-copy">
+              <div className="eyebrow" style={{ marginBottom: 20 }}>How it works</div>
+              {steps.map((s, i) => (
+                <div key={i} style={{
+                  position: i === step ? 'relative' : 'absolute',
+                  opacity: i === step ? 1 : 0,
+                  transform: `translateY(${i === step ? 0 : 20}px)`,
+                  transition: 'opacity 600ms var(--zs-ease), transform 700ms var(--zs-ease)',
+                }}>
+                  <div className="step-num">{s.num}</div>
+                  <h2>{s.h}</h2>
+                  <p>{s.p}</p>
+                </div>
+              ))}
+            </div>
+            <div className="process-stage">
+              <div className="process-track">
+                {[0, 1, 2].map((i) => <div key={i} className={`dot ${i === step ? 'active' : ''}`} />)}
+              </div>
+
+              {/* Slide 1 */}
+              <div className={`process-slide ${step === 0 ? 'active' : ''}`}>
+                <div className="slide-form">
+                  <div className="row"><span className="k">Ideal client</span><span className="v">Small business owners, owner-operated{step === 0 && <span className="cursor" />}</span></div>
+                  <div className="row"><span className="k">Target geography</span><span className="v">United States · $500K–$5M revenue</span></div>
+                  <div className="row"><span className="k">Offer</span><span className="v">Your service, positioned to your ICP</span></div>
+                  <div className="row"><span className="k">Your calendar</span><span className="v">Synced on setup</span></div>
+                </div>
+              </div>
+
+              {/* Slide 2 */}
+              <div className={`process-slide ${step === 1 ? 'active' : ''}`}>
+                <div className="slide-network">
+                  <svg viewBox="0 0 400 400" preserveAspectRatio="none">
+                    <path d="M80 120 L240 200 L140 280 L288 100 L240 200" />
+                  </svg>
+                  <div className="node a" />
+                  <div className="node b" />
+                  <div className="node c" />
+                  <div className="node d" />
+                  <div style={{ position: 'absolute', bottom: 24, left: 64, right: 64, fontFamily: 'var(--zs-mono)', fontSize: 11, letterSpacing: '0.12em', textTransform: 'uppercase', color: 'var(--zs-ink-4)', display: 'flex', justifyContent: 'space-between' }}>
+                    <span>Scanning signals</span>
+                    <span>412 prospects</span>
+                  </div>
+                </div>
+              </div>
+
+              {/* Slide 3 */}
+              <div className={`process-slide ${step === 2 ? 'active' : ''}`}>
+                <div className="slide-cal">
+                  <div className="chdr"><span>M</span><span>T</span><span>W</span><span>T</span><span>F</span><span>S</span><span>S</span></div>
+                  <div className="cgrid">
+                    {Array.from({ length: 28 }).map((_, i) => {
+                      const booked = [2, 4, 8, 9, 14, 16, 17, 22, 24].includes(i);
+                      const today = i === 10;
+                      return <div key={i} className={`cd ${booked ? 'has' : ''} ${today ? 'today' : ''}`}>{i + 1}</div>;
+                    })}
+                  </div>
+                  <div style={{ marginTop: 14, display: 'flex', justifyContent: 'space-between', fontFamily: 'var(--zs-mono)', fontSize: 11, letterSpacing: '0.1em', textTransform: 'uppercase', color: 'var(--zs-ink-5)' }}>
+                    <span>9 booked</span>
+                    <span>April 2026</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+  );
+}
+
+/* ─── BENTO ──────────────────────────────────────── */
+function Bento() {
+  return (
+    <section className="zs-section zs-section-paper" id="why">
+      <div className="zs-container">
+        <div className="reveal" style={{ maxWidth: 860, marginBottom: 72 }}>
+          <span className="eyebrow">Why ZionShift</span>
+          <h2 style={{ fontSize: 'clamp(40px,5vw,80px)', fontWeight: 700, letterSpacing: '-0.045em', lineHeight: 0.98, marginTop: 20, color: 'var(--zs-ink)' }}>
+            Sharper than an agency.<br />Easier than a tool.
+          </h2>
+        </div>
+
+        <div className="bento">
+          <div className="tile wide reveal d1">
+            <h3>Personalized outreach that reads human.</h3>
+            <p>Every message is researched, written and sent for each prospect — matched to their role, their company, and the signal that made them a fit.</p>
+            <div className="bt-wave">
+              {Array.from({ length: 12 }).map((_, i) => <i key={i} />)}
+            </div>
+          </div>
+
+          <div className="tile reveal d2">
+            <h3>24/7 operation.</h3>
+            <p>While you sleep, the AI researches, drafts, sends, and replies.</p>
+            <div className="bt-clock"><span className="twentyfour">24</span></div>
+          </div>
+
+          <div className="tile reveal d3">
+            <h3>Hands-free.</h3>
+            <p>No software to learn. Nothing to configure.</p>
+            <div className="bt-orbit">
+              <div className="ring" />
+              <div className="ring r2" />
+              <div className="ring r3" />
+              <div className="sat" />
+            </div>
+          </div>
+
+          <div className="tile reveal d2" style={{ gridColumn: 'span 2' }}>
+            <h3>Gets smarter every week.</h3>
+            <p>The AI continuously learns what messaging resonates with your ideal client — so results compound month over month.</p>
+            <div className="bt-graph">
+              <svg viewBox="0 0 400 100" preserveAspectRatio="none">
+                <path d="M0 85 L60 78 L120 70 L180 58 L240 40 L300 28 L400 10" />
+                <circle cx="400" cy="10" r="5" />
+              </svg>
+            </div>
+          </div>
+
+          <div className="tile reveal d3">
+            <h3>Only qualified meetings.</h3>
+            <p>The AI vets every prospect before booking. You only meet people who match.</p>
+            <div style={{ position: 'absolute', bottom: 28, right: 28, fontFamily: 'var(--zs-sans)', fontWeight: 700, fontSize: 56, letterSpacing: '-0.04em', color: 'var(--zs-ink)' }}>
+              <Counter to={94} /><span style={{ fontSize: 24 }}>%</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+  );
+}
+
+/* ─── VIDEO ──────────────────────────────────────── */
+function Video() {
+  return (
+    <section className="video-section">
+      <div className="zs-container" style={{ maxWidth: 900 }}>
+        <div className="reveal">
+          <span className="eyebrow">Meet The Founder</span>
+          <h2>See why business owners are making the switch.</h2>
+        </div>
+        <div className="video-wrap reveal d1">
+          <iframe
+            src="https://www.youtube.com/embed/xYVrAxbh_pI?rel=0&modestbranding=1&showinfo=0"
+            title="Meet Ryan, Founder of ZionShift"
+            allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+            allowFullScreen
+            loading="lazy"
+          />
+        </div>
+      </div>
+    </section>
+  );
+}
+
+/* ─── FAQ ────────────────────────────────────────── */
+function FAQ() {
+  const [open, setOpen] = useState(0);
+  const faqs = [
+    { q: 'How does the AI find qualified leads?', a: 'Our AI scans thousands of signals to identify decision makers at companies showing active buying intent — recent hiring, revenue growth, new entity formations, funding, tech changes, engagement activity. It writes and sends personalized outreach on your behalf, 24/7.' },
+    { q: 'Is this really hands-free?', a: "Yes. After a quick onboarding call where you tell us your ideal client, the AI handles everything — prospect research, personalized outreach, follow-ups, conversation management. You don't touch any software." },
+    { q: 'How long until I see booked calls?', a: 'Most clients begin seeing qualified meetings within the first 2–3 weeks. The AI continuously learns which industries and messaging resonate best with your offer, so results typically compound month over month.' },
+    { q: 'What does it cost?', a: 'A simple, transparent structure: a one-time setup fee and a monthly retainer — a fraction of what a human SDR or traditional agency would cost. No long-term contracts. Book a free call and we\'ll walk through numbers specific to your business.' },
+    { q: 'What kinds of businesses do you work with?', a: 'Any B2B or owner-operated service business selling into small-to-mid-sized companies: trades, professional services, agencies, consultancies, e-commerce brands, medical and dental practices, law firms, real estate teams, and more.' },
+    { q: 'Can I cancel anytime?', a: 'Yes. Month-to-month. No long-term contracts. No cancellation fees.' },
+  ];
+  return (
+    <section id="faq" className="zs-section">
+      <div className="zs-narrow">
+        <div className="reveal" style={{ marginBottom: 56 }}>
+          <span className="eyebrow">Common questions</span>
+          <h2 style={{ fontSize: 'clamp(40px,5vw,72px)', fontWeight: 700, letterSpacing: '-0.04em', lineHeight: 1, marginTop: 20, color: 'var(--zs-ink)' }}>
+            Questions, answered.
+          </h2>
+        </div>
+        <div className="reveal d1">
+          {faqs.map((f, i) => (
+            <div key={i} className={`faq-item ${open === i ? 'open' : ''}`}>
+              <button className="faq-q" onClick={() => setOpen(open === i ? -1 : i)}>
+                <span>{f.q}</span>
+                <span className="faq-plus">+</span>
+              </button>
+              <div className="faq-a"><p>{f.a}</p></div>
+            </div>
+          ))}
+        </div>
+      </div>
+    </section>
+  );
+}
+
+/* ─── CTA ────────────────────────────────────────── */
+function CTA({ onBook }: { onBook: () => void }) {
+  return (
+    <section className="zs-section">
+      <div className="zs-container">
+        <div className="cta-wrap reveal">
+          <h2>Put your lead generation<br />on autopilot.</h2>
+          <p style={{ margin: '32px auto 0', maxWidth: 560, fontSize: 19, lineHeight: 1.5 }}>
+            Book a free strategy call and see exactly how our 24/7 AI would build your hands-free outbound pipeline. No pitch. No pressure.
+          </p>
+          <div style={{ marginTop: 40, position: 'relative', zIndex: 1 }}>
+            <button className="btn btn-primary btn-lg" onClick={onBook} style={{ background: '#fff', color: 'var(--zs-ink)' }}>
+              Book your free strategy call<span className="chev">→</span>
+            </button>
+          </div>
+          <p style={{ marginTop: 20, fontSize: 13, color: 'rgba(255,255,255,0.5)', position: 'relative', zIndex: 1 }}>
+            No commitment · No sales pitch · Just a real conversation
+          </p>
+        </div>
+      </div>
+    </section>
+  );
+}
+
+/* ─── FOOTER ─────────────────────────────────────── */
+function Footer() {
+  return (
+    <footer className="zs-footer">
+      <div className="zs-container inner">
+        {/* eslint-disable-next-line @next/next/no-img-element */}
+        <img src="/logo.png" alt="ZionShift" />
+        <p>© 2026 ZionShift. All rights reserved.</p>
+      </div>
+    </footer>
+  );
+}
+
+/* ─── MODAL ──────────────────────────────────────── */
+interface FormState { name: string; email: string; phone: string; business: string; challenge: string; }
+
+function Modal({ open, onClose }: { open: boolean; onClose: () => void }) {
   const [submitted, setSubmitted] = useState(false);
   const [loading, setLoading] = useState(false);
   const [formError, setFormError] = useState('');
-  const [form, setForm] = useState({
-    name: '', email: '', phone: '', business: '', challenge: '',
-  });
+  const [form, setForm] = useState<FormState>({ name: '', email: '', phone: '', business: '', challenge: '' });
   const overlayRef = useRef<HTMLDivElement>(null);
 
-  /* Lock body scroll when modal is open */
-  useEffect(() => {
-    document.body.style.overflow = modalOpen ? 'hidden' : '';
-    return () => { document.body.style.overflow = ''; };
-  }, [modalOpen]);
+  useEffect(() => { document.body.style.overflow = open ? 'hidden' : ''; }, [open]);
 
-  function openModal() {
+  const close = useCallback(() => {
     setSubmitted(false);
     setFormError('');
     setForm({ name: '', email: '', phone: '', business: '', challenge: '' });
-    setModalOpen(true);
-  }
-  function closeModal() { setModalOpen(false); }
-
-  function handleOverlayClick(e: React.MouseEvent<HTMLDivElement>) {
-    if (e.target === overlayRef.current) closeModal();
-  }
+    onClose();
+  }, [onClose]);
 
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
@@ -172,13 +608,7 @@ export default function Home() {
       const res = await fetch('/api/contact', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          name: form.name,
-          email: form.email,
-          phone: form.phone,
-          business: form.business,
-          challenge: form.challenge,
-        }),
+        body: JSON.stringify(form),
       });
       const data = await res.json();
       if (!res.ok) throw new Error(data.error || 'Something went wrong.');
@@ -190,774 +620,71 @@ export default function Home() {
     }
   }
 
+  if (!open) return null;
+
   return (
     <div
-      className="min-h-screen"
-      style={{ backgroundColor: '#F5F0EA', color: '#1A1715', fontFamily: "var(--font-barlow), 'Barlow', sans-serif" }}
+      className="modal-overlay"
+      ref={overlayRef}
+      onClick={(e) => { if (e.target === overlayRef.current) close(); }}
     >
-      {/* ═══════════════════════════════════════════════════
-          NAV — floating pill with frosted glass
-      ════════════════════════════════════════════════════ */}
-      <nav className="fixed top-5 left-0 right-0 z-50 flex justify-center px-4">
-        <div
-          className="frosted-glass flex items-center justify-between gap-6 px-6 py-3 rounded-full shadow-lg w-full max-w-4xl"
-          style={{ border: '1px solid rgba(196,184,168,0.4)' }}
-        >
-          {/* eslint-disable-next-line @next/next/no-img-element */}
-          <img
-            src="/logo.png"
-            alt="ZionShift"
-            width={130}
-            className="object-contain flex-shrink-0"
-            style={{ height: 'auto' }}
-          />
-
-          <div className="hidden md:flex items-center gap-7">
-            {['How It Works', 'Why Us', 'FAQ'].map((label) => {
-              const href = '#' + label.toLowerCase().replace(/ /g, '-');
-              return (
-                <a
-                  key={label}
-                  href={href}
-                  className="text-sm font-medium transition-colors hover:text-[#C75B2A]"
-                  style={{ color: '#1A1715' }}
-                >
-                  {label}
-                </a>
-              );
-            })}
-          </div>
-
-          <button
-            onClick={openModal}
-            className="bg-[#1A1715] text-white text-sm font-semibold px-5 py-2.5 rounded-full hover:bg-black transition-colors whitespace-nowrap flex-shrink-0"
-          >
-            Book a Free Call
-          </button>
-        </div>
-      </nav>
-
-      {/* ═══════════════════════════════════════════════════
-          HERO
-      ════════════════════════════════════════════════════ */}
-      <section className="pt-36 pb-24 px-4 max-w-7xl mx-auto">
-        <div className="grid md:grid-cols-2 gap-14 items-center">
-          {/* Left copy */}
-          <div className="fade-in-up">
-            {/* Badge */}
-            <div
-              className="inline-flex items-center gap-2 text-sm font-semibold px-4 py-2 rounded-full mb-6"
-              style={{
-                backgroundColor: 'rgba(91,140,90,0.12)',
-                color: '#5B8C5A',
-                border: '1px solid rgba(91,140,90,0.2)',
-              }}
-            >
-              <span className="w-2 h-2 rounded-full bg-[#5B8C5A]" />
-              Now Accepting Clients
+      <div className="modal">
+        <button className="modal-close" onClick={close} aria-label="Close">✕</button>
+        {submitted ? (
+          <div style={{ textAlign: 'center', padding: '8px 0' }}>
+            <div style={{ width: 56, height: 56, borderRadius: 999, background: '#E8F1EA', display: 'flex', alignItems: 'center', justifyContent: 'center', margin: '0 auto 20px' }}>
+              <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="#1F6B3A" strokeWidth="2.5">
+                <path d="M5 13l4 4L19 7" />
+              </svg>
             </div>
-
-            <h1 className="text-5xl md:text-[3.4rem] font-extrabold leading-tight mb-6">
-              Your AI-Powered Sales Engine{' '}
-              <span style={{ color: '#C75B2A' }}>That Never Sleeps.</span>
-            </h1>
-
-            <p
-              className="text-lg leading-relaxed mb-8"
-              style={{ color: '#8B7D6B', fontWeight: 400 }}
-            >
-              ZionShift is a fully autonomous, 24/7 AI outbound system that finds
-              qualified B2B leads, reaches out personally, and books meetings
-              directly on your calendar — completely hands-free. No software to
-              learn. No manual work. Just meetings appearing on your calendar.
-            </p>
-
-            <div className="flex flex-col sm:flex-row gap-3 mb-5">
-              <button
-                onClick={openModal}
-                className="bg-[#1A1715] text-white font-bold px-7 py-4 rounded-full text-center hover:bg-black transition-colors"
-              >
-                Book a Free Strategy Call
+            <h3 style={{ fontSize: 24, fontWeight: 700, letterSpacing: '-0.025em', margin: 0 }}>You&apos;re in.</h3>
+            <p style={{ color: 'var(--zs-ink-4)', marginTop: 10 }}>We&apos;ll reach out within 24 hours to schedule your call.</p>
+            <button className="btn btn-primary" style={{ marginTop: 28, width: '100%' }} onClick={close}>Close</button>
+          </div>
+        ) : (
+          <>
+            <h3 style={{ fontSize: 22, fontWeight: 700, letterSpacing: '-0.025em', margin: 0 }}>Book a free strategy call</h3>
+            <p style={{ fontSize: 14, color: 'var(--zs-ink-4)', marginTop: 6, marginBottom: 24 }}>No commitment · No sales pitch · Just a real conversation.</p>
+            <form onSubmit={handleSubmit}>
+              <div className="field"><label>Your name</label><input required value={form.name} onChange={(e) => setForm({ ...form, name: e.target.value })} placeholder="Jane Rivera" /></div>
+              <div className="field"><label>Email</label><input type="email" required value={form.email} onChange={(e) => setForm({ ...form, email: e.target.value })} placeholder="jane@firm.com" /></div>
+              <div className="field"><label>Phone</label><input type="tel" required value={form.phone} onChange={(e) => setForm({ ...form, phone: e.target.value })} placeholder="(555) 000-0000" /></div>
+              <div className="field"><label>Business</label><input value={form.business} onChange={(e) => setForm({ ...form, business: e.target.value })} placeholder="Rivera Consulting LLC" /></div>
+              <div className="field"><label>Biggest challenge</label><textarea value={form.challenge} onChange={(e) => setForm({ ...form, challenge: e.target.value })} placeholder="Tell us what's holding you back…" /></div>
+              <button type="submit" disabled={loading} className="btn btn-primary" style={{ marginTop: 20, width: '100%', padding: '14px' }}>
+                {loading ? 'Sending…' : <>Book your free strategy call<span className="chev">→</span></>}
               </button>
-              <a
-                href="#how-it-works"
-                className="border-2 border-[#1A1715] text-[#1A1715] font-bold px-7 py-4 rounded-full text-center hover:bg-[#1A1715] hover:text-white transition-colors"
-              >
-                See How It Works
-              </a>
-            </div>
-
-            <p className="text-sm" style={{ color: '#8B7D6B' }}>
-              ✦ Free 30-minute call · No commitment
-            </p>
-          </div>
-
-          {/* Right — meeting card */}
-          <div className="relative fade-in-up delay-2">
-            <div
-              className="rounded-2xl p-6 shadow-xl"
-              style={{
-                backgroundColor: '#FDFCFA',
-                border: '1px solid rgba(196,184,168,0.4)',
-              }}
-            >
-              <div className="flex items-center justify-between mb-5">
-                <h3 className="font-bold text-lg">Upcoming Meetings</h3>
-                <span
-                  className="text-xs font-semibold px-3 py-1.5 rounded-full"
-                  style={{ backgroundColor: '#F5F0EA', color: '#8B7D6B' }}
-                >
-                  This Week
-                </span>
-              </div>
-
-              <div className="space-y-3">
-                {meetings.map((m, i) => (
-                  <div
-                    key={i}
-                    className="meeting-row flex items-center justify-between p-3 rounded-xl"
-                    style={{
-                      backgroundColor: '#F5F0EA',
-                      animationDelay: `${0.4 + i * 0.15}s`,
-                    }}
-                  >
-                    <div className="flex items-center gap-3">
-                      <span
-                        className="text-xs font-semibold w-16 flex-shrink-0"
-                        style={{ color: '#8B7D6B' }}
-                      >
-                        {m.time}
-                      </span>
-                      <div>
-                        <p className="font-semibold text-sm">{m.name}</p>
-                        <p className="text-xs" style={{ color: '#8B7D6B' }}>
-                          {m.company}
-                        </p>
-                      </div>
-                    </div>
-                    <span
-                      className="text-xs font-bold px-3 py-1 rounded-full flex-shrink-0"
-                      style={{ backgroundColor: '#5B8C5A', color: 'white' }}
-                    >
-                      Qualified
-                    </span>
-                  </div>
-                ))}
-              </div>
-            </div>
-
-            {/* Floating badge 1 */}
-            <div
-              className="animate-float absolute -top-4 -right-3 text-white text-sm font-bold px-4 py-2.5 rounded-full shadow-lg"
-              style={{ backgroundColor: '#1A1715' }}
-            >
-              4 meetings booked today 🎯
-            </div>
-
-            {/* Floating badge 2 */}
-            <div
-              className="animate-float-delayed absolute -bottom-4 -left-3 text-white text-sm font-bold px-4 py-2.5 rounded-full shadow-lg"
-              style={{ backgroundColor: '#C75B2A' }}
-            >
-              14 meetings this month 📅
-            </div>
-          </div>
-        </div>
-      </section>
-
-      {/* ═══════════════════════════════════════════════════
-          STATS BAR
-      ════════════════════════════════════════════════════ */}
-      <section
-        className="py-10 px-4"
-        style={{
-          backgroundColor: '#FDFCFA',
-          borderTop: '1px solid rgba(196,184,168,0.35)',
-          borderBottom: '1px solid rgba(196,184,168,0.35)',
-        }}
-      >
-        <div className="max-w-6xl mx-auto grid grid-cols-2 md:grid-cols-4 gap-8 text-center">
-          {stats.map((s, i) => (
-            <div key={i} className={`fade-in-up delay-${i + 1}`}>
-              <p className="text-2xl font-extrabold" style={{ color: '#C75B2A' }}>
-                {s.value}
-              </p>
-              <p className="text-sm mt-1" style={{ color: '#8B7D6B' }}>
-                {s.label}
-              </p>
-            </div>
-          ))}
-        </div>
-      </section>
-
-      {/* ═══════════════════════════════════════════════════
-          PROBLEM SECTION
-      ════════════════════════════════════════════════════ */}
-      <section className="py-24 px-4 max-w-7xl mx-auto">
-        <div className="text-center mb-14 fade-in-up">
-          <span
-            className="text-xs font-bold uppercase tracking-widest"
-            style={{ color: '#C75B2A' }}
-          >
-            The Problem
-          </span>
-          <h2 className="text-4xl md:text-5xl font-extrabold mt-3 max-w-2xl mx-auto leading-tight">
-            Great at what you do. But growing your client base shouldn&apos;t feel impossible.
-          </h2>
-        </div>
-
-        <div className="grid md:grid-cols-3 gap-6">
-          {problems.map((p, i) => (
-            <div
-              key={i}
-              className={`fade-in-up delay-${i + 1} p-8 rounded-2xl`}
-              style={{
-                backgroundColor: '#FDFCFA',
-                border: '1px solid rgba(196,184,168,0.25)',
-              }}
-            >
-              <span className="text-4xl mb-5 block">{p.icon}</span>
-              <h3 className="text-xl font-bold mb-3">{p.title}</h3>
-              <p style={{ color: '#8B7D6B', fontWeight: 400, lineHeight: 1.7 }}>
-                {p.desc}
-              </p>
-            </div>
-          ))}
-        </div>
-      </section>
-
-      {/* ═══════════════════════════════════════════════════
-          HOW IT WORKS
-      ════════════════════════════════════════════════════ */}
-      <section
-        id="how-it-works"
-        className="py-24 px-4"
-        style={{ backgroundColor: '#FDFCFA' }}
-      >
-        <div className="max-w-7xl mx-auto">
-          <div className="text-center mb-14 fade-in-up">
-            <span
-              className="text-xs font-bold uppercase tracking-widest"
-              style={{ color: '#C75B2A' }}
-            >
-              How It Works
-            </span>
-            <h2 className="text-4xl md:text-5xl font-extrabold mt-3">
-              Three steps to a full calendar of qualified B2B meetings.
-            </h2>
-          </div>
-
-          <div className="grid md:grid-cols-3 gap-6">
-            {steps.map((s, i) => (
-              <div
-                key={i}
-                className={`fade-in-up delay-${i + 1} p-8 rounded-2xl relative overflow-hidden`}
-                style={{
-                  backgroundColor: '#F5F0EA',
-                  border: '1px solid rgba(196,184,168,0.25)',
-                }}
-              >
-                {/* Faded large number */}
-                <span
-                  className="absolute top-3 right-5 text-9xl font-black select-none leading-none pointer-events-none"
-                  style={{ color: '#1A1715', opacity: 0.07 }}
-                >
-                  {s.num}
-                </span>
-
-                <span
-                  className="text-xs font-bold uppercase tracking-widest mb-4 block"
-                  style={{ color: '#C75B2A' }}
-                >
-                  Step {s.num}
-                </span>
-                <h3 className="text-xl font-bold mb-3">{s.title}</h3>
-                <p style={{ color: '#8B7D6B', fontWeight: 400, lineHeight: 1.7 }}>
-                  {s.desc}
-                </p>
-              </div>
-            ))}
-          </div>
-        </div>
-      </section>
-
-      {/* ═══════════════════════════════════════════════════
-          VIDEO SECTION
-      ════════════════════════════════════════════════════ */}
-      <section className="py-24 px-4 max-w-4xl mx-auto">
-        <div className="text-center mb-10 fade-in-up">
-          <span
-            className="text-xs font-bold uppercase tracking-widest"
-            style={{ color: '#C75B2A' }}
-          >
-            Meet The Founder
-          </span>
-          <h2 className="text-4xl md:text-5xl font-extrabold mt-3">
-            See why business owners are making the switch.
-          </h2>
-        </div>
-
-        <div
-          className="fade-in-up rounded-3xl overflow-hidden"
-          style={{ position: 'relative', paddingBottom: '56.25%', height: 0 }}
-        >
-          <iframe
-            src="https://www.youtube.com/embed/xYVrAxbh_pI?rel=0&modestbranding=1&showinfo=0"
-            title="Meet Ryan, Founder of ZionShift"
-            width="100%"
-            frameBorder="0"
-            allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
-            allowFullScreen
-            loading="lazy"
-            style={{
-              position: 'absolute',
-              top: 0,
-              left: 0,
-              width: '100%',
-              height: '100%',
-            }}
-          />
-        </div>
-      </section>
-
-      {/* ═══════════════════════════════════════════════════
-          COMPARISON
-      ════════════════════════════════════════════════════ */}
-      <section
-        id="why-us"
-        className="py-24 px-4"
-        style={{ backgroundColor: '#FDFCFA' }}
-      >
-        <div className="max-w-5xl mx-auto">
-          <div className="text-center mb-14 fade-in-up">
-            <span
-              className="text-xs font-bold uppercase tracking-widest"
-              style={{ color: '#C75B2A' }}
-            >
-              Why ZionShift
-            </span>
-            <h2 className="text-4xl md:text-5xl font-extrabold mt-3">
-              ZionShift vs. the alternatives.
-            </h2>
-          </div>
-
-          <div className="grid md:grid-cols-3 gap-6">
-            {/* Traditional Agencies card */}
-            <div
-              className="fade-in-up p-8 rounded-2xl"
-              style={{
-                backgroundColor: '#F5F0EA',
-                border: '1px solid rgba(196,184,168,0.25)',
-              }}
-            >
-              <p className="text-xs font-bold uppercase tracking-widest mb-2" style={{ color: '#8B7D6B' }}>Traditional Agencies</p>
-              <h3
-                className="text-xl font-bold mb-6"
-                style={{ color: '#1A1715' }}
-              >
-                Outdated and overpriced
-              </h3>
-              <ul className="space-y-4">
-                {agencyItems.map((item, i) => (
-                  <li key={i} className="flex items-start gap-3">
-                    <span className="text-red-500 font-bold text-base mt-0.5 flex-shrink-0">
-                      ✕
-                    </span>
-                    <span style={{ color: '#8B7D6B', fontWeight: 400 }}>
-                      {item}
-                    </span>
-                  </li>
-                ))}
-              </ul>
-            </div>
-
-            {/* DIY AI Tools card */}
-            <div
-              className="fade-in-up delay-2 p-8 rounded-2xl"
-              style={{
-                backgroundColor: '#F5F0EA',
-                border: '1px solid rgba(196,184,168,0.25)',
-              }}
-            >
-              <p className="text-xs font-bold uppercase tracking-widest mb-2" style={{ color: '#8B7D6B' }}>DIY AI Tools</p>
-              <h3
-                className="text-xl font-bold mb-6"
-                style={{ color: '#1A1715' }}
-              >
-                Powerful but overwhelming
-              </h3>
-              <ul className="space-y-4">
-                {diyItems.map((item, i) => (
-                  <li key={i} className="flex items-start gap-3">
-                    <span className="text-red-500 font-bold text-base mt-0.5 flex-shrink-0">
-                      ✕
-                    </span>
-                    <span style={{ color: '#8B7D6B', fontWeight: 400 }}>
-                      {item}
-                    </span>
-                  </li>
-                ))}
-              </ul>
-            </div>
-
-            {/* ZionShift card */}
-            <div
-              className="fade-in-up delay-3 p-8 rounded-2xl"
-              style={{ backgroundColor: '#1A1715' }}
-            >
-              <p className="text-xs font-bold uppercase tracking-widest mb-2" style={{ color: '#C75B2A' }}>ZionShift</p>
-              <h3 className="text-xl font-bold mb-6 text-white">AI-powered, completely hands-free</h3>
-              <ul className="space-y-4">
-                {zionItems.map((item, i) => (
-                  <li key={i} className="flex items-start gap-3">
-                    <span
-                      className="font-bold text-base mt-0.5 flex-shrink-0"
-                      style={{ color: '#5B8C5A' }}
-                    >
-                      ✓
-                    </span>
-                    <span className="text-white" style={{ fontWeight: 400 }}>
-                      {item}
-                    </span>
-                  </li>
-                ))}
-              </ul>
-            </div>
-          </div>
-        </div>
-      </section>
-
-      {/* ═══════════════════════════════════════════════════
-          WHO WE HELP
-      ════════════════════════════════════════════════════ */}
-      <section className="py-24 px-4 max-w-5xl mx-auto">
-        <div className="text-center mb-12 fade-in-up">
-          <span
-            className="text-xs font-bold uppercase tracking-widest"
-            style={{ color: '#C75B2A' }}
-          >
-            Who We Help
-          </span>
-          <h2 className="text-4xl md:text-5xl font-extrabold mt-3 mb-4">
-            Built For B2B Service Businesses That Need More Clients.
-          </h2>
-          <p
-            className="text-lg max-w-2xl mx-auto leading-relaxed"
-            style={{ color: '#8B7D6B', fontWeight: 400 }}
-          >
-            If you sell a B2B service and need a consistent flow of qualified
-            meetings with decision makers, ZionShift was built for you.
-          </p>
-        </div>
-
-        <div className="fade-in-up flex flex-wrap justify-center gap-4">
-          {[
-            { icon: '📣', label: 'Marketing Agencies' },
-            { icon: '💻', label: 'IT Services' },
-            { icon: '🤝', label: 'Staffing & Recruiting' },
-            { icon: '📊', label: 'Business Consulting' },
-            { icon: '🌐', label: 'Web Design' },
-            { icon: '🛡️', label: 'Insurance Brokers' },
-            { icon: '🧾', label: 'Accounting Firms' },
-          ].map((item) => (
-            <div
-              key={item.label}
-              className="flex items-center gap-3 px-6 py-4 rounded-2xl font-semibold"
-              style={{
-                backgroundColor: '#FDFCFA',
-                border: '1px solid rgba(196,184,168,0.25)',
-              }}
-            >
-              <span className="text-2xl">{item.icon}</span>
-              <span style={{ color: '#1A1715' }}>{item.label}</span>
-            </div>
-          ))}
-
-          {/* And More — accent style */}
-          <div
-            className="flex items-center gap-3 px-6 py-4 rounded-2xl font-semibold"
-            style={{
-              backgroundColor: 'rgba(199,91,42,0.06)',
-              border: '1px solid rgba(199,91,42,0.3)',
-            }}
-          >
-            <span className="text-2xl">➕</span>
-            <span style={{ color: '#C75B2A' }}>And More</span>
-          </div>
-        </div>
-      </section>
-
-      {/* ═══════════════════════════════════════════════════
-          FAQ
-      ════════════════════════════════════════════════════ */}
-      <section
-        id="faq"
-        className="py-24 px-4"
-        style={{ backgroundColor: '#FDFCFA' }}
-      >
-        <div className="max-w-3xl mx-auto">
-          <div className="text-center mb-14 fade-in-up">
-            <span
-              className="text-xs font-bold uppercase tracking-widest"
-              style={{ color: '#C75B2A' }}
-            >
-              FAQ
-            </span>
-            <h2 className="text-4xl md:text-5xl font-extrabold mt-3">
-              Common questions.
-            </h2>
-          </div>
-
-          <div className="space-y-3">
-            {faqs.map((f, i) => (
-              <div
-                key={i}
-                className="fade-in-up rounded-2xl overflow-hidden"
-                style={{ border: '1px solid rgba(196,184,168,0.3)' }}
-              >
-                <button
-                  className="w-full flex items-center justify-between p-6 text-left transition-colors hover:bg-[#F5F0EA]"
-                  style={{ backgroundColor: '#FDFCFA' }}
-                  onClick={() => setOpenFaq(openFaq === i ? null : i)}
-                >
-                  <span className="font-bold text-lg pr-4">{f.q}</span>
-                  <span
-                    className="text-2xl flex-shrink-0 transition-transform duration-300"
-                    style={{
-                      color: '#C75B2A',
-                      transform: openFaq === i ? 'rotate(45deg)' : 'rotate(0deg)',
-                    }}
-                  >
-                    +
-                  </span>
-                </button>
-
-                <div
-                  className={`faq-answer ${openFaq === i ? 'open' : ''}`}
-                  style={{ backgroundColor: '#FDFCFA' }}
-                >
-                  <p
-                    className="px-6 pb-6 leading-relaxed"
-                    style={{ color: '#8B7D6B', fontWeight: 400 }}
-                  >
-                    {f.a}
-                  </p>
-                </div>
-              </div>
-            ))}
-          </div>
-        </div>
-      </section>
-
-      {/* ═══════════════════════════════════════════════════
-          CTA SECTION
-      ════════════════════════════════════════════════════ */}
-      <section id="book" className="py-24 px-4 max-w-5xl mx-auto">
-        <div
-          className="fade-in-up relative rounded-3xl overflow-hidden px-8 py-16 md:px-16 md:py-20 text-center"
-          style={{ backgroundColor: '#1A1715' }}
-        >
-          {/* Orange radial glow */}
-          <div
-            className="absolute inset-0 pointer-events-none"
-            style={{
-              background:
-                'radial-gradient(ellipse 60% 60% at 50% 50%, rgba(199,91,42,0.28) 0%, transparent 70%)',
-            }}
-          />
-
-          <div className="relative z-10">
-            <h2 className="text-4xl md:text-5xl font-extrabold text-white mb-5">
-              Ready to put your lead generation on autopilot?
-            </h2>
-            <p
-              className="text-lg mb-10 max-w-xl mx-auto leading-relaxed"
-              style={{ color: 'rgba(255,255,255,0.55)', fontWeight: 400 }}
-            >
-              Book a free strategy call and see exactly how our 24/7 autonomous
-              AI would build your hands-free outbound pipeline. No pitch, no
-              pressure — just a real conversation.
-            </p>
-            <button
-              onClick={openModal}
-              className="inline-block text-white font-bold px-9 py-4 rounded-full text-lg transition-opacity hover:opacity-90"
-              style={{ backgroundColor: '#C75B2A' }}
-            >
-              Book Your Free Strategy Call
-            </button>
-            <p
-              className="mt-5 text-sm"
-              style={{ color: 'rgba(255,255,255,0.35)' }}
-            >
-              No commitment · No sales pitch · Just a real conversation
-            </p>
-          </div>
-        </div>
-      </section>
-
-      {/* ═══════════════════════════════════════════════════
-          MODAL
-      ════════════════════════════════════════════════════ */}
-      {modalOpen && (
-        <div
-          ref={overlayRef}
-          onClick={handleOverlayClick}
-          className="fixed inset-0 z-[100] flex items-center justify-center px-4"
-          style={{ backgroundColor: 'rgba(0,0,0,0.5)', animation: 'fadeInOverlay 0.2s ease' }}
-        >
-          <div
-            className="relative w-full rounded-3xl p-8 shadow-2xl"
-            style={{
-              backgroundColor: '#FDFCFA',
-              maxWidth: 480,
-              animation: 'fadeInModal 0.25s ease',
-            }}
-          >
-            {/* Close button */}
-            <button
-              onClick={closeModal}
-              className="absolute top-4 right-4 w-8 h-8 flex items-center justify-center rounded-full transition-colors hover:bg-[#F5F0EA]"
-              style={{ color: '#8B7D6B' }}
-              aria-label="Close"
-            >
-              ✕
-            </button>
-
-            {submitted ? (
-              /* ── Confirmation ── */
-              <div className="text-center py-6">
-                <div
-                  className="w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-5"
-                  style={{ backgroundColor: 'rgba(91,140,90,0.12)' }}
-                >
-                  <svg className="w-8 h-8" style={{ color: '#5B8C5A' }} fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5}>
-                    <path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" />
-                  </svg>
-                </div>
-                <h3 className="text-2xl font-extrabold mb-2" style={{ color: '#1A1715' }}>You&apos;re in.</h3>
-                <p className="mb-8" style={{ color: '#8B7D6B', fontWeight: 400 }}>
-                  We&apos;ll reach out within 24 hours to schedule your call.
-                </p>
-                <button
-                  onClick={closeModal}
-                  className="w-full py-3 rounded-full font-bold text-white transition-opacity hover:opacity-90"
-                  style={{ backgroundColor: '#1A1715' }}
-                >
-                  Close
-                </button>
-              </div>
-            ) : (
-              /* ── Form ── */
-              <>
-                <h3 className="text-2xl font-extrabold mb-1" style={{ color: '#1A1715' }}>Book a Free Strategy Call</h3>
-                <p className="text-sm mb-6" style={{ color: '#8B7D6B' }}>No commitment · No sales pitch · Just a real conversation.</p>
-
-                <form onSubmit={handleSubmit} className="space-y-4">
-                  <div>
-                    <label className="block text-xs font-semibold mb-1.5 uppercase tracking-wide" style={{ color: '#8B7D6B' }}>Your Name *</label>
-                    <input
-                      type="text"
-                      required
-                      placeholder="John Smith"
-                      className={inputClass}
-                      style={inputStyle}
-                      value={form.name}
-                      onChange={e => setForm(f => ({ ...f, name: e.target.value }))}
-                    />
-                  </div>
-
-                  <div>
-                    <label className="block text-xs font-semibold mb-1.5 uppercase tracking-wide" style={{ color: '#8B7D6B' }}>Email Address *</label>
-                    <input
-                      type="email"
-                      required
-                      placeholder="john@example.com"
-                      className={inputClass}
-                      style={inputStyle}
-                      value={form.email}
-                      onChange={e => setForm(f => ({ ...f, email: e.target.value }))}
-                    />
-                  </div>
-
-                  <div>
-                    <label className="block text-xs font-semibold mb-1.5 uppercase tracking-wide" style={{ color: '#8B7D6B' }}>Phone Number *</label>
-                    <input
-                      type="tel"
-                      required
-                      placeholder="(555) 000-0000"
-                      className={inputClass}
-                      style={inputStyle}
-                      value={form.phone}
-                      onChange={e => setForm(f => ({ ...f, phone: e.target.value }))}
-                    />
-                  </div>
-
-                  <div>
-                    <label className="block text-xs font-semibold mb-1.5 uppercase tracking-wide" style={{ color: '#8B7D6B' }}>Business Name</label>
-                    <input
-                      type="text"
-                      placeholder="Your Business LLC"
-                      className={inputClass}
-                      style={inputStyle}
-                      value={form.business}
-                      onChange={e => setForm(f => ({ ...f, business: e.target.value }))}
-                    />
-                  </div>
-
-                  <div>
-                    <label className="block text-xs font-semibold mb-1.5 uppercase tracking-wide" style={{ color: '#8B7D6B' }}>What&apos;s your biggest challenge right now?</label>
-                    <textarea
-                      rows={3}
-                      placeholder="Tell us what's holding you back..."
-                      className={inputClass}
-                      style={{ ...inputStyle, resize: 'none' }}
-                      value={form.challenge}
-                      onChange={e => setForm(f => ({ ...f, challenge: e.target.value }))}
-                    />
-                  </div>
-
-                  <button
-                    type="submit"
-                    disabled={loading}
-                    className="w-full py-4 rounded-full font-bold text-white text-base transition-opacity hover:opacity-90 mt-2 disabled:opacity-60 disabled:cursor-not-allowed"
-                    style={{ backgroundColor: '#C75B2A' }}
-                  >
-                    {loading ? 'Sending...' : 'Book Your Free Strategy Call'}
-                  </button>
-
-                  {formError && (
-                    <p className="text-sm text-center" style={{ color: '#C75B2A' }}>
-                      {formError}
-                    </p>
-                  )}
-                </form>
-              </>
-            )}
-          </div>
-        </div>
-      )}
-
-      {/* ═══════════════════════════════════════════════════
-          FOOTER
-      ════════════════════════════════════════════════════ */}
-      <footer
-        className="py-8 px-4"
-        style={{ borderTop: '1px solid rgba(196,184,168,0.3)' }}
-      >
-        <div className="max-w-7xl mx-auto flex flex-col sm:flex-row items-center justify-between gap-4">
-          {/* eslint-disable-next-line @next/next/no-img-element */}
-          <img
-            src="/logo.png"
-            alt="ZionShift"
-            width={120}
-            className="object-contain"
-            style={{ height: 'auto' }}
-          />
-          <p className="text-sm" style={{ color: '#8B7D6B' }}>
-            © 2026 ZionShift. All rights reserved.
-          </p>
-        </div>
-      </footer>
+              {formError && <p style={{ marginTop: 12, fontSize: 13, color: 'var(--zs-signal)', textAlign: 'center' }}>{formError}</p>}
+            </form>
+          </>
+        )}
+      </div>
     </div>
+  );
+}
+
+/* ─── ROOT ───────────────────────────────────────── */
+export default function Home() {
+  useReveal();
+  useScrollProgress();
+  const [modal, setModal] = useState(false);
+  const openModal = useCallback(() => setModal(true), []);
+  const closeModal = useCallback(() => setModal(false), []);
+
+  return (
+    <>
+      <div className="scroll-progress" />
+      <Nav onBook={openModal} />
+      <Hero onBook={openModal} />
+      <Marquee />
+      <Stats />
+      <Process />
+      <Bento />
+      <Video />
+      <FAQ />
+      <CTA onBook={openModal} />
+      <Footer />
+      <Modal open={modal} onClose={closeModal} />
+    </>
   );
 }

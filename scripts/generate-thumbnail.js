@@ -1,4 +1,4 @@
-const { createCanvas, loadImage } = require('canvas');
+const { createCanvas } = require('canvas');
 const fs = require('fs');
 const path = require('path');
 
@@ -8,104 +8,50 @@ const H = 720;
 const canvas = createCanvas(W, H);
 const ctx = canvas.getContext('2d');
 
-// ── Background ──────────────────────────────────────────────
-ctx.fillStyle = '#F5F0EA';
+// ── Background ───────────────────────────────────────────────
+ctx.fillStyle = '#1A1715';
 ctx.fillRect(0, 0, W, H);
 
-// ── Left accent bar ──────────────────────────────────────────
+// ── Subtle warm glow, right side ────────────────────────────
+const glow = ctx.createRadialGradient(W * 0.82, H * 0.5, 0, W * 0.82, H * 0.5, W * 0.55);
+glow.addColorStop(0, 'rgba(199,91,42,0.2)');
+glow.addColorStop(1, 'rgba(199,91,42,0)');
+ctx.fillStyle = glow;
+ctx.fillRect(0, 0, W, H);
+
+// ── Left orange bar ──────────────────────────────────────────
 ctx.fillStyle = '#C75B2A';
 ctx.fillRect(0, 0, 6, H);
 
-// ── Subtle right-side geometric block ───────────────────────
-ctx.fillStyle = '#EDE8E1';
-ctx.beginPath();
-ctx.moveTo(W * 0.58, 0);
-ctx.lineTo(W, 0);
-ctx.lineTo(W, H);
-ctx.lineTo(W * 0.62, H);
-ctx.closePath();
-ctx.fill();
-
-// ── Diagonal accent line ─────────────────────────────────────
-ctx.strokeStyle = 'rgba(199,91,42,0.12)';
-ctx.lineWidth = 120;
-ctx.beginPath();
-ctx.moveTo(W * 0.55, -50);
-ctx.lineTo(W * 0.78, H + 50);
-ctx.stroke();
-
-// ── Top-left: eyebrow label ───────────────────────────────────
+// ── "ZIONSHIFT" — small, top left ───────────────────────────
 ctx.fillStyle = '#C75B2A';
-ctx.font = 'bold 22px sans-serif';
-ctx.letterSpacing = '0.15em';
-ctx.fillText('MEET THE FOUNDER', 80, 100);
+ctx.font = 'bold 15px sans-serif';
+ctx.letterSpacing = '0.3em';
+ctx.fillText('ZIONSHIFT', 52, 72);
 
-// ── Divider under eyebrow ─────────────────────────────────────
-ctx.fillStyle = 'rgba(199,91,42,0.3)';
-ctx.fillRect(80, 116, 220, 2);
+// ── Name — the hero element ──────────────────────────────────
+ctx.fillStyle = '#F5F0EA';
+ctx.font = 'bold 108px sans-serif';
+ctx.letterSpacing = '-0.01em';
+ctx.fillText('Ryan Flores', 48, 370);
 
-// ── Main heading ─────────────────────────────────────────────
-ctx.fillStyle = '#1A1715';
-ctx.font = 'bold 72px sans-serif';
-ctx.fillText('Ryan Flores', 80, 230);
-
-// ── Sub heading ──────────────────────────────────────────────
-ctx.fillStyle = '#8B7D6B';
-ctx.font = '32px sans-serif';
-ctx.fillText('Founder & CEO, ZionShift', 80, 285);
-
-// ── Divider ───────────────────────────────────────────────────
-ctx.fillStyle = 'rgba(196,184,168,0.5)';
-ctx.fillRect(80, 330, 400, 1);
-
-// ── Quote / tagline ───────────────────────────────────────────
-ctx.fillStyle = '#1A1715';
-ctx.font = '28px sans-serif';
-const line1 = 'How we book qualified B2B meetings';
-const line2 = 'for service businesses — on autopilot.';
-ctx.fillText(line1, 80, 390);
-ctx.fillText(line2, 80, 430);
-
-// ── Bottom badge pill ─────────────────────────────────────────
-const badgeX = 80;
-const badgeY = 530;
-const badgeW = 320;
-const badgeH = 52;
-const r = 26;
-
-ctx.fillStyle = '#1A1715';
-ctx.beginPath();
-ctx.moveTo(badgeX + r, badgeY);
-ctx.lineTo(badgeX + badgeW - r, badgeY);
-ctx.quadraticCurveTo(badgeX + badgeW, badgeY, badgeX + badgeW, badgeY + r);
-ctx.lineTo(badgeX + badgeW, badgeY + badgeH - r);
-ctx.quadraticCurveTo(badgeX + badgeW, badgeY + badgeH, badgeX + badgeW - r, badgeY + badgeH);
-ctx.lineTo(badgeX + r, badgeY + badgeH);
-ctx.quadraticCurveTo(badgeX, badgeY + badgeH, badgeX, badgeY + badgeH - r);
-ctx.lineTo(badgeX, badgeY + r);
-ctx.quadraticCurveTo(badgeX, badgeY, badgeX + r, badgeY);
-ctx.closePath();
-ctx.fill();
-
-ctx.fillStyle = '#ffffff';
-ctx.font = 'bold 18px sans-serif';
-ctx.fillText('AI-Powered Outbound System', 110, 562);
-
-// ── Right side: ZionShift wordmark ───────────────────────────
-ctx.fillStyle = '#1A1715';
-ctx.font = 'bold 52px sans-serif';
-ctx.fillText('ZIONSHIFT', W * 0.62, H / 2 - 20);
-
+// ── Orange underline ─────────────────────────────────────────
 ctx.fillStyle = '#C75B2A';
-ctx.fillRect(W * 0.62, H / 2 + 4, 260, 3);
+ctx.fillRect(50, 392, 500, 4);
 
-ctx.fillStyle = '#8B7D6B';
-ctx.font = '22px sans-serif';
-ctx.fillText('zionshift.com', W * 0.62, H / 2 + 45);
+// ── Subtitle ─────────────────────────────────────────────────
+ctx.fillStyle = 'rgba(245,240,234,0.4)';
+ctx.font = '500 24px sans-serif';
+ctx.letterSpacing = '0';
+ctx.fillText('Founder & CEO, ZionShift', 52, 442);
 
-// ── Save ──────────────────────────────────────────────────────
-const outputPath = path.join(__dirname, '..', 'public', 'video-thumbnail.png');
+// ── Save to Desktop ──────────────────────────────────────────
+const desktopPath = path.join(
+  process.env.USERPROFILE || process.env.HOME,
+  'Desktop',
+  'zionshift-thumbnail.png'
+);
 const buffer = canvas.toBuffer('image/png');
-fs.writeFileSync(outputPath, buffer);
-console.log('Thumbnail saved to public/video-thumbnail.png');
+fs.writeFileSync(desktopPath, buffer);
+console.log(`Saved to Desktop: zionshift-thumbnail.png`);
 console.log(`Size: ${(buffer.length / 1024).toFixed(1)} KB`);

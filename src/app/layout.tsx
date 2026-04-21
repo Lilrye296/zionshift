@@ -1,11 +1,18 @@
 import type { Metadata } from "next";
-import { Barlow } from "next/font/google";
+import { IBM_Plex_Mono, Source_Serif_4 } from "next/font/google";
 import "./globals.css";
 
-const barlow = Barlow({
+const ibmPlexMono = IBM_Plex_Mono({
   subsets: ["latin"],
-  weight: ["400", "500", "600", "700", "800"],
-  variable: "--font-barlow",
+  weight: ["400", "500", "600", "700"],
+  variable: "--font-ibm-mono",
+  display: "swap",
+});
+
+const sourceSerif4 = Source_Serif_4({
+  subsets: ["latin"],
+  weight: ["300", "400", "500", "600"],
+  variable: "--font-source-serif",
   display: "swap",
 });
 
@@ -22,7 +29,9 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en">
-      <body className={`${barlow.variable} antialiased`}>{children}</body>
+      <body className={`${ibmPlexMono.variable} ${sourceSerif4.variable} antialiased`}>
+        {children}
+      </body>
     </html>
   );
 }
