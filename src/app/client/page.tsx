@@ -191,8 +191,12 @@ function AppleIcon() {
 function OutlookIcon() {
   return (
     <svg width="30" height="30" viewBox="0 0 24 24" aria-hidden>
-      <rect x="1" y="1" width="22" height="22" rx="5" fill="#0078D4"/>
-      <path fill="#fff" d="M6 6h5.5C13.4 6 15 7.6 15 9.5S13.4 13 11.5 13H9v4H6V6zm3 2v3h2.5c.83 0 1.5-.67 1.5-1.5S12.33 8 11.5 8H9z"/>
+      {/* Microsoft Outlook — blue envelope */}
+      <rect width="24" height="24" rx="4" fill="#0078D4"/>
+      {/* envelope body */}
+      <rect x="3.5" y="7.5" width="17" height="11" rx="1.5" fill="white"/>
+      {/* envelope flap chevron */}
+      <path fill="none" stroke="#0078D4" strokeWidth="1.4" strokeLinejoin="round" d="M3.5 9 12 14.5 20.5 9"/>
     </svg>
   );
 }
@@ -608,13 +612,13 @@ export default function ClientPage() {
                   <span className="cd-cal-connected">Connected</span>
                 </div>
                 <div className="cd-cal-option">
-                  <AppleIcon />
-                  <span className="cd-cal-option-name">Apple Calendar</span>
+                  <OutlookIcon />
+                  <span className="cd-cal-option-name">Outlook / Microsoft 365</span>
                   <span className="cd-cal-disconnected">Not connected</span>
                 </div>
                 <div className="cd-cal-option">
-                  <OutlookIcon />
-                  <span className="cd-cal-option-name">Outlook</span>
+                  <AppleIcon />
+                  <span className="cd-cal-option-name">Apple Calendar</span>
                   <span className="cd-cal-disconnected">Not connected</span>
                 </div>
               </div>
