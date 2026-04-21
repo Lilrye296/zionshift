@@ -468,17 +468,57 @@ function Process() {
         </div>
       </div>
 
-      {/* Mobile: stacked step cards */}
+      {/* Mobile: stacked step cards with visuals */}
       <div className="process-mobile">
         <div className="zs-container">
           <div className="eyebrow reveal" style={{ marginBottom: 32 }}>How it works</div>
-          {steps.map((s, i) => (
-            <div key={i} className="process-card reveal" style={{ transitionDelay: `${i * 120}ms` }}>
-              <div className="step-num">{s.num}</div>
-              <h3>{s.h}</h3>
-              <p>{s.p}</p>
+
+          <div className="process-card reveal">
+            <div className="step-num">{steps[0].num}</div>
+            <h3>{steps[0].h}</h3>
+            <p>{steps[0].p}</p>
+            <div className="process-card-stage">
+              <div className="slide-form">
+                <div className="row"><span className="k">Ideal client</span><span className="v">Small business owners, owner-operated<span className="cursor" /></span></div>
+                <div className="row"><span className="k">Target geography</span><span className="v">United States · $500K–$5M revenue</span></div>
+                <div className="row"><span className="k">Offer</span><span className="v">Your service, positioned to your ICP</span></div>
+              </div>
             </div>
-          ))}
+          </div>
+
+          <div className="process-card reveal d1">
+            <div className="step-num">{steps[1].num}</div>
+            <h3>{steps[1].h}</h3>
+            <p>{steps[1].p}</p>
+            <div className="process-card-stage">
+              <div className="prospect-feed">
+                {[
+                  { name: 'David Okafor',    co: 'Okafor Plumbing Co.',       signal: 'Hiring · 4 roles' },
+                  { name: 'Lisa Tran',        co: 'Tran Family Dental',         signal: 'Just expanded' },
+                  { name: 'Carlos Mendez',   co: 'Mendez Construction LLC',    signal: 'Revenue growth' },
+                  { name: 'Rachel Kim',       co: 'Kim & Park Law Group',       signal: 'New entity' },
+                ].map((p, i) => (
+                  <div key={i} className="prospect-card">
+                    <div className="pc-info">
+                      <div className="pc-name">{p.name}</div>
+                      <div className="pc-co">{p.co}</div>
+                    </div>
+                    <span className="pc-signal">{p.signal}</span>
+                  </div>
+                ))}
+              </div>
+            </div>
+          </div>
+
+          <div className="process-card reveal d2">
+            <div className="step-num">{steps[2].num}</div>
+            <h3>{steps[2].h}</h3>
+            <p>{steps[2].p}</p>
+            <div className="process-card-stage">
+              <CalendarSlide />
+            </div>
+          </div>
+
         </div>
       </div>
 
