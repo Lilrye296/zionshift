@@ -260,7 +260,7 @@ function CalendarConnectModal({
             <Icon />
             <div>
               <div className="ccm-title">{info.name}</div>
-              {isConnected && <div className="ccm-connected-label">● Connected</div>}
+              {isConnected && <div className="ccm-connected-label">Connected</div>}
             </div>
           </div>
           <div className="ccm-steps-label">How it works</div>
@@ -705,7 +705,7 @@ export default function ClientPage() {
                     {p === 'apple'   && <AppleIcon />}
                     <span className="cd-cal-option-name">{CAL_INFO[p].name}</span>
                     {connectedCal === p
-                      ? <span className="cd-cal-connected">● Connected</span>
+                      ? <span className="cd-cal-connected">Connected</span>
                       : <span className="cd-cal-tap">Tap to connect</span>
                     }
                   </div>

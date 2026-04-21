@@ -629,7 +629,7 @@ body { font-family: var(--zs-sans); color: var(--zs-ink-2); overflow-x: hidden; 
 .cd-cal-option { border: 1px solid var(--zs-border); border-radius: 14px; padding: 18px 16px; display: flex; flex-direction: column; align-items: center; gap: 8px; }
 .cd-cal-option-btn { cursor: pointer; transition: border-color 160ms, background 160ms; }
 .cd-cal-option-btn:hover { border-color: var(--zs-ink); background: var(--zs-mist); }
-.cd-cal-option-active { border-color: #16a34a !important; background: #f0fdf4; }
+.cd-cal-option-active { }
 .cd-cal-option-name { font: 500 14px var(--zs-sans); color: var(--zs-ink); letter-spacing: -0.01em; text-align: center; }
 .cd-cal-connected { font: 500 12px var(--zs-sans); color: #16a34a; }
 .cd-cal-tap { font: 400 12px var(--zs-sans); color: var(--zs-ink-5); }
