@@ -492,19 +492,60 @@ footer.zs-footer { padding: 40px 0; border-top: 1px solid var(--zs-border); }
 
 /* ─── RESPONSIVE ──────────────────────────────────── */
 @media (max-width: 900px) {
-  .visual-grid { grid-template-columns: 1fr; }
+  /* Nav */
+  .zs-nav-links { display: none; }
+  .zs-nav { padding: 0 20px; }
+
+  /* Hero */
+  .hero { padding: 110px 0 60px; }
+  .hero-visual { margin-top: 60px; overflow: hidden; }
+  .visual-grid { grid-template-columns: 1fr; gap: 16px; }
+  .h-panel:last-child { display: none; }
+  .hero-badge-1 { top: -12px; right: 4px; }
+  .hero-badge-2 { display: none; }
+
+  /* Stats */
   .stats-row { grid-template-columns: repeat(2, 1fr); }
   .stats-row .stat:nth-child(2) { border-left: 1px solid var(--zs-border); }
   .stats-row .stat:nth-child(3) { border-left: none; border-top: 1px solid var(--zs-border); }
   .stats-row .stat:nth-child(4) { border-top: 1px solid var(--zs-border); }
-  .process-grid { grid-template-columns: 1fr; gap: 40px; }
-  .bento { grid-template-columns: 1fr; }
-  .bento .wide { grid-column: span 1; }
-  .hero { padding: 130px 0 80px; }
-  .zs-section { padding: 80px 0; }
-  .cta-wrap { padding: 60px 24px; border-radius: 20px; }
-  .zs-nav-links { display: none; }
-  .hero-badge-2 { display: none; }
+  .stat { padding: 28px 20px; }
+  .stat .val { font-size: clamp(32px, 8vw, 52px); }
+
+  /* Process */
   .process { min-height: auto; }
-  .process-sticky { position: relative; height: auto; }
+  .process-sticky { position: relative; height: auto; padding: 40px 0; }
+  .process-grid { grid-template-columns: 1fr; gap: 32px; }
+  .process-copy h2 { font-size: clamp(32px, 8vw, 52px); }
+  .process-stage { aspect-ratio: 4/3; }
+
+  /* Bento */
+  .bento { grid-template-columns: 1fr; gap: 12px; }
+  .bento .wide { grid-column: span 1; }
+  .tile { padding: 28px 24px; min-height: 200px; }
+
+  /* Pricing */
+  .pricing-card { padding: 36px 24px; }
+  .pricing-row { flex-direction: column; gap: 24px; }
+  .pricing-divider { width: 80%; height: 1px; flex-shrink: 0; }
+  .pricing-item { padding: 0; }
+  .pricing-amount { font-size: 44px; }
+
+  /* Sections */
+  .zs-section { padding: 64px 0; }
+  .zs-narrow { padding: 0 20px; }
+
+  /* CTA */
+  .cta-wrap { padding: 56px 24px; border-radius: 20px; }
+  .cta-wrap h2 { font-size: clamp(32px, 8vw, 52px); }
+
+  /* Video */
+  .video-wrap { border-radius: 16px; }
+  .video-section h2 { font-size: clamp(32px, 8vw, 52px) !important; }
+
+  /* FAQ */
+  .faq-q { font-size: 17px; }
+
+  /* Container */
+  .zs-container { padding: 0 20px; }
 }
