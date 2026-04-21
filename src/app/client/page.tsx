@@ -284,7 +284,6 @@ export default function ClientPage() {
   }, []);
 
   const PERIOD_LABEL = { week: 'This Week', month: 'This Month', alltime: 'All Time' };
-  const PERIOD_SUB   = { week: 'this week', month: 'this month', alltime: 'all time'  };
 
   const p = profile;
   const greeting  = getGreeting();
