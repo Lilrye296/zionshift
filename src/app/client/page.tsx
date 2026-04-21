@@ -339,15 +339,6 @@ export default function ClientPage() {
             {/* ── Overview ── */}
             {activeTab === 'overview' && (<>
 
-            {/* ── Status preview row (all 5 states) ── */}
-            <div className="cd-status-preview">
-              <span className="cd-status-badge live"><span className="cd-status-dot" />Live — Sending</span>
-              <span className="cd-status-badge warming"><span className="cd-status-dot" />Warming Up — Day 3 of 14</span>
-              <span className="cd-status-badge idle"><span className="cd-status-dot" />Idle</span>
-              <span className="cd-status-badge paused"><span className="cd-status-dot" />Paused</span>
-              <span className="cd-status-badge error"><span className="cd-status-dot" />Error</span>
-            </div>
-
             {/* ── Greeting row ── */}
             <div className="cd-greeting-row">
               <h1 className="cd-greeting">{greeting}, {firstName}.</h1>
