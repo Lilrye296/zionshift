@@ -29,7 +29,13 @@ const MONTH_NAMES = [
 ];
 const DOW = ['S','M','T','W','T','F','S'];
 
-function MiniCalendar({ activeDates = [] }: { activeDates?: number[] }) {
+function MiniCalendar({
+  meetings = [],
+  onDayClick,
+}: {
+  meetings?: CalMeeting[];
+  onDayClick?: (meeting: CalMeeting) => void;
+}) {
   const now   = new Date();
   const year  = now.getFullYear();
   const month = now.getMonth();
@@ -43,24 +49,68 @@ function MiniCalendar({ activeDates = [] }: { activeDates?: number[] }) {
   for (let d = 1; d <= daysInMonth; d++) cells.push(d);
   while (cells.length % 7 !== 0) cells.push(null);
 
+  const meetingDays = meetings.map(m => m.day);
+
   return (
     <div className="mini-cal">
       <div className="mini-cal-header">{MONTH_NAMES[month].toUpperCase()} {year}</div>
       <div className="mini-cal-grid">
         {DOW.map((d, i) => <div key={i} className="mini-cal-dow">{d}</div>)}
-        {cells.map((day, i) => (
-          <div
-            key={i}
-            className={[
-              'mini-cal-day',
-              day === today ? 'today' : '',
-              day && activeDates.includes(day) ? 'has-dot' : '',
-            ].join(' ').trim()}
-          >
-            <span>{day ?? ''}</span>
-            {day && activeDates.includes(day) && <span className="mini-cal-dot" />}
+        {cells.map((day, i) => {
+          const hasMeeting = day !== null && meetingDays.includes(day);
+          const meeting    = hasMeeting ? meetings.find(m => m.day === day) : null;
+          return (
+            <div
+              key={i}
+              className={[
+                'mini-cal-day',
+                day === today  ? 'today'   : '',
+                hasMeeting     ? 'has-dot' : '',
+                hasMeeting     ? 'clickable' : '',
+              ].join(' ').trim()}
+              onClick={() => meeting && onDayClick?.(meeting)}
+            >
+              <span>{day ?? ''}</span>
+              {hasMeeting && <span className="mini-cal-dot" />}
+            </div>
+          );
+        })}
+      </div>
+    </div>
+  );
+}
+
+/* ── Meeting Detail Modal ── */
+function MeetingDetailModal({ meeting, onClose }: { meeting: CalMeeting; onClose: () => void }) {
+  const now   = new Date();
+  const month = MONTH_NAMES[now.getMonth()];
+
+  return (
+    <div className="modal-overlay" onClick={onClose}>
+      <div className="modal" style={{ maxWidth: 400 }} onClick={e => e.stopPropagation()}>
+        <button className="modal-close" onClick={onClose}>✕</button>
+        <div className="modal-scroll">
+          <div className="mdm-eyebrow">Scheduled Meeting</div>
+          <h2 className="mdm-name">{meeting.prospect}</h2>
+          <div className="mdm-firm">{meeting.firm}</div>
+          <div className="mdm-divider" />
+          <div className="mdm-row">
+            <span className="mdm-icon">📅</span>
+            <span>{month} {meeting.day}, {now.getFullYear()}</span>
           </div>
-        ))}
+          <div className="mdm-row">
+            <span className="mdm-icon">🕐</span>
+            <span>{meeting.time}</span>
+          </div>
+          <div className="mdm-row">
+            <span className="mdm-icon">📹</span>
+            <span>Zoom call</span>
+          </div>
+          <div className="mdm-divider" />
+          <span className={`cd-pill ${meeting.status.toLowerCase()}`} style={{ marginTop: 4 }}>
+            {meeting.status}
+          </span>
+        </div>
       </div>
     </div>
   );
@@ -73,6 +123,20 @@ const ACTIVITY = [
   { label: 'Email 2 delivered to 104 prospects',         sub: 'Apr 18',        strong: false },
   { label: 'Campaign entered Week 3',                    sub: 'Apr 15',        strong: false },
   { label: 'Initial outreach sent to 98 prospects',      sub: 'Apr 8',         strong: false },
+];
+
+interface CalMeeting {
+  day: number;
+  prospect: string;
+  firm: string;
+  time: string;
+  status: string;
+}
+
+const CAL_MEETINGS: CalMeeting[] = [
+  { day: 11, prospect: 'James Rivera',    firm: 'Apex Financial Services',   time: '10:00 AM EST', status: 'Completed' },
+  { day: 17, prospect: 'Sarah Mitchell',  firm: 'Clarity Point Bookkeeping', time: '2:00 PM EST',  status: 'Completed' },
+  { day: 23, prospect: 'Marcus Thompson', firm: 'Northstar CFO Group',        time: '9:00 AM EST',  status: 'Scheduled' },
 ];
 
 const MEETINGS = [
@@ -267,9 +331,10 @@ export default function ClientPage() {
     router.push('/login');
   }
 
-  const [activeTab, setActiveTab]           = useState<'overview' | 'billing'>('overview');
-  const [showLogoUpload, setShowLogoUpload] = useState(false);
-  const [localLogoUrl, setLocalLogoUrl]     = useState<string | null>(null);
+  const [activeTab, setActiveTab]               = useState<'overview' | 'billing'>('overview');
+  const [showLogoUpload, setShowLogoUpload]     = useState(false);
+  const [localLogoUrl, setLocalLogoUrl]         = useState<string | null>(null);
+  const [selectedMeeting, setSelectedMeeting]   = useState<CalMeeting | null>(null);
   const [period, setPeriod]                 = useState<'week' | 'month' | 'alltime'>('month');
   const [periodOpen, setPeriodOpen]         = useState(false);
   const periodRef                           = useRef<HTMLDivElement>(null);
@@ -426,7 +491,10 @@ export default function ClientPage() {
               </div>
 
               <div className="cd-card">
-                <MiniCalendar activeDates={[11, 17, 23]} />
+                <MiniCalendar
+                  meetings={CAL_MEETINGS}
+                  onDayClick={(m) => setSelectedMeeting(m)}
+                />
               </div>
             </div>
 
@@ -514,6 +582,13 @@ export default function ClientPage() {
         <LogoUploadModal
           onClose={() => setShowLogoUpload(false)}
           onSave={(url) => setLocalLogoUrl(url)}
+        />
+      )}
+
+      {selectedMeeting && (
+        <MeetingDetailModal
+          meeting={selectedMeeting}
+          onClose={() => setSelectedMeeting(null)}
         />
       )}
     </div>

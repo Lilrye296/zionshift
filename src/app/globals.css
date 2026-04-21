@@ -589,6 +589,16 @@ body { font-family: var(--zs-sans); color: var(--zs-ink-2); overflow-x: hidden; 
 .mini-cal-day.today { background: var(--zs-ink); color: #fff; font-weight: 600; border-radius: 8px; }
 .mini-cal-dot { width: 4px; height: 4px; border-radius: 50%; background: var(--zs-ink-4); flex-shrink: 0; }
 .mini-cal-day.today .mini-cal-dot { background: rgba(255,255,255,0.55); }
+.mini-cal-day.clickable { cursor: pointer; }
+.mini-cal-day.clickable:hover { background: var(--zs-mist); border-radius: 8px; }
+.mini-cal-day.today.clickable:hover { background: var(--zs-ink); }
+
+.mdm-eyebrow { font: 500 11px var(--zs-mono); letter-spacing: 0.08em; text-transform: uppercase; color: var(--zs-ink-5); margin-bottom: 10px; }
+.mdm-name { font: 700 22px var(--zs-sans); letter-spacing: -0.03em; color: var(--zs-ink); margin: 0 0 4px; }
+.mdm-firm { font: 400 14px var(--zs-sans); color: var(--zs-ink-4); margin-bottom: 4px; }
+.mdm-divider { border: none; border-top: 1px solid var(--zs-border); margin: 20px 0; }
+.mdm-row { display: flex; align-items: center; gap: 12px; font: 400 14px var(--zs-sans); color: var(--zs-ink); margin-bottom: 12px; }
+.mdm-icon { font-size: 16px; width: 20px; text-align: center; flex-shrink: 0; }
 
 .cd-table { width: 100%; border-collapse: collapse; }
 .cd-table th { font: 500 11px var(--zs-mono); letter-spacing: 0.08em; text-transform: uppercase; color: var(--zs-ink-5); text-align: left; padding: 0 16px 14px 0; border-bottom: 1px solid var(--zs-border); }
