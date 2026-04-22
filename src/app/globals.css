@@ -971,6 +971,76 @@ footer.zs-footer { padding: 40px 0; border-top: 1px solid var(--zs-border); }
 /* Divider */
 .adm-divider { height: 1px; background: var(--zs-border-soft); width: 100%; }
 
+/* ─── ADMIN MEETINGS TAB ─────────────────────────── */
+
+/* Header stats strip */
+.adm-meetings-stats { display: flex; align-items: center; gap: 20px; flex-shrink: 0; }
+.adm-meet-stat { display: flex; flex-direction: column; align-items: center; gap: 2px; }
+.adm-meet-stat-val { font: 700 26px var(--zs-sans); letter-spacing: -0.04em; color: var(--zs-ink); line-height: 1; }
+.adm-meet-stat-label { font: 400 11px var(--zs-mono); text-transform: uppercase; letter-spacing: 0.1em; color: var(--zs-ink-5); }
+.adm-meet-stat-divider { width: 1px; height: 32px; background: var(--zs-border); }
+
+/* Two-column grid */
+.adm-meet-grid { display: grid; grid-template-columns: 360px 1fr; gap: 20px; align-items: start; }
+
+/* Mini calendar */
+.adm-cal-dow { display: grid; grid-template-columns: repeat(7,1fr); gap: 4px; margin-bottom: 6px; }
+.adm-cal-dow span { font: 500 10px var(--zs-mono); text-transform: uppercase; letter-spacing: 0.06em; color: var(--zs-ink-5); text-align: center; padding: 4px 0; }
+.adm-cal-grid { display: grid; grid-template-columns: repeat(7,1fr); gap: 4px; }
+.adm-cal-cell { position: relative; aspect-ratio: 1; border-radius: 8px; background: var(--zs-mist); border: none; font: 500 12px var(--zs-sans); color: var(--zs-ink-4); cursor: default; display: flex; align-items: center; justify-content: center; transition: background 160ms; }
+.adm-cal-cell.empty { background: transparent; }
+.adm-cal-cell.today { outline: 2px solid var(--zs-ink); outline-offset: 2px; color: var(--zs-ink); font-weight: 700; }
+.adm-cal-cell.has-meet { background: var(--zs-ink); color: #fff; cursor: pointer; }
+.adm-cal-cell.has-meet:hover { background: #222; }
+.adm-cal-cell.selected { background: var(--zs-ink); color: #fff; box-shadow: 0 0 0 3px rgba(11,11,12,0.2); }
+.adm-cal-dot { position: absolute; bottom: 4px; right: 4px; width: 4px; height: 4px; border-radius: 50%; background: #5fb87a; }
+
+/* Meeting detail panel */
+.adm-meet-detail { margin-top: 20px; padding-top: 16px; border-top: 1px solid var(--zs-border-soft); }
+.adm-meet-detail-head { display: flex; align-items: flex-start; justify-content: space-between; gap: 12px; margin-bottom: 14px; }
+.adm-meet-detail-name { font: 600 15px var(--zs-sans); color: var(--zs-ink); letter-spacing: -0.01em; }
+.adm-meet-detail-firm { font: 400 12px var(--zs-mono); color: var(--zs-ink-4); margin-top: 2px; }
+.adm-meet-detail-row { display: flex; align-items: center; justify-content: space-between; padding: 8px 0; }
+.adm-meet-detail-label { font: 500 11px var(--zs-mono); text-transform: uppercase; letter-spacing: 0.08em; color: var(--zs-ink-5); }
+.adm-meet-detail-val { font: 500 13px var(--zs-sans); color: var(--zs-ink-3); }
+.adm-zoom-btn { display: inline-flex; align-items: center; margin-top: 14px; font: 600 13px var(--zs-sans); color: #fff; background: #2D8CFF; border-radius: 999px; padding: 8px 18px; text-decoration: none; transition: background 160ms; }
+.adm-zoom-btn:hover { background: #1a7aef; }
+.adm-cal-hint { font: 400 12px var(--zs-mono); color: var(--zs-ink-5); margin-top: 20px; text-align: center; padding-top: 16px; border-top: 1px solid var(--zs-border-soft); }
+
+/* Meeting status pills */
+.adm-meet-pill { font: 600 11px var(--zs-sans); border-radius: 999px; padding: 3px 10px; white-space: nowrap; display: inline-block; }
+.adm-meet-pill--upcoming  { background: #eff6ff; color: #2563eb; border: 1px solid #bfdbfe; }
+.adm-meet-pill--completed { background: #f0fdf4; color: #16a34a; border: 1px solid #bbf7d0; }
+.adm-meet-pill--no-show   { background: #fff1f2; color: #dc2626; border: 1px solid #fecaca; }
+
+/* Meeting log (right card) */
+.adm-meet-log { overflow-y: auto; max-height: 460px; scrollbar-width: thin; scrollbar-color: var(--zs-line) transparent; }
+.adm-meet-log::-webkit-scrollbar { width: 4px; }
+.adm-meet-log::-webkit-scrollbar-track { background: transparent; }
+.adm-meet-log::-webkit-scrollbar-thumb { background: var(--zs-line); border-radius: 999px; }
+.adm-meet-row { display: flex; align-items: center; gap: 14px; padding: 16px 24px; cursor: pointer; transition: background 140ms; }
+.adm-meet-row:hover { background: var(--zs-paper); }
+.adm-meet-row.selected { background: var(--zs-mist); }
+.adm-meet-row-avatar { width: 36px; height: 36px; background: var(--zs-ink); color: #fff; border-radius: 50%; display: flex; align-items: center; justify-content: center; font: 600 12px var(--zs-sans); flex-shrink: 0; }
+.adm-meet-row-info { flex: 1; min-width: 0; }
+.adm-meet-row-name { font: 600 14px var(--zs-sans); color: var(--zs-ink); letter-spacing: -0.01em; display: block; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.adm-meet-row-firm { font: 400 12px var(--zs-sans); color: var(--zs-ink-4); display: block; margin-top: 2px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.adm-meet-row-right { display: flex; flex-direction: column; align-items: flex-end; gap: 6px; flex-shrink: 0; }
+.adm-meet-row-date { font: 400 11px var(--zs-mono); color: var(--zs-ink-5); white-space: nowrap; }
+
+/* Calendar sync tiles */
+.adm-cal-sync-row { display: grid; grid-template-columns: repeat(3,1fr); gap: 12px; }
+.adm-cal-sync-tile { border: 1px solid var(--zs-border); border-radius: 14px; padding: 18px 20px; cursor: pointer; transition: border-color 160ms, background 160ms; }
+.adm-cal-sync-tile:hover { border-color: var(--zs-ink-3); background: var(--zs-paper); }
+.adm-cal-sync-name { font: 600 14px var(--zs-sans); color: var(--zs-ink); letter-spacing: -0.01em; display: block; margin-bottom: 4px; }
+.adm-cal-sync-cta { font: 400 12px var(--zs-mono); color: var(--zs-ink-5); }
+
+@media (max-width: 900px) {
+  .adm-meet-grid { grid-template-columns: 1fr; }
+  .adm-cal-sync-row { grid-template-columns: 1fr; }
+  .adm-meetings-stats { gap: 12px; }
+}
+
 @media (max-width: 900px) {
   .adm-biz-grid { grid-template-columns: 1fr; }
   .adm-table-wrap { overflow-x: auto; }

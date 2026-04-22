@@ -126,7 +126,31 @@ const ACTIVITY_FEED: ActivityItem[] = [
   { id: 4, text: 'Sarah Mitchell onboarded — campaign going live',  time: 'Apr 11',  type: 'onboard'   },
 ];
 
-const TABS = ['Business', 'Replies', 'Inbound', 'Pipeline', 'Opt-Outs'] as const;
+// TODO (Calendly): replace with live webhook data from Supabase meetings table.
+// Each booking from Calendly fires a webhook → Supabase insert → this list updates.
+interface ProspectMeeting {
+  id: number;
+  prospect: string;
+  firm: string;
+  date: string;       // e.g. "Apr 24, 2026"
+  day: number;        // day of month for calendar dot
+  time: string;       // e.g. "10:00 AM"
+  zoomUrl: string;
+  status: 'upcoming' | 'completed' | 'no-show';
+}
+
+const PROSPECT_MEETINGS: ProspectMeeting[] = [
+  { id: 1, prospect: 'Carter Flynn',   firm: 'Flynn Financial',        date: 'Apr 24, 2026', day: 24, time: '10:00 AM', zoomUrl: 'https://zoom.us/j/placeholder', status: 'upcoming'  },
+  { id: 2, prospect: 'James Okafor',   firm: 'OFC Group',              date: 'Apr 22, 2026', day: 22, time: '2:00 PM',  zoomUrl: 'https://zoom.us/j/placeholder', status: 'upcoming'  },
+  { id: 3, prospect: 'Beth Navarro',   firm: 'Navarro Wealth Mgmt',    date: 'Apr 17, 2026', day: 17, time: '11:00 AM', zoomUrl: 'https://zoom.us/j/placeholder', status: 'completed' },
+  { id: 4, prospect: 'Marcus Webb',    firm: 'Webb Capital Partners',  date: 'Apr 14, 2026', day: 14, time: '3:00 PM',  zoomUrl: 'https://zoom.us/j/placeholder', status: 'completed' },
+  { id: 5, prospect: 'Diana Solis',    firm: 'Solis Wealth Management',date: 'Apr 10, 2026', day: 10, time: '9:00 AM',  zoomUrl: 'https://zoom.us/j/placeholder', status: 'no-show'   },
+];
+
+const DOW_LABELS = ['S','M','T','W','T','F','S'];
+const MONTH_NAMES_FULL = ['January','February','March','April','May','June','July','August','September','October','November','December'];
+
+const TABS = ['Business', 'Meetings', 'Replies', 'Inbound', 'Pipeline', 'Opt-Outs'] as const;
 type Tab = typeof TABS[number];
 
 /* ── Component ──────────────────────────────────────────────────── */
@@ -139,6 +163,7 @@ export default function AdminPage() {
   const [replyLog, setReplyLog]           = useState<ReplyLog[]>(REPLY_LOG);
   const [metricPeriod, setMetricPeriod]   = useState<MetricPeriod>('alltime');
   const [periodOpen, setPeriodOpen]       = useState(false);
+  const [selectedMeeting, setSelectedMeeting] = useState<ProspectMeeting | null>(null);
   // TODO (Supabase + Smartlead): replace null with real aggregated stats per period.
   // Query Supabase view that sums Smartlead campaign stats across all active clients.
   const [periodStats, setPeriodStats]     = useState<AdminPeriodStats | null>(null);
@@ -218,6 +243,179 @@ export default function AdminPage() {
             </button>
           ))}
         </div>
+
+        {/* ══ MEETINGS ════════════════════════════════════════════ */}
+        {activeTab === 'Meetings' && (() => {
+          const now         = new Date();
+          const year        = now.getFullYear();
+          const month       = now.getMonth();
+          const today       = now.getDate();
+          const firstDay    = new Date(year, month, 1).getDay();
+          const daysInMonth = new Date(year, month + 1, 0).getDate();
+          const meetingDays = new Set(PROSPECT_MEETINGS.map(m => m.day));
+
+          const cells: (number | null)[] = [];
+          for (let i = 0; i < firstDay; i++) cells.push(null);
+          for (let d = 1; d <= daysInMonth; d++) cells.push(d);
+          while (cells.length % 7 !== 0) cells.push(null);
+
+          const upcoming  = PROSPECT_MEETINGS.filter(m => m.status === 'upcoming');
+          const past      = PROSPECT_MEETINGS.filter(m => m.status !== 'upcoming');
+
+          return (
+            <div>
+              {/* Header */}
+              <div className="adm-section-head" style={{ marginBottom: 28 }}>
+                <div>
+                  <h2 className="portal-heading" style={{ marginBottom: 6 }}>Meetings</h2>
+                  <p className="adm-subhead">Discovery calls booked by prospects via Calendly.</p>
+                </div>
+                <div className="adm-meetings-stats">
+                  <div className="adm-meet-stat">
+                    <span className="adm-meet-stat-val">{upcoming.length}</span>
+                    <span className="adm-meet-stat-label">Upcoming</span>
+                  </div>
+                  <div className="adm-meet-stat-divider" />
+                  <div className="adm-meet-stat">
+                    <span className="adm-meet-stat-val">{PROSPECT_MEETINGS.filter(m => m.status === 'completed').length}</span>
+                    <span className="adm-meet-stat-label">Completed</span>
+                  </div>
+                  <div className="adm-meet-stat-divider" />
+                  <div className="adm-meet-stat">
+                    <span className="adm-meet-stat-val">{PROSPECT_MEETINGS.filter(m => m.status === 'no-show').length}</span>
+                    <span className="adm-meet-stat-label">No-show</span>
+                  </div>
+                </div>
+              </div>
+
+              <div className="adm-meet-grid">
+
+                {/* Calendar */}
+                <div className="adm-biz-card" style={{ padding: '24px' }}>
+                  <div className="adm-biz-card-head">
+                    <span className="adm-biz-card-title">{MONTH_NAMES_FULL[month]} {year}</span>
+                  </div>
+                  <div className="adm-cal-dow">
+                    {DOW_LABELS.map((d, i) => <span key={i}>{d}</span>)}
+                  </div>
+                  <div className="adm-cal-grid">
+                    {cells.map((d, i) => (
+                      <button
+                        key={i}
+                        disabled={!d || !meetingDays.has(d)}
+                        onClick={() => {
+                          if (!d) return;
+                          const m = PROSPECT_MEETINGS.find(x => x.day === d);
+                          setSelectedMeeting(m ?? null);
+                        }}
+                        className={[
+                          'adm-cal-cell',
+                          !d                      ? 'empty'    : '',
+                          d === today             ? 'today'    : '',
+                          d && meetingDays.has(d) ? 'has-meet' : '',
+                          selectedMeeting?.day === d ? 'selected' : '',
+                        ].join(' ').trim()}
+                      >
+                        {d ?? ''}
+                        {d && meetingDays.has(d) && <span className="adm-cal-dot" />}
+                      </button>
+                    ))}
+                  </div>
+
+                  {/* Selected meeting detail */}
+                  {selectedMeeting ? (
+                    <div className="adm-meet-detail">
+                      <div className="adm-meet-detail-head">
+                        <div>
+                          <div className="adm-meet-detail-name">{selectedMeeting.prospect}</div>
+                          <div className="adm-meet-detail-firm">{selectedMeeting.firm}</div>
+                        </div>
+                        <span className={`adm-meet-pill adm-meet-pill--${selectedMeeting.status}`}>
+                          {selectedMeeting.status === 'upcoming'  ? 'Upcoming'  :
+                           selectedMeeting.status === 'completed' ? 'Completed' : 'No-show'}
+                        </span>
+                      </div>
+                      <div className="adm-meet-detail-row">
+                        <span className="adm-meet-detail-label">Date &amp; Time</span>
+                        <span className="adm-meet-detail-val">{selectedMeeting.date} · {selectedMeeting.time}</span>
+                      </div>
+                      {selectedMeeting.status === 'upcoming' && (
+                        <a
+                          href={selectedMeeting.zoomUrl}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="adm-zoom-btn"
+                        >
+                          Join Zoom →
+                        </a>
+                      )}
+                    </div>
+                  ) : (
+                    <p className="adm-cal-hint">Tap a highlighted date to see meeting details.</p>
+                  )}
+                </div>
+
+                {/* Meeting log */}
+                <div className="adm-biz-card" style={{ padding: 0, overflow: 'hidden' }}>
+                  <div style={{ padding: '24px 24px 0' }}>
+                    <div className="adm-biz-card-head">
+                      <span className="adm-biz-card-title">All Meetings</span>
+                      <span className="adm-count-chip">{PROSPECT_MEETINGS.length} Total</span>
+                    </div>
+                  </div>
+                  <div className="adm-meet-log">
+                    {PROSPECT_MEETINGS.map((m, i) => (
+                      <Fragment key={m.id}>
+                        {i > 0 && <div className="adm-divider" style={{ margin: '0 24px' }} />}
+                        <div
+                          className={`adm-meet-row${selectedMeeting?.id === m.id ? ' selected' : ''}`}
+                          onClick={() => setSelectedMeeting(prev => prev?.id === m.id ? null : m)}
+                        >
+                          <div className="adm-meet-row-avatar">
+                            {m.prospect.split(' ').map(w => w[0]).join('')}
+                          </div>
+                          <div className="adm-meet-row-info">
+                            <span className="adm-meet-row-name">{m.prospect}</span>
+                            <span className="adm-meet-row-firm">{m.firm}</span>
+                          </div>
+                          <div className="adm-meet-row-right">
+                            <span className="adm-meet-row-date">{m.date} · {m.time}</span>
+                            <span className={`adm-meet-pill adm-meet-pill--${m.status}`}>
+                              {m.status === 'upcoming'  ? 'Upcoming'  :
+                               m.status === 'completed' ? 'Completed' : 'No-show'}
+                            </span>
+                          </div>
+                        </div>
+                      </Fragment>
+                    ))}
+                  </div>
+                </div>
+
+              </div>
+
+              {/* Calendar sync */}
+              <div className="adm-biz-card" style={{ marginTop: 20 }}>
+                <div className="adm-biz-card-head">
+                  <span className="adm-biz-card-title">Sync to Your Calendar</span>
+                  <span className="adm-subhead">New bookings will appear automatically once connected.</span>
+                </div>
+                <div className="adm-cal-sync-row">
+                  {[
+                    { name: 'Google Calendar',         key: 'google'  },
+                    { name: 'Outlook / Microsoft 365', key: 'outlook' },
+                    { name: 'Apple Calendar',          key: 'apple'   },
+                  ].map(c => (
+                    <div key={c.key} className="adm-cal-sync-tile">
+                      <span className="adm-cal-sync-name">{c.name}</span>
+                      <span className="adm-cal-sync-cta">Tap to connect</span>
+                    </div>
+                  ))}
+                </div>
+              </div>
+
+            </div>
+          );
+        })()}
 
         {/* ══ REPLIES — read-only auto-send log ═══════════════════ */}
         {activeTab === 'Replies' && (
