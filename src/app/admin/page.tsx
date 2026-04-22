@@ -342,9 +342,13 @@ export default function AdminPage() {
 
   // TODO (Supabase): uncomment to load live meetings from Supabase.
   // Remove PROSPECT_MEETINGS_SEED initializer above and use [] instead.
+  // Ordered descending so newest meetings appear at the top of the All Meetings list.
   // useEffect(() => {
   //   const supabase = createClient();
-  //   supabase.from('meetings').select('*').order('year').order('month').order('day')
+  //   supabase.from('meetings').select('*')
+  //     .order('year',  { ascending: false })
+  //     .order('month', { ascending: false })
+  //     .order('day',   { ascending: false })
   //     .then(({ data }) => { if (data) setMeetings(data as ProspectMeeting[]); });
   // }, []);
 
@@ -412,20 +416,28 @@ export default function AdminPage() {
       <main className="portal-main">
 
         {/* ── Tab pills ── */}
-        <div className="cd-tabs" style={{ marginBottom: 32 }}>
-          {TABS.map(tab => (
-            <button
-              key={tab}
-              className={`cd-tab${activeTab === tab ? ' active' : ''}`}
-              onClick={() => setActiveTab(tab)}
-            >
-              {tab}
-              {tab === 'Replies' && flaggedCount > 0 && (
-                <span className="adm-badge adm-badge-flag">{flaggedCount}</span>
-              )}
-            </button>
-          ))}
-        </div>
+        {(() => {
+          const upcomingCount = meetings.filter(m => m.status === 'upcoming').length;
+          return (
+            <div className="cd-tabs" style={{ marginBottom: 32 }}>
+              {TABS.map(tab => (
+                <button
+                  key={tab}
+                  className={`cd-tab${activeTab === tab ? ' active' : ''}`}
+                  onClick={() => setActiveTab(tab)}
+                >
+                  {tab}
+                  {tab === 'Meetings' && upcomingCount > 0 && (
+                    <span className="adm-badge adm-badge-meet">{upcomingCount}</span>
+                  )}
+                  {tab === 'Replies' && flaggedCount > 0 && (
+                    <span className="adm-badge adm-badge-flag">{flaggedCount}</span>
+                  )}
+                </button>
+              ))}
+            </div>
+          );
+        })()}
 
         {/* ══ MEETINGS ════════════════════════════════════════════ */}
         {activeTab === 'Meetings' && (() => {

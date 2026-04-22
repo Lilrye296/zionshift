@@ -643,7 +643,7 @@ body { font-family: var(--zs-sans); color: var(--zs-ink-2); overflow-x: hidden; 
 .cd-cal-option { border: 1px solid var(--zs-border); border-radius: 14px; padding: 18px 16px; display: flex; flex-direction: column; align-items: center; gap: 8px; }
 .cd-cal-option-btn { cursor: pointer; transition: border-color 160ms, background 160ms; }
 .cd-cal-option-btn:hover { border-color: var(--zs-ink); background: var(--zs-mist); }
-.cd-cal-option-active { }
+.cd-cal-option-active { border-color: #16a34a; background: #f0fdf4; }
 .cd-cal-option-name { font: 500 14px var(--zs-sans); color: var(--zs-ink); letter-spacing: -0.01em; text-align: center; }
 .cd-cal-connected { font: 500 12px var(--zs-sans); color: #16a34a; }
 .cd-cal-tap { font: 400 12px var(--zs-sans); color: var(--zs-ink-5); }
@@ -844,6 +844,7 @@ footer.zs-footer { padding: 40px 0; border-top: 1px solid var(--zs-border); }
 /* Tab badge */
 .adm-badge { display: inline-flex; align-items: center; justify-content: center; min-width: 17px; height: 17px; padding: 0 4px; border-radius: 999px; background: var(--zs-ink); color: #fff; font: 700 10px var(--zs-sans); margin-left: 4px; }
 .adm-badge-flag { background: #b45309; }
+.adm-badge-meet { background: #2563eb; }
 
 /* Reply log header meta */
 .adm-log-meta { display: flex; flex-direction: column; align-items: flex-end; gap: 4px; padding-top: 6px; flex-shrink: 0; }
@@ -1010,7 +1011,6 @@ footer.zs-footer { padding: 40px 0; border-top: 1px solid var(--zs-border); }
 .adm-cal-dow span { font: 500 10px var(--zs-mono); text-transform: uppercase; letter-spacing: 0.06em; color: var(--zs-ink-5); text-align: center; padding: 4px 0; }
 .adm-cal-grid { display: grid; grid-template-columns: repeat(7,1fr); gap: 4px; }
 .adm-cal-cell { position: relative; aspect-ratio: 1; border-radius: 8px; background: var(--zs-mist); border: none; font: 500 12px var(--zs-sans); color: var(--zs-ink-4); cursor: default; display: flex; align-items: center; justify-content: center; transition: background 160ms; }
-.adm-cal-cell.empty { background: transparent; }
 .adm-cal-cell.today { outline: 2px solid var(--zs-ink); outline-offset: 2px; color: var(--zs-ink); font-weight: 700; }
 .adm-cal-cell.has-meet { background: var(--zs-ink); color: #fff; cursor: pointer; }
 .adm-cal-cell.has-meet:hover { background: #222; }
@@ -1050,16 +1050,8 @@ footer.zs-footer { padding: 40px 0; border-top: 1px solid var(--zs-border); }
 .adm-meet-row-date { font: 400 10px var(--zs-mono); color: var(--zs-ink-5); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; width: 100%; text-align: right; }
 .adm-meet-row-time { font: 500 11px var(--zs-sans); color: var(--zs-ink-3); white-space: nowrap; text-align: right; }
 
-/* Calendar sync tiles */
-.adm-cal-sync-row { display: grid; grid-template-columns: repeat(3,1fr); gap: 12px; }
-.adm-cal-sync-tile { border: 1px solid var(--zs-border); border-radius: 14px; padding: 18px 20px; cursor: pointer; transition: border-color 160ms, background 160ms; }
-.adm-cal-sync-tile:hover { border-color: var(--zs-ink-3); background: var(--zs-paper); }
-.adm-cal-sync-name { font: 600 14px var(--zs-sans); color: var(--zs-ink); letter-spacing: -0.01em; display: block; margin-bottom: 4px; }
-.adm-cal-sync-cta { font: 400 12px var(--zs-mono); color: var(--zs-ink-5); }
-
 @media (max-width: 900px) {
   .adm-meet-grid { grid-template-columns: 1fr; }
-  .adm-cal-sync-row { grid-template-columns: 1fr; }
   .adm-meetings-stats { gap: 12px; }
 }
 
