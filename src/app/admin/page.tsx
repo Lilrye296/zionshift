@@ -135,14 +135,6 @@ interface OptOut {
   triggeredBy: string;
 }
 
-interface PipelineLead {
-  id: number;
-  name: string;
-  firm: string;
-  whatTheySaid: string;
-  reEntryDate: string;
-}
-
 interface ActiveClient {
   id: number;
   name: string;
@@ -176,12 +168,6 @@ const OPT_OUTS: OptOut[] = [
   { id: 1, date: 'Apr 18, 2026', name: 'Kevin Marsh',   firm: 'Marsh Financial',     email: 'kmarsh@marshfinancial.com', triggeredBy: 'Email sequence #3' },
   { id: 2, date: 'Apr 14, 2026', name: 'Sandra Liu',    firm: 'Liu Advisory Group',  email: 'sliu@liuadvisory.com',      triggeredBy: 'Email sequence #1' },
   { id: 3, date: 'Apr 09, 2026', name: 'Tom Garrett',   firm: 'Garrett Investments', email: 'tom@garrettinv.com',        triggeredBy: 'Email sequence #2' },
-];
-
-const PIPELINE_LEADS: PipelineLead[] = [
-  { id: 1, name: 'Patricia Howe', firm: 'Howe Asset Management',  whatTheySaid: 'Not the right time — check back in Q3.',          reEntryDate: 'Jul 7, 2026'  },
-  { id: 2, name: 'Derek Yuen',    firm: 'Yuen Capital',           whatTheySaid: 'Heading into busy season, reach out after June.',  reEntryDate: 'Jun 15, 2026' },
-  { id: 3, name: 'Angela Price',  firm: 'Price Wealth Partners',  whatTheySaid: 'Interested but budget review is in May.',          reEntryDate: 'May 20, 2026' },
 ];
 
 // TODO (Supabase): replace ALL_CLIENTS with a live fetch from the clients table.
@@ -244,7 +230,7 @@ const MRR_MILESTONES = [2000, 6000, 10000, 20000, 30000, 40000, 50000, 60000, 70
 const DOW_LABELS = ['S','M','T','W','T','F','S'];
 const MONTH_NAMES_FULL = ['January','February','March','April','May','June','July','August','September','October','November','December'];
 
-const TABS = ['Overview', 'Meetings', 'Pipeline', 'Opt-Outs'] as const;
+const TABS = ['Overview', 'Meetings', 'Opt-Outs'] as const;
 type Tab = typeof TABS[number];
 
 /* ── Component ──────────────────────────────────────────────────── */
@@ -588,42 +574,6 @@ export default function AdminPage() {
             </div>
           );
         })()}
-
-        {/* ══ PIPELINE ════════════════════════════════════════════ */}
-        {activeTab === 'Pipeline' && (
-          <div>
-            <div className="adm-section-head" style={{ marginBottom: 24 }}>
-              <div>
-                <h2 className="portal-heading" style={{ marginBottom: 6 }}>Future Pipeline</h2>
-                <p className="adm-subhead">Not-now leads with scheduled re-entry dates.</p>
-              </div>
-            </div>
-            <div className="adm-table-wrap">
-              <table className="adm-table">
-                <thead>
-                  <tr>
-                    <th>Name</th>
-                    <th>Firm</th>
-                    <th>What They Said</th>
-                    <th>Re-Entry Date</th>
-                    <th>Status</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {PIPELINE_LEADS.map(p => (
-                    <tr key={p.id}>
-                      <td className="adm-td-bold">{p.name}</td>
-                      <td className="adm-td-muted">{p.firm}</td>
-                      <td className="adm-td-italic">&ldquo;{p.whatTheySaid}&rdquo;</td>
-                      <td className="adm-td-muted">{p.reEntryDate}</td>
-                      <td><span className="adm-pill-amber">Scheduled</span></td>
-                    </tr>
-                  ))}
-                </tbody>
-              </table>
-            </div>
-          </div>
-        )}
 
         {/* ══ OVERVIEW ════════════════════════════════════════════ */}
         {activeTab === 'Overview' && (
