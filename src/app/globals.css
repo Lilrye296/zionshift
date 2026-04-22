@@ -848,23 +848,6 @@ footer.zs-footer { padding: 40px 0; border-top: 1px solid var(--zs-border); }
 /* Section header */
 .adm-section-head { display: flex; align-items: center; justify-content: space-between; gap: 24px; margin-bottom: 32px; flex-wrap: wrap; }
 .adm-subhead { font: 400 13px var(--zs-mono); color: var(--zs-ink-4); margin: 0; }
-.adm-bulk-row { display: flex; gap: 8px; align-items: center; padding-top: 8px; flex-shrink: 0; }
-
-/* Tables */
-.adm-table-wrap { background: #fff; border: 1px solid var(--zs-border); border-radius: 20px; overflow: hidden; }
-.adm-table { width: 100%; border-collapse: collapse; }
-.adm-table th { font: 500 11px var(--zs-mono); text-transform: uppercase; letter-spacing: 0.1em; color: var(--zs-ink-5); padding: 14px 20px; text-align: left; border-bottom: 1px solid var(--zs-border); background: var(--zs-paper); white-space: nowrap; }
-.adm-table td { padding: 16px 20px; border-bottom: 1px solid var(--zs-border-soft); vertical-align: top; }
-.adm-table tbody tr:last-child td { border-bottom: none; }
-.adm-table tbody tr:hover { background: var(--zs-paper); }
-.adm-td-bold    { font: 600 14px var(--zs-sans); color: var(--zs-ink); letter-spacing: -0.01em; white-space: nowrap; }
-.adm-td-muted   { font: 400 13px var(--zs-sans); color: var(--zs-ink-4); white-space: nowrap; }
-.adm-td-mono    { font: 400 12px var(--zs-mono); color: var(--zs-ink-3); white-space: nowrap; }
-
-/* Pills */
-.adm-pill-green   { font: 600 11px var(--zs-sans); border-radius: 999px; padding: 4px 10px; background: #f0fdf4; color: #16a34a; border: 1px solid #bbf7d0; white-space: nowrap; display: inline-block; }
-.adm-pill-live    { font: 500 12px var(--zs-sans); border-radius: 999px; padding: 4px 11px; background: #f0fdf4; color: #16a34a; border: 1px solid #bbf7d0; white-space: nowrap; display: inline-block; }
-.adm-pill-live.paused { background: #fffbeb; color: #b45309; border-color: #fde68a; }
 
 /* Business top row */
 .adm-biz-toprow { display: flex; align-items: center; justify-content: space-between; gap: 16px; }
@@ -1013,5 +996,4 @@ footer.zs-footer { padding: 40px 0; border-top: 1px solid var(--zs-border); }
   .adm-meet-grid { grid-template-columns: 1fr; }
   .adm-meetings-stats { gap: 12px; }
   .adm-biz-grid { grid-template-columns: 1fr; }
-  .adm-table-wrap { overflow-x: auto; }
 }

@@ -126,15 +126,6 @@ function AdminCalModal({
 
 /* ── Types ─────────────────────────────────────────────────────── */
 
-interface OptOut {
-  id: number;
-  date: string;
-  name: string;
-  firm: string;
-  email: string;
-  triggeredBy: string;
-}
-
 interface ActiveClient {
   id: number;
   name: string;
@@ -163,12 +154,6 @@ interface AdminPeriodStats {
 }
 
 /* ── Static placeholder data ────────────────────────────────────── */
-
-const OPT_OUTS: OptOut[] = [
-  { id: 1, date: 'Apr 18, 2026', name: 'Kevin Marsh',   firm: 'Marsh Financial',     email: 'kmarsh@marshfinancial.com', triggeredBy: 'Email sequence #3' },
-  { id: 2, date: 'Apr 14, 2026', name: 'Sandra Liu',    firm: 'Liu Advisory Group',  email: 'sliu@liuadvisory.com',      triggeredBy: 'Email sequence #1' },
-  { id: 3, date: 'Apr 09, 2026', name: 'Tom Garrett',   firm: 'Garrett Investments', email: 'tom@garrettinv.com',        triggeredBy: 'Email sequence #2' },
-];
 
 // TODO (Supabase): replace ALL_CLIENTS with a live fetch from the clients table.
 // Fields populated by: Stripe webhook (setupFeePaid, firstMonthPaid), onboarding form (since, status).
@@ -230,7 +215,7 @@ const MRR_MILESTONES = [2000, 6000, 10000, 20000, 30000, 40000, 50000, 60000, 70
 const DOW_LABELS = ['S','M','T','W','T','F','S'];
 const MONTH_NAMES_FULL = ['January','February','March','April','May','June','July','August','September','October','November','December'];
 
-const TABS = ['Overview', 'Meetings', 'Opt-Outs'] as const;
+const TABS = ['Overview', 'Meetings'] as const;
 type Tab = typeof TABS[number];
 
 /* ── Component ──────────────────────────────────────────────────── */
@@ -744,44 +729,6 @@ export default function AdminPage() {
                 </div>
 
               </div>
-            </div>
-          </div>
-        )}
-
-        {/* ══ OPT-OUTS ════════════════════════════════════════════ */}
-        {activeTab === 'Opt-Outs' && (
-          <div>
-            <div className="adm-section-head" style={{ marginBottom: 24 }}>
-              <div>
-                <h2 className="portal-heading" style={{ marginBottom: 6 }}>Opt-Out Log</h2>
-                <p className="adm-subhead">Read-only CAN-SPAM compliance record. All opt-outs are permanently suppressed.</p>
-              </div>
-            </div>
-            <div className="adm-table-wrap">
-              <table className="adm-table">
-                <thead>
-                  <tr>
-                    <th>Date</th>
-                    <th>Name</th>
-                    <th>Firm</th>
-                    <th>Email</th>
-                    <th>Triggered By</th>
-                    <th>Status</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {OPT_OUTS.map(o => (
-                    <tr key={o.id}>
-                      <td className="adm-td-muted">{o.date}</td>
-                      <td className="adm-td-bold">{o.name}</td>
-                      <td className="adm-td-muted">{o.firm}</td>
-                      <td className="adm-td-mono">{o.email}</td>
-                      <td className="adm-td-muted">{o.triggeredBy}</td>
-                      <td><span className="adm-pill-green">Suppressed ✓</span></td>
-                    </tr>
-                  ))}
-                </tbody>
-              </table>
             </div>
           </div>
         )}
