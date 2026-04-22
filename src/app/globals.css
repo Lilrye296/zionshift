@@ -829,6 +829,25 @@ footer.zs-footer { padding: 40px 0; border-top: 1px solid var(--zs-border); }
 
 /* Tab badge */
 .adm-badge { display: inline-flex; align-items: center; justify-content: center; min-width: 17px; height: 17px; padding: 0 4px; border-radius: 999px; background: var(--zs-ink); color: #fff; font: 700 10px var(--zs-sans); margin-left: 4px; }
+.adm-badge-flag { background: #b45309; }
+
+/* Reply log header meta */
+.adm-log-meta { display: flex; flex-direction: column; align-items: flex-end; gap: 4px; padding-top: 6px; flex-shrink: 0; }
+.adm-log-count { font: 400 12px var(--zs-mono); color: var(--zs-ink-5); }
+.adm-flag-count { font: 600 12px var(--zs-mono); color: #b45309; }
+
+/* Reply card — flagged state */
+.adm-reply-card.flagged { border-color: #fde68a; background: #fffdf5; }
+
+/* Reply card header extras */
+.adm-reply-header-right { display: flex; align-items: center; gap: 12px; margin-left: auto; flex-shrink: 0; }
+.adm-sent-time { font: 400 11px var(--zs-mono); color: var(--zs-ink-5); white-space: nowrap; }
+.adm-flag-btn { font: 500 12px var(--zs-sans); color: var(--zs-ink-5); background: none; border: 1px solid var(--zs-border); border-radius: 999px; padding: 5px 12px; cursor: pointer; transition: all 160ms; }
+.adm-flag-btn:hover { border-color: #b45309; color: #b45309; }
+.adm-flag-btn.active { background: #fffbeb; border-color: #fde68a; color: #b45309; font-weight: 600; }
+
+/* Auto-sent chip */
+.adm-auto-chip { font: 500 10px var(--zs-mono); letter-spacing: 0.06em; text-transform: uppercase; background: #f0fdf4; color: #16a34a; border: 1px solid #bbf7d0; border-radius: 4px; padding: 2px 7px; }
 
 /* Section header */
 .adm-section-head { display: flex; align-items: flex-start; justify-content: space-between; gap: 24px; margin-bottom: 32px; flex-wrap: wrap; }

@@ -6,13 +6,15 @@ import { createClient } from '@/utils/supabase/client';
 
 /* ── Types ─────────────────────────────────────────────────────── */
 
-interface PendingReply {
+interface ReplyLog {
   id: number;
   prospect: string;
   firm: string;
   email: string;
   theirMessage: string;
-  aiDraft: string;
+  aiSent: string;      // what the AI auto-sent — read-only
+  sentAt: string;
+  flagged: boolean;
 }
 
 interface OptOut {
@@ -57,14 +59,16 @@ interface ActivityItem {
 
 /* ── Static placeholder data ────────────────────────────────────── */
 
-const PENDING_REPLIES: PendingReply[] = [
+const REPLY_LOG: ReplyLog[] = [
   {
     id: 1,
     prospect: 'Marcus Webb',
     firm: 'Webb Capital Partners',
     email: 'marcus@webbcapital.com',
     theirMessage: 'Thanks for reaching out — I\'m open to hearing more. What does your process look like?',
-    aiDraft: 'Hi Marcus, great to hear back from you. Our process starts with a 20-minute discovery call where we map out your ideal client profile and build a targeted outreach sequence from there. We handle everything end-to-end — copywriting, sending, and reply management — so you can stay focused on closing. Would Thursday or Friday work for a quick call?',
+    aiSent: 'Hi Marcus, great to hear back from you. Our process starts with a 20-minute discovery call where we map out your ideal client profile and build a targeted outreach sequence from there. We handle everything end-to-end — copywriting, sending, and reply management — so you can stay focused on closing. Would Thursday or Friday work for a quick call?',
+    sentAt: 'Apr 21, 2026 · 10:14 AM',
+    flagged: false,
   },
   {
     id: 2,
@@ -72,7 +76,9 @@ const PENDING_REPLIES: PendingReply[] = [
     firm: 'Solis Wealth Management',
     email: 'diana@soliswealth.com',
     theirMessage: 'I\'ve been burned by outreach agencies before. What makes you different?',
-    aiDraft: 'Hi Diana, I completely understand that hesitation — it\'s the most common thing we hear. The difference with ZionShift is that we don\'t do blast campaigns. Every sequence is written specifically for your firm, your voice, and your ideal client. We also only work with a small number of advisors at a time so your results don\'t get diluted. Happy to show you some recent examples if that would help.',
+    aiSent: 'Hi Diana, I completely understand that hesitation — it\'s the most common thing we hear. The difference with ZionShift is that we don\'t do blast campaigns. Every sequence is written specifically for your firm, your voice, and your ideal client. We also only work with a small number of advisors at a time so your results don\'t get diluted. Happy to show you some recent examples if that would help.',
+    sentAt: 'Apr 21, 2026 · 8:02 AM',
+    flagged: false,
   },
 ];
 
@@ -89,9 +95,9 @@ const PIPELINE_LEADS: PipelineLead[] = [
 ];
 
 const INBOUND_LEADS: InboundLead[] = [
-  { id: 1, date: 'Apr 20, 2026', name: 'James Okafor',  email: 'jokafor@ofcgroup.com',     message: 'Came across your site and wanted to learn more about how the outreach works. We\'re a mid-size RIA looking to grow our HNW book.', status: 'new'    },
-  { id: 2, date: 'Apr 17, 2026', name: 'Beth Navarro',  email: 'beth@navarrowm.com',       message: 'A colleague recommended ZionShift. Looking for a demo if possible.',                                                               status: 'replied' },
-  { id: 3, date: 'Apr 11, 2026', name: 'Carter Flynn',  email: 'carter@flynnfinancial.com',message: 'Interested in a proposal. We manage about $400M AUM and want to expand to UHNW prospects.',                                        status: 'new'    },
+  { id: 1, date: 'Apr 20, 2026', name: 'James Okafor',  email: 'jokafor@ofcgroup.com',      message: 'Came across your site and wanted to learn more about how the outreach works. We\'re a mid-size RIA looking to grow our HNW book.', status: 'new'    },
+  { id: 2, date: 'Apr 17, 2026', name: 'Beth Navarro',  email: 'beth@navarrowm.com',        message: 'A colleague recommended ZionShift. Looking for a demo if possible.',                                                               status: 'replied' },
+  { id: 3, date: 'Apr 11, 2026', name: 'Carter Flynn',  email: 'carter@flynnfinancial.com', message: 'Interested in a proposal. We manage about $400M AUM and want to expand to UHNW prospects.',                                        status: 'new'    },
 ];
 
 const ACTIVE_CLIENTS: ActiveClient[] = [
@@ -100,23 +106,21 @@ const ACTIVE_CLIENTS: ActiveClient[] = [
 ];
 
 const ACTIVITY_FEED: ActivityItem[] = [
-  { id: 1, text: 'Marcus Webb replied to sequence #2',         time: '2h ago'  },
-  { id: 2, text: 'Diana Solis replied to sequence #1',         time: '4h ago'  },
-  { id: 3, text: 'Kevin Marsh opted out — suppressed',         time: '3d ago'  },
-  { id: 4, text: 'James Okafor submitted a website form',      time: '5d ago'  },
-  { id: 5, text: 'Sarah Mitchell onboarded — campaign live',   time: '10d ago' },
+  { id: 1, text: 'AI replied to Marcus Webb (Webb Capital)',       time: '2h ago'  },
+  { id: 2, text: 'AI replied to Diana Solis (Solis Wealth)',       time: '4h ago'  },
+  { id: 3, text: 'Kevin Marsh opted out — suppressed',             time: '3d ago'  },
+  { id: 4, text: 'James Okafor submitted a website form',          time: '5d ago'  },
+  { id: 5, text: 'Sarah Mitchell onboarded — campaign live',       time: '10d ago' },
 ];
 
-const TABS = ['Replies', 'Opt-Outs', 'Pipeline', 'Inbound', 'Business'] as const;
+const TABS = ['Replies', 'Inbound', 'Pipeline', 'Business', 'Opt-Outs'] as const;
 type Tab = typeof TABS[number];
 
 /* ── Component ──────────────────────────────────────────────────── */
 
 export default function AdminPage() {
-  const [activeTab, setActiveTab] = useState<Tab>('Replies');
-  const [replies, setReplies]     = useState<PendingReply[]>(PENDING_REPLIES);
-  const [editId, setEditId]       = useState<number | null>(null);
-  const [editText, setEditText]   = useState('');
+  const [activeTab, setActiveTab]   = useState<Tab>('Replies');
+  const [replyLog, setReplyLog]     = useState<ReplyLog[]>(REPLY_LOG);
   const router = useRouter();
 
   async function handleSignOut() {
@@ -127,18 +131,11 @@ export default function AdminPage() {
     router.push('/login');
   }
 
-  function approveReply(id: number) {
-    // TODO: send via Smartlead API
-    setReplies(r => r.filter(x => x.id !== id));
+  function toggleFlag(id: number) {
+    setReplyLog(log => log.map(r => r.id === id ? { ...r, flagged: !r.flagged } : r));
   }
-  function skipReply(id: number) { setReplies(r => r.filter(x => x.id !== id)); }
-  function startEdit(r: PendingReply) { setEditId(r.id); setEditText(r.aiDraft); }
-  function saveEdit(id: number) {
-    setReplies(r => r.map(x => x.id === id ? { ...x, aiDraft: editText } : x));
-    setEditId(null);
-  }
-  function approveAll() { setReplies([]); }
-  function skipAll()    { setReplies([]); }
+
+  const flaggedCount = replyLog.filter(r => r.flagged).length;
 
   const totalMRR      = ACTIVE_CLIENTS.reduce((s, c) => s + c.mrr, 0);
   const setupFees     = 1000;
@@ -147,19 +144,13 @@ export default function AdminPage() {
   return (
     <div className="portal-page">
 
-      {/* ── Nav — matches client page style ─────────────────────── */}
+      {/* ── Nav ─────────────────────────────────────────────────── */}
       <header className="portal-nav">
         <div className="portal-nav-inner">
           {/* eslint-disable-next-line @next/next/no-img-element */}
           <a href="/"><img src="/logo.png" alt="ZionShift" className="portal-logo" /></a>
-
           <span className="adm-center-label">Admin Portal</span>
-
-          <button
-            className="btn btn-ghost"
-            onClick={handleSignOut}
-            style={{ fontSize: 13, padding: '8px 16px' }}
-          >
+          <button className="btn btn-ghost" onClick={handleSignOut} style={{ fontSize: 13, padding: '8px 16px' }}>
             Sign out
           </button>
         </div>
@@ -167,56 +158,68 @@ export default function AdminPage() {
 
       <main className="portal-main">
 
-        {/* ── Tab pills — same style as client ── */}
+        {/* ── Tab pills ── */}
         <div className="cd-tabs" style={{ marginBottom: 32 }}>
           {TABS.map(tab => (
             <button
               key={tab}
               className={`cd-tab${activeTab === tab ? ' active' : ''}`}
               onClick={() => setActiveTab(tab)}
-              style={{ position: 'relative' }}
             >
               {tab}
-              {tab === 'Replies' && replies.length > 0 && (
-                <span className="adm-badge">{replies.length}</span>
+              {tab === 'Replies' && flaggedCount > 0 && (
+                <span className="adm-badge adm-badge-flag">{flaggedCount}</span>
               )}
             </button>
           ))}
         </div>
 
-        {/* ── REPLIES ─────────────────────────────────────────────── */}
+        {/* ══ REPLIES — read-only auto-send log ═══════════════════ */}
         {activeTab === 'Replies' && (
           <div>
             <div className="adm-section-head">
               <div>
-                <h2 className="portal-heading" style={{ marginBottom: 6 }}>Pending Replies</h2>
-                <p className="adm-subhead">Review and approve AI-drafted responses before they send.</p>
+                <h2 className="portal-heading" style={{ marginBottom: 6 }}>Reply Log</h2>
+                <p className="adm-subhead">
+                  All replies are sent automatically. Flag any exchange that looks off for later review.
+                </p>
               </div>
-              {replies.length > 0 && (
-                <div className="adm-bulk-row">
-                  <button className="btn btn-ghost" style={{ fontSize: 13, padding: '8px 18px' }} onClick={skipAll}>Skip all</button>
-                  <button className="btn btn-primary" style={{ fontSize: 13, padding: '8px 18px' }} onClick={approveAll}>Approve all</button>
-                </div>
-              )}
+              <div className="adm-log-meta">
+                <span className="adm-log-count">{replyLog.length} exchanges today</span>
+                {flaggedCount > 0 && (
+                  <span className="adm-flag-count">⚑ {flaggedCount} flagged</span>
+                )}
+              </div>
             </div>
 
-            {replies.length === 0 ? (
+            {replyLog.length === 0 ? (
               <div className="portal-tab-body portal-empty">
-                <p>All caught up.</p>
-                <span>No pending replies right now.</span>
+                <p>No replies yet today.</p>
+                <span>Auto-sent exchanges will appear here.</span>
               </div>
             ) : (
               <div className="adm-reply-list">
-                {replies.map(r => (
-                  <div key={r.id} className="adm-reply-card">
-                    {/* Prospect header */}
+                {replyLog.map(r => (
+                  <div key={r.id} className={`adm-reply-card${r.flagged ? ' flagged' : ''}`}>
+
+                    {/* Header row */}
                     <div className="adm-reply-header">
                       <div className="adm-reply-avatar">
                         {r.prospect.split(' ').map(w => w[0]).join('')}
                       </div>
-                      <div>
+                      <div className="adm-reply-who">
                         <div className="adm-reply-name">{r.prospect}</div>
                         <div className="adm-reply-meta">{r.firm} &middot; {r.email}</div>
+                      </div>
+                      <div className="adm-reply-header-right">
+                        <span className="adm-sent-time">{r.sentAt}</span>
+                        <button
+                          className={`adm-flag-btn${r.flagged ? ' active' : ''}`}
+                          onClick={() => toggleFlag(r.id)}
+                          title={r.flagged ? 'Remove flag' : 'Flag this exchange'}
+                        >
+                          ⚑ {r.flagged ? 'Flagged' : 'Flag'}
+                        </button>
                       </div>
                     </div>
 
@@ -226,36 +229,15 @@ export default function AdminPage() {
                       <p className="adm-their-text">&ldquo;{r.theirMessage}&rdquo;</p>
                     </div>
 
-                    {/* AI draft */}
+                    {/* AI auto-sent */}
                     <div className="adm-draft-block">
                       <div className="adm-block-label-row">
-                        <span className="adm-block-label">AI draft</span>
-                        <span className="adm-ai-chip">AI</span>
+                        <span className="adm-block-label">AI auto-sent</span>
+                        <span className="adm-auto-chip">Sent automatically</span>
                       </div>
-                      {editId === r.id ? (
-                        <textarea
-                          className="adm-textarea"
-                          value={editText}
-                          onChange={e => setEditText(e.target.value)}
-                          rows={5}
-                        />
-                      ) : (
-                        <p className="adm-draft-text">{r.aiDraft}</p>
-                      )}
+                      <p className="adm-draft-text">{r.aiSent}</p>
                     </div>
 
-                    {/* Actions */}
-                    <div className="adm-reply-actions">
-                      <button className="btn btn-ghost" style={{ fontSize: 12, padding: '7px 16px' }} onClick={() => skipReply(r.id)}>Skip</button>
-                      {editId === r.id ? (
-                        <button className="btn btn-ghost" style={{ fontSize: 12, padding: '7px 16px' }} onClick={() => saveEdit(r.id)}>Save</button>
-                      ) : (
-                        <button className="btn btn-ghost" style={{ fontSize: 12, padding: '7px 16px' }} onClick={() => startEdit(r)}>Edit</button>
-                      )}
-                      <button className="btn btn-primary" style={{ fontSize: 12, padding: '7px 16px' }} onClick={() => approveReply(r.id)}>
-                        Approve &amp; Send
-                      </button>
-                    </div>
                   </div>
                 ))}
               </div>
@@ -263,81 +245,7 @@ export default function AdminPage() {
           </div>
         )}
 
-        {/* ── OPT-OUTS ────────────────────────────────────────────── */}
-        {activeTab === 'Opt-Outs' && (
-          <div>
-            <div className="adm-section-head" style={{ marginBottom: 24 }}>
-              <div>
-                <h2 className="portal-heading" style={{ marginBottom: 6 }}>Opt-Out Log</h2>
-                <p className="adm-subhead">Read-only CAN-SPAM compliance record. All opt-outs are permanently suppressed.</p>
-              </div>
-            </div>
-            <div className="adm-table-wrap">
-              <table className="adm-table">
-                <thead>
-                  <tr>
-                    <th>Date</th>
-                    <th>Name</th>
-                    <th>Firm</th>
-                    <th>Email</th>
-                    <th>Triggered By</th>
-                    <th>Status</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {OPT_OUTS.map(o => (
-                    <tr key={o.id}>
-                      <td className="adm-td-muted">{o.date}</td>
-                      <td className="adm-td-bold">{o.name}</td>
-                      <td className="adm-td-muted">{o.firm}</td>
-                      <td className="adm-td-mono">{o.email}</td>
-                      <td className="adm-td-muted">{o.triggeredBy}</td>
-                      <td><span className="adm-pill-green">Suppressed ✓</span></td>
-                    </tr>
-                  ))}
-                </tbody>
-              </table>
-            </div>
-          </div>
-        )}
-
-        {/* ── PIPELINE ────────────────────────────────────────────── */}
-        {activeTab === 'Pipeline' && (
-          <div>
-            <div className="adm-section-head" style={{ marginBottom: 24 }}>
-              <div>
-                <h2 className="portal-heading" style={{ marginBottom: 6 }}>Future Pipeline</h2>
-                <p className="adm-subhead">Not-now leads with scheduled re-entry dates.</p>
-              </div>
-            </div>
-            <div className="adm-table-wrap">
-              <table className="adm-table">
-                <thead>
-                  <tr>
-                    <th>Name</th>
-                    <th>Firm</th>
-                    <th>What They Said</th>
-                    <th>Re-Entry Date</th>
-                    <th>Status</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {PIPELINE_LEADS.map(p => (
-                    <tr key={p.id}>
-                      <td className="adm-td-bold">{p.name}</td>
-                      <td className="adm-td-muted">{p.firm}</td>
-                      <td className="adm-td-italic">&ldquo;{p.whatTheySaid}&rdquo;</td>
-                      <td className="adm-td-muted">{p.reEntryDate}</td>
-                      <td><span className="adm-pill-amber">Scheduled</span></td>
-                    </tr>
-                  ))}
-                </tbody>
-              </table>
-            </div>
-          </div>
-        )}
-
-        {/* ── INBOUND ─────────────────────────────────────────────── */}
+        {/* ══ INBOUND ═════════════════════════════════════════════ */}
         {activeTab === 'Inbound' && (
           <div>
             <div className="adm-section-head" style={{ marginBottom: 24 }}>
@@ -378,12 +286,47 @@ export default function AdminPage() {
           </div>
         )}
 
-        {/* ── BUSINESS ────────────────────────────────────────────── */}
+        {/* ══ PIPELINE ════════════════════════════════════════════ */}
+        {activeTab === 'Pipeline' && (
+          <div>
+            <div className="adm-section-head" style={{ marginBottom: 24 }}>
+              <div>
+                <h2 className="portal-heading" style={{ marginBottom: 6 }}>Future Pipeline</h2>
+                <p className="adm-subhead">Not-now leads with scheduled re-entry dates.</p>
+              </div>
+            </div>
+            <div className="adm-table-wrap">
+              <table className="adm-table">
+                <thead>
+                  <tr>
+                    <th>Name</th>
+                    <th>Firm</th>
+                    <th>What They Said</th>
+                    <th>Re-Entry Date</th>
+                    <th>Status</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {PIPELINE_LEADS.map(p => (
+                    <tr key={p.id}>
+                      <td className="adm-td-bold">{p.name}</td>
+                      <td className="adm-td-muted">{p.firm}</td>
+                      <td className="adm-td-italic">&ldquo;{p.whatTheySaid}&rdquo;</td>
+                      <td className="adm-td-muted">{p.reEntryDate}</td>
+                      <td><span className="adm-pill-amber">Scheduled</span></td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+          </div>
+        )}
+
+        {/* ══ BUSINESS ════════════════════════════════════════════ */}
         {activeTab === 'Business' && (
           <div>
             <h2 className="portal-heading" style={{ marginBottom: 28 }}>Business Overview</h2>
 
-            {/* Metric cards */}
             <div className="portal-metrics" style={{ marginBottom: 28 }}>
               {[
                 { label: 'MRR',             value: `$${totalMRR.toLocaleString()}` },
@@ -398,10 +341,7 @@ export default function AdminPage() {
               ))}
             </div>
 
-            {/* Two-column layout */}
             <div className="adm-biz-grid">
-
-              {/* Active clients */}
               <div className="adm-biz-card">
                 <div className="adm-biz-card-head">
                   <span className="adm-biz-card-title">Active Clients</span>
@@ -435,10 +375,7 @@ export default function AdminPage() {
                 )}
               </div>
 
-              {/* Right column */}
               <div className="adm-biz-right-col">
-
-                {/* Revenue */}
                 <div className="adm-biz-card">
                   <div className="adm-biz-card-head">
                     <span className="adm-biz-card-title">Revenue</span>
@@ -461,7 +398,6 @@ export default function AdminPage() {
                   </div>
                 </div>
 
-                {/* Recent activity */}
                 <div className="adm-biz-card">
                   <div className="adm-biz-card-head">
                     <span className="adm-biz-card-title">Recent Activity</span>
@@ -479,8 +415,45 @@ export default function AdminPage() {
                     ))}
                   </div>
                 </div>
-
               </div>
+            </div>
+          </div>
+        )}
+
+        {/* ══ OPT-OUTS ════════════════════════════════════════════ */}
+        {activeTab === 'Opt-Outs' && (
+          <div>
+            <div className="adm-section-head" style={{ marginBottom: 24 }}>
+              <div>
+                <h2 className="portal-heading" style={{ marginBottom: 6 }}>Opt-Out Log</h2>
+                <p className="adm-subhead">Read-only CAN-SPAM compliance record. All opt-outs are permanently suppressed.</p>
+              </div>
+            </div>
+            <div className="adm-table-wrap">
+              <table className="adm-table">
+                <thead>
+                  <tr>
+                    <th>Date</th>
+                    <th>Name</th>
+                    <th>Firm</th>
+                    <th>Email</th>
+                    <th>Triggered By</th>
+                    <th>Status</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {OPT_OUTS.map(o => (
+                    <tr key={o.id}>
+                      <td className="adm-td-muted">{o.date}</td>
+                      <td className="adm-td-bold">{o.name}</td>
+                      <td className="adm-td-muted">{o.firm}</td>
+                      <td className="adm-td-mono">{o.email}</td>
+                      <td className="adm-td-muted">{o.triggeredBy}</td>
+                      <td><span className="adm-pill-green">Suppressed ✓</span></td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
             </div>
           </div>
         )}
