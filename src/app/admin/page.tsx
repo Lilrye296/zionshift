@@ -148,9 +148,8 @@ interface ActivityItem {
 // TODO (Supabase): fetch from an aggregated view that sums across all active clients
 //   for the selected period. Shape mirrors Smartlead campaign stats.
 interface AdminPeriodStats {
-  emails_sent:     number | null;
-  total_replies:   number | null;
-  meetings_booked: number | null;
+  emails_sent:   number | null;
+  total_replies: number | null;
 }
 
 /* ── Static placeholder data ────────────────────────────────────── */
@@ -320,6 +319,30 @@ export default function AdminPage() {
 
   const upcomingCount = meetings.filter(m => m.status === 'upcoming').length;
 
+  // Calendar grid — recomputed when calMonth/calYear/meetings state changes
+  const calNow      = new Date();
+  const calToday    = (calMonth === calNow.getMonth() && calYear === calNow.getFullYear()) ? calNow.getDate() : -1;
+  const calFirstDay = new Date(calYear, calMonth, 1).getDay();
+  const calDays     = new Date(calYear, calMonth + 1, 0).getDate();
+  const meetingDays = new Set(
+    meetings.filter(m => m.month === calMonth && m.year === calYear).map(m => m.day)
+  );
+  const calCells: (number | null)[] = [];
+  for (let i = 0; i < calFirstDay; i++) calCells.push(null);
+  for (let d = 1; d <= calDays; d++) calCells.push(d);
+  while (calCells.length % 7 !== 0) calCells.push(null);
+
+  function prevMonth() {
+    setSelectedMeeting(null); // clear detail panel — it belongs to the month being left
+    if (calMonth === 0) { setCalMonth(11); setCalYear(y => y - 1); }
+    else setCalMonth(m => m - 1);
+  }
+  function nextMonth() {
+    setSelectedMeeting(null); // clear detail panel — it belongs to the month being left
+    if (calMonth === 11) { setCalMonth(0); setCalYear(y => y + 1); }
+    else setCalMonth(m => m + 1);
+  }
+
   return (
     <div className="portal-page">
 
@@ -354,217 +377,184 @@ export default function AdminPage() {
         </div>
 
         {/* ══ MEETINGS ════════════════════════════════════════════ */}
-        {activeTab === 'Meetings' && (() => {
-          const now         = new Date();
-          const curMonth    = now.getMonth();
-          const curYear     = now.getFullYear();
-          const today       = (calMonth === curMonth && calYear === curYear) ? now.getDate() : -1;
-          const firstDay    = new Date(calYear, calMonth, 1).getDay();
-          const daysInMonth = new Date(calYear, calMonth + 1, 0).getDate();
-          // Only show meeting dots for meetings in the displayed month/year
-          const meetingDays = new Set(
-            meetings
-              .filter(m => m.month === calMonth && m.year === calYear)
-              .map(m => m.day)
-          );
-
-          const cells: (number | null)[] = [];
-          for (let i = 0; i < firstDay; i++) cells.push(null);
-          for (let d = 1; d <= daysInMonth; d++) cells.push(d);
-          while (cells.length % 7 !== 0) cells.push(null);
-
-          const upcoming = meetings.filter(m => m.status === 'upcoming');
-
-          function prevMonth() {
-            setSelectedMeeting(null); // clear detail panel — it belongs to the month being left
-            if (calMonth === 0) { setCalMonth(11); setCalYear(y => y - 1); }
-            else setCalMonth(m => m - 1);
-          }
-          function nextMonth() {
-            setSelectedMeeting(null); // clear detail panel — it belongs to the month being left
-            if (calMonth === 11) { setCalMonth(0); setCalYear(y => y + 1); }
-            else setCalMonth(m => m + 1);
-          }
-
-          return (
-            <div>
-              {/* Header */}
-              <div className="adm-section-head" style={{ marginBottom: 28 }}>
-                <div>
-                  <h2 className="portal-heading" style={{ marginBottom: 6 }}>Meetings</h2>
-                  <p className="adm-subhead">Discovery calls booked by prospects via Calendly.</p>
+        {activeTab === 'Meetings' && (
+          <div>
+            {/* Header */}
+            <div className="adm-section-head" style={{ marginBottom: 28 }}>
+              <div>
+                <h2 className="portal-heading" style={{ marginBottom: 6 }}>Meetings</h2>
+                <p className="adm-subhead">Discovery calls booked by prospects via Calendly.</p>
+              </div>
+              <div className="adm-meetings-stats">
+                <div className="adm-meet-stat">
+                  <span className="adm-meet-stat-val">{upcomingCount}</span>
+                  <span className="adm-meet-stat-label">Upcoming</span>
                 </div>
-                <div className="adm-meetings-stats">
-                  <div className="adm-meet-stat">
-                    <span className="adm-meet-stat-val">{upcoming.length}</span>
-                    <span className="adm-meet-stat-label">Upcoming</span>
-                  </div>
-                  <div className="adm-meet-stat-divider" />
-                  <div className="adm-meet-stat">
-                    <span className="adm-meet-stat-val">{meetings.filter(m => m.status === 'completed').length}</span>
-                    <span className="adm-meet-stat-label">Completed</span>
-                  </div>
+                <div className="adm-meet-stat-divider" />
+                <div className="adm-meet-stat">
+                  <span className="adm-meet-stat-val">{meetings.filter(m => m.status === 'completed').length}</span>
+                  <span className="adm-meet-stat-label">Completed</span>
                 </div>
               </div>
+            </div>
 
-              <div className="adm-meet-grid">
+            <div className="adm-meet-grid">
 
-                {/* Calendar */}
-                <div className="adm-biz-card">
-                  {/* Month nav */}
-                  <div className="adm-cal-nav">
-                    <button className="adm-cal-nav-btn" onClick={prevMonth} aria-label="Previous month">
-                      <svg width="14" height="14" viewBox="0 0 14 14" fill="none" aria-hidden>
-                        <path d="M9 2L4 7L9 12" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
-                      </svg>
-                    </button>
-                    <span className="adm-biz-card-title">{MONTH_NAMES_FULL[calMonth]} {calYear}</span>
-                    <button className="adm-cal-nav-btn" onClick={nextMonth} aria-label="Next month">
-                      <svg width="14" height="14" viewBox="0 0 14 14" fill="none" aria-hidden>
-                        <path d="M5 2L10 7L5 12" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
-                      </svg>
-                    </button>
-                  </div>
-                  <div className="adm-cal-dow">
-                    {DOW_LABELS.map((d, i) => <span key={i}>{d}</span>)}
-                  </div>
-                  <div className="adm-cal-grid">
-                    {cells.map((d, i) => {
-                      if (!d) return <div key={i} />;
-                      const hasMeet = meetingDays.has(d);
-                      const isSelected = selectedMeeting?.day === d &&
-                                         selectedMeeting?.month === calMonth &&
-                                         selectedMeeting?.year === calYear;
-                      return (
-                        <button
-                          key={i}
-                          disabled={!hasMeet}
-                          onClick={() => {
-                            // TODO: if two meetings land on the same day, find() surfaces only the first.
-                            // When real Calendly data arrives, consider a multi-meeting day modal.
-                            const m = meetings.find(x => x.day === d && x.month === calMonth && x.year === calYear);
-                            setSelectedMeeting(prev => prev?.id === m?.id ? null : (m ?? null));
-                          }}
-                          className={[
-                            'adm-cal-cell',
-                            d === today  ? 'today'    : '',
-                            hasMeet      ? 'has-meet' : '',
-                            isSelected   ? 'selected' : '',
-                          ].join(' ').trim()}
-                        >
-                          {d}
-                          {hasMeet && <span className="adm-cal-dot" />}
-                        </button>
-                      );
-                    })}
-                  </div>
-
-                  {/* Selected meeting detail */}
-                  {selectedMeeting ? (
-                    <div className="adm-meet-detail">
-                      <div className="adm-meet-detail-head">
-                        <div>
-                          <div className="adm-meet-detail-name">{selectedMeeting.prospect}</div>
-                          <div className="adm-meet-detail-firm">{selectedMeeting.firm}</div>
-                        </div>
-                        <span className={`adm-meet-pill adm-meet-pill--${selectedMeeting.status}`}>
-                          {selectedMeeting.status === 'upcoming' ? 'Upcoming' : 'Completed'}
-                        </span>
-                      </div>
-                      <div className="adm-meet-detail-row">
-                        <span className="adm-meet-detail-label">Date &amp; Time</span>
-                        <span className="adm-meet-detail-val">{selectedMeeting.date} · {selectedMeeting.time}</span>
-                      </div>
-                      {selectedMeeting.status === 'upcoming' && (
-                        <a href={selectedMeeting.zoom_url} target="_blank" rel="noopener noreferrer" className="adm-zoom-btn">
-                          Join Zoom →
-                        </a>
-                      )}
-                    </div>
-                  ) : (
-                    <p className="adm-cal-hint">Tap a highlighted date to see meeting details.</p>
-                  )}
+              {/* Calendar */}
+              <div className="adm-biz-card">
+                {/* Month nav */}
+                <div className="adm-cal-nav">
+                  <button className="adm-cal-nav-btn" onClick={prevMonth} aria-label="Previous month">
+                    <svg width="14" height="14" viewBox="0 0 14 14" fill="none" aria-hidden>
+                      <path d="M9 2L4 7L9 12" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
+                    </svg>
+                  </button>
+                  <span className="adm-biz-card-title">{MONTH_NAMES_FULL[calMonth]} {calYear}</span>
+                  <button className="adm-cal-nav-btn" onClick={nextMonth} aria-label="Next month">
+                    <svg width="14" height="14" viewBox="0 0 14 14" fill="none" aria-hidden>
+                      <path d="M5 2L10 7L5 12" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
+                    </svg>
+                  </button>
+                </div>
+                <div className="adm-cal-dow">
+                  {DOW_LABELS.map((d, i) => <span key={i}>{d}</span>)}
+                </div>
+                <div className="adm-cal-grid">
+                  {calCells.map((d, i) => {
+                    if (!d) return <div key={i} />;
+                    const hasMeet = meetingDays.has(d);
+                    const isSelected = selectedMeeting?.day === d &&
+                                       selectedMeeting?.month === calMonth &&
+                                       selectedMeeting?.year === calYear;
+                    return (
+                      <button
+                        key={i}
+                        disabled={!hasMeet}
+                        onClick={() => {
+                          // TODO: if two meetings land on the same day, find() surfaces only the first.
+                          // When real Calendly data arrives, consider a multi-meeting day modal.
+                          const m = meetings.find(x => x.day === d && x.month === calMonth && x.year === calYear);
+                          setSelectedMeeting(prev => prev?.id === m?.id ? null : (m ?? null));
+                        }}
+                        className={[
+                          'adm-cal-cell',
+                          d === calToday ? 'today'    : '',
+                          hasMeet        ? 'has-meet' : '',
+                          isSelected     ? 'selected' : '',
+                        ].join(' ').trim()}
+                      >
+                        {d}
+                        {hasMeet && <span className="adm-cal-dot" />}
+                      </button>
+                    );
+                  })}
                 </div>
 
-                {/* Meeting log */}
-                <div className="adm-biz-card" style={{ padding: 0, overflow: 'hidden' }}>
-                  <div style={{ padding: '24px 24px 0' }}>
-                    <div className="adm-biz-card-head">
-                      <span className="adm-biz-card-title">All Meetings</span>
-                      <span className="adm-count-chip">{meetings.length} Total</span>
+                {/* Selected meeting detail */}
+                {selectedMeeting ? (
+                  <div className="adm-meet-detail">
+                    <div className="adm-meet-detail-head">
+                      <div>
+                        <div className="adm-meet-detail-name">{selectedMeeting.prospect}</div>
+                        <div className="adm-meet-detail-firm">{selectedMeeting.firm}</div>
+                      </div>
+                      <span className={`adm-meet-pill adm-meet-pill--${selectedMeeting.status}`}>
+                        {selectedMeeting.status === 'upcoming' ? 'Upcoming' : 'Completed'}
+                      </span>
                     </div>
+                    <div className="adm-meet-detail-row">
+                      <span className="adm-meet-detail-label">Date &amp; Time</span>
+                      <span className="adm-meet-detail-val">{selectedMeeting.date} · {selectedMeeting.time}</span>
+                    </div>
+                    {selectedMeeting.status === 'upcoming' && (
+                      <a href={selectedMeeting.zoom_url} target="_blank" rel="noopener noreferrer" className="adm-zoom-btn">
+                        Join Zoom →
+                      </a>
+                    )}
                   </div>
-                  <div className="adm-meet-log">
-                    {meetings.length === 0 ? (
-                      <p className="adm-empty-text" style={{ padding: '24px' }}>No meetings yet. Calendly bookings will appear here automatically.</p>
-                    ) : meetings.map((m, i) => (
-                      <Fragment key={m.id}>
-                        {i > 0 && <div className="adm-divider" style={{ margin: '0 24px' }} />}
-                        <div
-                          className={`adm-meet-row${selectedMeeting?.id === m.id ? ' selected' : ''}`}
-                          onClick={() => setSelectedMeeting(prev => prev?.id === m.id ? null : m)}
-                        >
-                          <div className="adm-meet-row-avatar">
-                            {m.prospect.split(' ').map(w => w[0]).join('')}
-                          </div>
-                          <div className="adm-meet-row-info">
-                            <span className="adm-meet-row-name">{m.prospect}</span>
-                            <span className="adm-meet-row-firm">{m.firm}</span>
-                          </div>
-                          <div className="adm-meet-row-right">
-                            <span className="adm-meet-row-date">{m.date}</span>
-                            <span className="adm-meet-row-time">{m.time}</span>
-                            <span className={`adm-meet-pill adm-meet-pill--${m.status}`}>
-                              {m.status === 'upcoming' ? 'Upcoming' : 'Completed'}
-                            </span>
-                          </div>
-                        </div>
-                      </Fragment>
-                    ))}
-                  </div>
-                </div>
-
+                ) : (
+                  <p className="adm-cal-hint">Tap a highlighted date to see meeting details.</p>
+                )}
               </div>
 
-              {/* Calendar sync — matches client dashboard */}
-              {/* TODO (OAuth): wire each provider button to its OAuth flow.
-                  Google  → /api/auth/google-calendar   (scope: calendar.events.readonly)
-                  Outlook → /api/auth/outlook-calendar  (scope: Calendars.Read)
-                  Apple   → App-Specific Password prompt (CalDAV)
-                  On success, store provider token in Supabase user_integrations table.
-                  connectedCal state drives the UI — swap setConnectedCal(p) for the real token check. */}
-              <div className="cd-card" style={{ marginTop: 20 }}>
-                <div className="cd-cal-sync-top">
-                  <div>
-                    <div className="cd-cal-sync-title">Sync to your calendar</div>
-                    <div className="cd-cal-sync-sub">
-                      New Calendly bookings will appear automatically once connected.
-                    </div>
+              {/* Meeting log */}
+              <div className="adm-biz-card" style={{ padding: 0, overflow: 'hidden' }}>
+                <div style={{ padding: '24px 24px 0' }}>
+                  <div className="adm-biz-card-head">
+                    <span className="adm-biz-card-title">All Meetings</span>
+                    <span className="adm-count-chip">{meetings.length} Total</span>
                   </div>
                 </div>
-                <div className="cd-cal-options">
-                  {(['google', 'outlook', 'apple'] as CalProvider[]).map(p => (
-                    <div
-                      key={p}
-                      className={`cd-cal-option cd-cal-option-btn${connectedCal === p ? ' cd-cal-option-active' : ''}`}
-                      onClick={() => setCalModal(p)}
-                    >
-                      {p === 'google'  && <GoogleIcon />}
-                      {p === 'outlook' && <OutlookIcon />}
-                      {p === 'apple'   && <AppleIcon />}
-                      <span className="cd-cal-option-name">{CAL_INFO[p].name}</span>
-                      {connectedCal === p
-                        ? <span className="cd-cal-connected">Connected</span>
-                        : <span className="cd-cal-tap">Tap to connect</span>
-                      }
-                    </div>
+                <div className="adm-meet-log">
+                  {meetings.length === 0 ? (
+                    <p className="adm-empty-text" style={{ padding: '24px' }}>No meetings yet. Calendly bookings will appear here automatically.</p>
+                  ) : meetings.map((m, i) => (
+                    <Fragment key={m.id}>
+                      {i > 0 && <div className="adm-divider" style={{ margin: '0 24px' }} />}
+                      <div
+                        className={`adm-meet-row${selectedMeeting?.id === m.id ? ' selected' : ''}`}
+                        onClick={() => setSelectedMeeting(prev => prev?.id === m.id ? null : m)}
+                      >
+                        <div className="adm-meet-row-avatar">
+                          {m.prospect.split(' ').map(w => w[0]).join('')}
+                        </div>
+                        <div className="adm-meet-row-info">
+                          <span className="adm-meet-row-name">{m.prospect}</span>
+                          <span className="adm-meet-row-firm">{m.firm}</span>
+                        </div>
+                        <div className="adm-meet-row-right">
+                          <span className="adm-meet-row-date">{m.date}</span>
+                          <span className="adm-meet-row-time">{m.time}</span>
+                          <span className={`adm-meet-pill adm-meet-pill--${m.status}`}>
+                            {m.status === 'upcoming' ? 'Upcoming' : 'Completed'}
+                          </span>
+                        </div>
+                      </div>
+                    </Fragment>
                   ))}
                 </div>
               </div>
 
             </div>
-          );
-        })()}
+
+            {/* Calendar sync — matches client dashboard */}
+            {/* TODO (OAuth): wire each provider button to its OAuth flow.
+                Google  → /api/auth/google-calendar   (scope: calendar.events.readonly)
+                Outlook → /api/auth/outlook-calendar  (scope: Calendars.Read)
+                Apple   → App-Specific Password prompt (CalDAV)
+                On success, store provider token in Supabase user_integrations table.
+                connectedCal state drives the UI — swap setConnectedCal(p) for the real token check. */}
+            <div className="cd-card" style={{ marginTop: 20 }}>
+              <div className="cd-cal-sync-top">
+                <div>
+                  <div className="cd-cal-sync-title">Sync to your calendar</div>
+                  <div className="cd-cal-sync-sub">
+                    New Calendly bookings will appear automatically once connected.
+                  </div>
+                </div>
+              </div>
+              <div className="cd-cal-options">
+                {(['google', 'outlook', 'apple'] as CalProvider[]).map(p => (
+                  <div
+                    key={p}
+                    className={`cd-cal-option cd-cal-option-btn${connectedCal === p ? ' cd-cal-option-active' : ''}`}
+                    onClick={() => setCalModal(p)}
+                  >
+                    {p === 'google'  && <GoogleIcon />}
+                    {p === 'outlook' && <OutlookIcon />}
+                    {p === 'apple'   && <AppleIcon />}
+                    <span className="cd-cal-option-name">{CAL_INFO[p].name}</span>
+                    {connectedCal === p
+                      ? <span className="cd-cal-connected">Connected</span>
+                      : <span className="cd-cal-tap">Tap to connect</span>
+                    }
+                  </div>
+                ))}
+              </div>
+            </div>
+
+          </div>
+        )}
 
         {/* ══ OVERVIEW ════════════════════════════════════════════ */}
         {activeTab === 'Overview' && (
