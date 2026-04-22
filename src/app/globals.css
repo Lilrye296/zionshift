@@ -588,6 +588,10 @@ body { font-family: var(--zs-sans); color: var(--zs-ink-2); overflow-x: hidden; 
 .cd-activity-text { font: 400 14px var(--zs-sans); color: var(--zs-ink); line-height: 1.4; }
 .cd-activity-sub { font: 400 12px var(--zs-mono); color: var(--zs-ink-5); }
 
+/* Client calendar month nav */
+.mini-cal-nav { display: flex; align-items: center; justify-content: space-between; margin-bottom: 16px; }
+.mini-cal-nav-btn { background: none; border: none; color: var(--zs-ink-4); cursor: pointer; width: 28px; height: 28px; display: flex; align-items: center; justify-content: center; border-radius: 8px; transition: background 140ms, color 140ms; padding: 0; flex-shrink: 0; }
+.mini-cal-nav-btn:hover { background: var(--zs-mist); color: var(--zs-ink); }
 .mini-cal-header { font: 500 11px var(--zs-mono); letter-spacing: 0.08em; text-transform: uppercase; color: var(--zs-ink-5); margin-bottom: 16px; }
 .mini-cal-grid { display: grid; grid-template-columns: repeat(7,1fr); gap: 4px; }
 .mini-cal-dow { font: 500 10px var(--zs-mono); text-transform: uppercase; letter-spacing: 0.06em; color: var(--zs-ink-5); text-align: center; padding: 4px 0; }
@@ -995,6 +999,11 @@ footer.zs-footer { padding: 40px 0; border-top: 1px solid var(--zs-border); }
 
 /* Two-column grid */
 .adm-meet-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; align-items: stretch; }
+
+/* Admin calendar month nav */
+.adm-cal-nav { display: flex; align-items: center; justify-content: space-between; margin-bottom: 20px; }
+.adm-cal-nav-btn { background: none; border: none; color: var(--zs-ink-4); cursor: pointer; width: 28px; height: 28px; display: flex; align-items: center; justify-content: center; border-radius: 8px; transition: background 140ms, color 140ms; padding: 0; flex-shrink: 0; }
+.adm-cal-nav-btn:hover { background: var(--zs-mist); color: var(--zs-ink); }
 
 /* Mini calendar */
 .adm-cal-dow { display: grid; grid-template-columns: repeat(7,1fr); gap: 4px; margin-bottom: 6px; }

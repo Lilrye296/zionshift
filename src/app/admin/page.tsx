@@ -264,17 +264,19 @@ interface ProspectMeeting {
   firm: string;
   date: string;       // e.g. "Apr 24, 2026"
   day: number;        // day of month for calendar dot
+  month: number;      // 0-indexed (0=Jan, 3=Apr) — used for month navigation filtering
+  year: number;       // e.g. 2026
   time: string;       // e.g. "10:00 AM"
   zoomUrl: string;
   status: 'upcoming' | 'completed' | 'no-show';
 }
 
 const PROSPECT_MEETINGS: ProspectMeeting[] = [
-  { id: 1, prospect: 'Carter Flynn',   firm: 'Flynn Financial',        date: 'Apr 24, 2026', day: 24, time: '10:00 AM', zoomUrl: 'https://zoom.us/j/placeholder', status: 'upcoming'  },
-  { id: 2, prospect: 'James Okafor',   firm: 'OFC Group',              date: 'Apr 22, 2026', day: 22, time: '2:00 PM',  zoomUrl: 'https://zoom.us/j/placeholder', status: 'upcoming'  },
-  { id: 3, prospect: 'Beth Navarro',   firm: 'Navarro Wealth Mgmt',    date: 'Apr 17, 2026', day: 17, time: '11:00 AM', zoomUrl: 'https://zoom.us/j/placeholder', status: 'completed' },
-  { id: 4, prospect: 'Marcus Webb',    firm: 'Webb Capital Partners',  date: 'Apr 14, 2026', day: 14, time: '3:00 PM',  zoomUrl: 'https://zoom.us/j/placeholder', status: 'completed' },
-  { id: 5, prospect: 'Diana Solis',    firm: 'Solis Wealth Management',date: 'Apr 10, 2026', day: 10, time: '9:00 AM',  zoomUrl: 'https://zoom.us/j/placeholder', status: 'no-show'   },
+  { id: 1, prospect: 'Carter Flynn',   firm: 'Flynn Financial',        date: 'Apr 24, 2026', day: 24, month: 3, year: 2026, time: '10:00 AM', zoomUrl: 'https://zoom.us/j/placeholder', status: 'upcoming'  },
+  { id: 2, prospect: 'James Okafor',   firm: 'OFC Group',              date: 'Apr 22, 2026', day: 22, month: 3, year: 2026, time: '2:00 PM',  zoomUrl: 'https://zoom.us/j/placeholder', status: 'upcoming'  },
+  { id: 3, prospect: 'Beth Navarro',   firm: 'Navarro Wealth Mgmt',    date: 'Apr 17, 2026', day: 17, month: 3, year: 2026, time: '11:00 AM', zoomUrl: 'https://zoom.us/j/placeholder', status: 'completed' },
+  { id: 4, prospect: 'Marcus Webb',    firm: 'Webb Capital Partners',  date: 'Apr 14, 2026', day: 14, month: 3, year: 2026, time: '3:00 PM',  zoomUrl: 'https://zoom.us/j/placeholder', status: 'completed' },
+  { id: 5, prospect: 'Diana Solis',    firm: 'Solis Wealth Management',date: 'Apr 10, 2026', day: 10, month: 3, year: 2026, time: '9:00 AM',  zoomUrl: 'https://zoom.us/j/placeholder', status: 'no-show'   },
 ];
 
 // Milestone ladder — defined outside component so it isn't re-created on every render
@@ -300,6 +302,8 @@ export default function AdminPage() {
   const [selectedMeeting, setSelectedMeeting] = useState<ProspectMeeting | null>(null);
   const [connectedCal, setConnectedCal]       = useState<CalProvider | null>(null);
   const [calModal, setCalModal]               = useState<CalProvider | null>(null);
+  const [calMonth, setCalMonth]               = useState(() => new Date().getMonth());
+  const [calYear, setCalYear]                 = useState(() => new Date().getFullYear());
   // TODO (Supabase + Smartlead): replace null with real aggregated stats per period.
   // Query Supabase view that sums Smartlead campaign stats across all active clients.
   const [periodStats, setPeriodStats]     = useState<AdminPeriodStats | null>(null);
@@ -408,19 +412,33 @@ export default function AdminPage() {
         {/* ══ MEETINGS ════════════════════════════════════════════ */}
         {activeTab === 'Meetings' && (() => {
           const now         = new Date();
-          const year        = now.getFullYear();
-          const month       = now.getMonth();
-          const today       = now.getDate();
-          const firstDay    = new Date(year, month, 1).getDay();
-          const daysInMonth = new Date(year, month + 1, 0).getDate();
-          const meetingDays = new Set(PROSPECT_MEETINGS.map(m => m.day));
+          const curMonth    = now.getMonth();
+          const curYear     = now.getFullYear();
+          const today       = (calMonth === curMonth && calYear === curYear) ? now.getDate() : -1;
+          const firstDay    = new Date(calYear, calMonth, 1).getDay();
+          const daysInMonth = new Date(calYear, calMonth + 1, 0).getDate();
+          // Only show meeting dots for meetings in the displayed month/year
+          const meetingDays = new Set(
+            PROSPECT_MEETINGS
+              .filter(m => m.month === calMonth && m.year === calYear)
+              .map(m => m.day)
+          );
 
           const cells: (number | null)[] = [];
           for (let i = 0; i < firstDay; i++) cells.push(null);
           for (let d = 1; d <= daysInMonth; d++) cells.push(d);
           while (cells.length % 7 !== 0) cells.push(null);
 
-          const upcoming  = PROSPECT_MEETINGS.filter(m => m.status === 'upcoming');
+          const upcoming = PROSPECT_MEETINGS.filter(m => m.status === 'upcoming');
+
+          function prevMonth() {
+            if (calMonth === 0) { setCalMonth(11); setCalYear(y => y - 1); }
+            else setCalMonth(m => m - 1);
+          }
+          function nextMonth() {
+            if (calMonth === 11) { setCalMonth(0); setCalYear(y => y + 1); }
+            else setCalMonth(m => m + 1);
+          }
 
           return (
             <div>
@@ -452,34 +470,50 @@ export default function AdminPage() {
 
                 {/* Calendar */}
                 <div className="adm-biz-card" style={{ padding: '24px' }}>
-                  <div className="adm-biz-card-head">
-                    <span className="adm-biz-card-title">{MONTH_NAMES_FULL[month]} {year}</span>
+                  {/* Month nav */}
+                  <div className="adm-cal-nav">
+                    <button className="adm-cal-nav-btn" onClick={prevMonth} aria-label="Previous month">
+                      <svg width="14" height="14" viewBox="0 0 14 14" fill="none" aria-hidden>
+                        <path d="M9 2L4 7L9 12" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
+                      </svg>
+                    </button>
+                    <span className="adm-biz-card-title">{MONTH_NAMES_FULL[calMonth]} {calYear}</span>
+                    <button className="adm-cal-nav-btn" onClick={nextMonth} aria-label="Next month">
+                      <svg width="14" height="14" viewBox="0 0 14 14" fill="none" aria-hidden>
+                        <path d="M5 2L10 7L5 12" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
+                      </svg>
+                    </button>
                   </div>
                   <div className="adm-cal-dow">
                     {DOW_LABELS.map((d, i) => <span key={i}>{d}</span>)}
                   </div>
                   <div className="adm-cal-grid">
-                    {cells.map((d, i) => (
-                      <button
-                        key={i}
-                        disabled={!d || !meetingDays.has(d)}
-                        onClick={() => {
-                          if (!d) return;
-                          const m = PROSPECT_MEETINGS.find(x => x.day === d);
-                          setSelectedMeeting(m ?? null);
-                        }}
-                        className={[
-                          'adm-cal-cell',
-                          !d                      ? 'empty'    : '',
-                          d === today             ? 'today'    : '',
-                          d && meetingDays.has(d) ? 'has-meet' : '',
-                          selectedMeeting?.day === d ? 'selected' : '',
-                        ].join(' ').trim()}
-                      >
-                        {d ?? ''}
-                        {d && meetingDays.has(d) && <span className="adm-cal-dot" />}
-                      </button>
-                    ))}
+                    {cells.map((d, i) => {
+                      if (!d) return <div key={i} />;
+                      const hasMeet = meetingDays.has(d);
+                      const isSelected = selectedMeeting?.day === d &&
+                                         selectedMeeting?.month === calMonth &&
+                                         selectedMeeting?.year === calYear;
+                      return (
+                        <button
+                          key={i}
+                          disabled={!hasMeet}
+                          onClick={() => {
+                            const m = PROSPECT_MEETINGS.find(x => x.day === d && x.month === calMonth && x.year === calYear);
+                            setSelectedMeeting(prev => prev?.id === m?.id ? null : (m ?? null));
+                          }}
+                          className={[
+                            'adm-cal-cell',
+                            d === today  ? 'today'    : '',
+                            hasMeet      ? 'has-meet' : '',
+                            isSelected   ? 'selected' : '',
+                          ].join(' ').trim()}
+                        >
+                          {d}
+                          {hasMeet && <span className="adm-cal-dot" />}
+                        </button>
+                      );
+                    })}
                   </div>
 
                   {/* Selected meeting detail */}
@@ -500,12 +534,7 @@ export default function AdminPage() {
                         <span className="adm-meet-detail-val">{selectedMeeting.date} · {selectedMeeting.time}</span>
                       </div>
                       {selectedMeeting.status === 'upcoming' && (
-                        <a
-                          href={selectedMeeting.zoomUrl}
-                          target="_blank"
-                          rel="noopener noreferrer"
-                          className="adm-zoom-btn"
-                        >
+                        <a href={selectedMeeting.zoomUrl} target="_blank" rel="noopener noreferrer" className="adm-zoom-btn">
                           Join Zoom →
                         </a>
                       )}

@@ -33,47 +33,77 @@ function MiniCalendar({
   meetings = [],
   onDayClick,
   selectedDay = null,
+  selectedMonth = null,
 }: {
   meetings?: CalMeeting[];
-  onDayClick?: (day: number) => void;
+  onDayClick?: (day: number, month: number) => void;
   selectedDay?: number | null;
+  selectedMonth?: number | null;
 }) {
-  const now   = new Date();
-  const year  = now.getFullYear();
-  const month = now.getMonth();
-  const today = now.getDate();
+  const now = new Date();
+  const [displayYear,  setDisplayYear]  = useState(now.getFullYear());
+  const [displayMonth, setDisplayMonth] = useState(now.getMonth());
 
-  const firstDay    = new Date(year, month, 1).getDay();
-  const daysInMonth = new Date(year, month + 1, 0).getDate();
+  const curYear  = now.getFullYear();
+  const curMonth = now.getMonth();
+  const today    = now.getDate();
+  const isCurrentMonth = displayYear === curYear && displayMonth === curMonth;
+
+  const firstDay    = new Date(displayYear, displayMonth, 1).getDay();
+  const daysInMonth = new Date(displayYear, displayMonth + 1, 0).getDate();
 
   const cells: (number | null)[] = [];
   for (let i = 0; i < firstDay; i++) cells.push(null);
   for (let d = 1; d <= daysInMonth; d++) cells.push(d);
   while (cells.length % 7 !== 0) cells.push(null);
 
-  const meetingDays = meetings.map(m => m.day);
+  // Only show dots for meetings in the displayed month
+  const meetingDays = meetings.filter(m => m.month === displayMonth).map(m => m.day);
+
+  function prevMonth() {
+    if (displayMonth === 0) { setDisplayMonth(11); setDisplayYear(y => y - 1); }
+    else setDisplayMonth(m => m - 1);
+  }
+  function nextMonth() {
+    if (displayMonth === 11) { setDisplayMonth(0); setDisplayYear(y => y + 1); }
+    else setDisplayMonth(m => m + 1);
+  }
 
   return (
     <div className="mini-cal">
-      <div className="mini-cal-header">{MONTH_NAMES[month].toUpperCase()} {year}</div>
+      <div className="mini-cal-nav">
+        <button className="mini-cal-nav-btn" onClick={prevMonth} aria-label="Previous month">
+          <svg width="14" height="14" viewBox="0 0 14 14" fill="none" aria-hidden>
+            <path d="M9 2L4 7L9 12" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
+          </svg>
+        </button>
+        <div className="mini-cal-header" style={{ margin: 0 }}>{MONTH_NAMES[displayMonth].toUpperCase()} {displayYear}</div>
+        <button className="mini-cal-nav-btn" onClick={nextMonth} aria-label="Next month">
+          <svg width="14" height="14" viewBox="0 0 14 14" fill="none" aria-hidden>
+            <path d="M5 2L10 7L5 12" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
+          </svg>
+        </button>
+      </div>
       <div className="mini-cal-grid">
         {DOW.map((d, i) => <div key={i} className="mini-cal-dow">{d}</div>)}
         {cells.map((day, i) => {
-          const hasMeeting = day !== null && meetingDays.includes(day);
+          // Empty cells — plain div, no class, no background
+          if (day === null) return <div key={i} />;
+          const hasMeeting  = meetingDays.includes(day);
+          const isSelected  = day === selectedDay && displayMonth === selectedMonth;
           return (
             <div
               key={i}
               className={[
                 'mini-cal-day',
-                day === null        ? 'empty'    : '',
-                day === today       ? 'today'    : '',
-                hasMeeting          ? 'has-dot'  : '',
-                hasMeeting          ? 'clickable': '',
-                day === selectedDay ? 'selected' : '',
+                isCurrentMonth && day === today ? 'today'    : '',
+                hasMeeting                      ? 'has-dot'  : '',
+                hasMeeting                      ? 'clickable': '',
+                isSelected                      ? 'selected' : '',
               ].join(' ').trim()}
-              onClick={() => hasMeeting && day && onDayClick?.(day)}
+              onClick={() => hasMeeting && onDayClick?.(day, displayMonth)}
             >
-              {day ?? ''}
+              {day}
             </div>
           );
         })}
@@ -667,11 +697,15 @@ export default function ClientPage() {
                       <MiniCalendar
                         meetings={CAL_MEETINGS}
                         selectedDay={selectedMeeting?.day ?? null}
-                        onDayClick={(day) => {
+                        selectedMonth={selectedMeeting?.month ?? null}
+                        onDayClick={(day, month) => {
                           const hit = [...CAL_MEETINGS]
+                            .filter(m => m.month === month)
                             .sort((a, b) => parseTime(a.time) - parseTime(b.time))
                             .find(m => m.day === day);
-                          setSelectedMeeting(prev => prev?.day === day && prev?.prospect === hit?.prospect ? null : (hit ?? null));
+                          setSelectedMeeting(prev =>
+                            prev?.day === day && prev?.month === month ? null : (hit ?? null)
+                          );
                         }}
                       />
 
