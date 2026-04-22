@@ -759,6 +759,9 @@ footer.zs-footer { padding: 40px 0; border-top: 1px solid var(--zs-border); }
   /* Prevent modal from bleeding off-screen horizontally on mobile */
   .modal { overflow-x: hidden; }
   .modal-scroll { padding: 48px 20px 24px; overflow-x: hidden; }
+  /* Allow divider text to wrap on mobile instead of overflowing */
+  .modal-divider { flex-wrap: wrap; }
+  .modal-divider span { white-space: normal; text-align: center; }
   .hamburger { display: flex; }
   .mobile-menu { display: block; }
 
