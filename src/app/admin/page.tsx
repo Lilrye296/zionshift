@@ -48,8 +48,10 @@ interface ActiveClient {
   name: string;
   firm: string;
   status: 'live' | 'paused' | 'cancelled';
-  mrr: number;
-  since: string;
+  mrr: number;           // monthly retainer amount in dollars
+  since: string;         // onboarded date label
+  firstMonthPaid: boolean; // true only after first $2k monthly charge clears
+  setupFeePaid: boolean;   // true as soon as $1k setup payment is confirmed
 }
 
 interface ActivityItem {
@@ -111,19 +113,27 @@ const INBOUND_LEADS: InboundLead[] = [
   { id: 3, date: 'Apr 11, 2026', name: 'Carter Flynn',  email: 'carter@flynnfinancial.com', message: 'Interested in a proposal. We manage about $400M AUM and want to expand to UHNW prospects.',                                        status: 'new'    },
 ];
 
+// TODO (Supabase): replace ALL_CLIENTS with a live fetch from the clients table.
+// Fields populated by: Stripe webhook (setupFeePaid, firstMonthPaid), onboarding form (since, status).
+// MRR card only counts clients where firstMonthPaid === true.
+// Setup fees count clients where setupFeePaid === true.
 const ALL_CLIENTS: ActiveClient[] = [
-  { id: 1, name: 'Sarah Mitchell', firm: 'Mitchell Wealth Advisors', status: 'live',      mrr: 2000, since: 'Apr 11, 2026' },
-  { id: 2, name: 'James Okafor',   firm: 'OFC Group',                status: 'live',      mrr: 2000, since: 'Apr 20, 2026' },
-  // Placeholder examples for paused/cancelled states:
-  // { id: 3, name: 'Beth Navarro', firm: 'Navarro WM', status: 'paused',    mrr: 2000, since: 'Mar 1, 2026' },
-  // { id: 4, name: 'Carter Flynn', firm: 'Flynn Financial', status: 'cancelled', mrr: 0, since: 'Feb 1, 2026' },
+  // firstMonthPaid: false — both clients are within their first 30 days, no monthly charge yet
+  { id: 1, name: 'Sarah Mitchell', firm: 'Mitchell Wealth Advisors', status: 'live', mrr: 2000, since: 'Apr 11, 2026', firstMonthPaid: false, setupFeePaid: true  },
+  { id: 2, name: 'James Okafor',   firm: 'OFC Group',                status: 'live', mrr: 2000, since: 'Apr 20, 2026', firstMonthPaid: false, setupFeePaid: true  },
+  // Example paused/cancelled (uncomment to test UI):
+  // { id: 3, name: 'Beth Navarro',  firm: 'Navarro WM',         status: 'paused',    mrr: 2000, since: 'Mar 1, 2026',  firstMonthPaid: true,  setupFeePaid: true  },
+  // { id: 4, name: 'Carter Flynn',  firm: 'Flynn Financial',    status: 'cancelled', mrr: 0,    since: 'Feb 1, 2026',  firstMonthPaid: false, setupFeePaid: true  },
 ];
 
+// TODO (Supabase): replace ACTIVITY_FEED with a live fetch from the business_events table.
+// Events written by: onboarding webhook (onboard), Stripe webhook (mrr, churn), Calendly webhook (meeting).
 const ACTIVITY_FEED: ActivityItem[] = [
-  { id: 1, text: 'James Okafor onboarded — campaign going live',   time: 'Apr 20',  type: 'onboard'   },
-  { id: 2, text: 'MRR reached $4,000 — 2 active clients',          time: 'Apr 20',  type: 'mrr'       },
-  { id: 3, text: 'Meeting booked via Calendly — prospect TBD',      time: 'Apr 18',  type: 'meeting'   },
-  { id: 4, text: 'Sarah Mitchell onboarded — campaign going live',  time: 'Apr 11',  type: 'onboard'   },
+  { id: 1, text: 'James Okafor onboarded — campaign going live',  time: 'Apr 20', type: 'onboard' },
+  { id: 2, text: 'Setup fee received — James Okafor ($1,000)',     time: 'Apr 20', type: 'mrr'     },
+  { id: 3, text: 'Meeting booked via Calendly — prospect TBD',     time: 'Apr 18', type: 'meeting' },
+  { id: 4, text: 'Sarah Mitchell onboarded — campaign going live', time: 'Apr 11', type: 'onboard' },
+  { id: 5, text: 'Setup fee received — Sarah Mitchell ($1,000)',   time: 'Apr 11', type: 'mrr'     },
 ];
 
 // TODO (Calendly): replace with live webhook data from Supabase meetings table.
@@ -150,7 +160,7 @@ const PROSPECT_MEETINGS: ProspectMeeting[] = [
 const DOW_LABELS = ['S','M','T','W','T','F','S'];
 const MONTH_NAMES_FULL = ['January','February','March','April','May','June','July','August','September','October','November','December'];
 
-const TABS = ['Business', 'Meetings', 'Replies', 'Inbound', 'Pipeline', 'Opt-Outs'] as const;
+const TABS = ['Overview', 'Meetings', 'Replies', 'Inbound', 'Pipeline', 'Opt-Outs'] as const;
 type Tab = typeof TABS[number];
 
 /* ── Component ──────────────────────────────────────────────────── */
@@ -159,7 +169,7 @@ type MetricPeriod = 'week' | 'month' | 'alltime';
 const PERIOD_LABEL: Record<MetricPeriod, string> = { week: 'This Week', month: 'This Month', alltime: 'All Time' };
 
 export default function AdminPage() {
-  const [activeTab, setActiveTab]         = useState<Tab>('Business');
+  const [activeTab, setActiveTab]         = useState<Tab>('Overview');
   const [replyLog, setReplyLog]           = useState<ReplyLog[]>(REPLY_LOG);
   const [metricPeriod, setMetricPeriod]   = useState<MetricPeriod>('alltime');
   const [periodOpen, setPeriodOpen]       = useState(false);
@@ -203,13 +213,31 @@ export default function AdminPage() {
   }
 
   // TODO (Supabase): replace ALL_CLIENTS with a live fetch from the clients table.
-  // ALL_CLIENTS is placeholder data — swap for: supabase.from('clients').select('*')
-  const liveClients   = ALL_CLIENTS.filter(c => c.status === 'live');
-  const totalMRR      = liveClients.reduce((s, c) => s + c.mrr, 0);
-  const setupFees     = ALL_CLIENTS.filter(c => c.status !== 'cancelled').length * 1000;
-  const nextMilestone = totalMRR < 5000 ? 5000 : totalMRR < 10000 ? 10000 : 20000;
-  const mrrProgress   = Math.min(Math.round((totalMRR / nextMilestone) * 100), 100);
-  const flaggedCount  = replyLog.filter(r => r.flagged).length;
+  // ALL_CLIENTS is placeholder — swap for: supabase.from('clients').select('*')
+
+  // MRR = only clients whose first monthly payment has cleared (not setup fees)
+  const totalMRR  = ALL_CLIENTS
+    .filter(c => c.firstMonthPaid)
+    .reduce((s, c) => s + c.mrr, 0);
+
+  // Setup fees = all clients who paid the $1k setup (regardless of monthly status)
+  const setupFees = ALL_CLIENTS
+    .filter(c => c.setupFeePaid)
+    .reduce((s, c) => s + 1000, 0);
+
+  // Milestone ladder: $2k → $6k → $10k → $20k → $30k → ... → $100k
+  // Milestones track MRR only — setup fees never move this bar
+  const MRR_MILESTONES = [2000, 6000, 10000, 20000, 30000, 40000, 50000, 60000, 70000, 80000, 90000, 100000];
+  const nextMilestone  = MRR_MILESTONES.find(m => m > totalMRR) ?? 100000;
+  const prevMilestone  = MRR_MILESTONES[MRR_MILESTONES.indexOf(nextMilestone) - 1] ?? 0;
+  // Progress is relative between the previous and next milestone (not from zero)
+  const mrrProgress    = nextMilestone === prevMilestone ? 100
+    : Math.min(Math.round(((totalMRR - prevMilestone) / (nextMilestone - prevMilestone)) * 100), 100);
+
+  // "X Total" pill: live + paused only (cancelled excluded — they're not current clients)
+  const activeClientCount = ALL_CLIENTS.filter(c => c.status !== 'cancelled').length;
+
+  const flaggedCount = replyLog.filter(r => r.flagged).length;
 
   return (
     <div className="portal-page">
@@ -564,8 +592,8 @@ export default function AdminPage() {
           </div>
         )}
 
-        {/* ══ BUSINESS ════════════════════════════════════════════ */}
-        {activeTab === 'Business' && (
+        {/* ══ OVERVIEW ════════════════════════════════════════════ */}
+        {activeTab === 'Overview' && (
           <div>
             {/* Heading + period toggle — uses same cd-period-* classes as client dashboard */}
             <div className="adm-biz-toprow">
@@ -625,7 +653,7 @@ export default function AdminPage() {
               <div className="adm-biz-card">
                 <div className="adm-biz-card-head">
                   <span className="adm-biz-card-title">Clients</span>
-                  <span className="adm-count-chip">{ALL_CLIENTS.filter(c => c.status !== 'cancelled').length} Total</span>
+                  <span className="adm-count-chip">{activeClientCount} Total</span>
                 </div>
                 {ALL_CLIENTS.length === 0 ? (
                   <p className="adm-empty-text">No clients yet.</p>
@@ -692,7 +720,7 @@ export default function AdminPage() {
                       <div className="adm-progress-fill" style={{ width: `${mrrProgress}%` }} />
                     </div>
                     <div className="adm-milestone-sub">
-                      ${totalMRR.toLocaleString()} of ${nextMilestone.toLocaleString()} — {mrrProgress}% there
+                      ${totalMRR.toLocaleString()} of ${nextMilestone.toLocaleString()} MRR — {mrrProgress}% there
                     </div>
                   </div>
                 </div>
