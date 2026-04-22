@@ -915,7 +915,7 @@ export default function ClientPage() {
                       <div className="bl-row">
                         <span className="bl-row-key">Monthly retainer</span>
                         <span className="bl-row-val">
-                          {billingData ? `$${billingData.monthly_amount.toLocaleString()} / mo` : '—'}
+                          {billingData ? `$${billingData.monthly_amount.toLocaleString('en-US')} / mo` : '—'}
                         </span>
                       </div>
                       <div className="bl-divider" />
@@ -976,7 +976,7 @@ export default function ClientPage() {
                           <div className="bl-invoice-row">
                             <span className="bl-inv-date">{inv.date}</span>
                             <span className="bl-inv-desc">{inv.description}</span>
-                            <span className="bl-inv-amount">${inv.amount.toLocaleString()}</span>
+                            <span className="bl-inv-amount">${inv.amount.toLocaleString('en-US')}</span>
                             <span className={`bl-inv-status bl-inv-${inv.status}`}>
                               {inv.status.charAt(0).toUpperCase() + inv.status.slice(1)}
                             </span>
