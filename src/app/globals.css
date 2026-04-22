@@ -733,7 +733,7 @@ footer.zs-footer { padding: 40px 0; border-top: 1px solid var(--zs-border); }
   /* Nav */
   .zs-nav-links { display: none; }
   .zs-nav { padding: 8px 12px 8px 16px; gap: 8px; }
-  .zs-nav-cta { gap: 6px; }
+  .zs-nav-cta { display: contents; } /* unwrap group on mobile — buttons rejoin nav as direct flex children */
   .zs-nav-cta .btn { padding: 9px 14px; font-size: 12px; }
 
   /* Modal close — larger tap target on mobile */
