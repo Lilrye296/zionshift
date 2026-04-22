@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useRef, useState, useCallback, ReactNode, RefObject } from 'react';
+import { useEffect, useRef, useState, useCallback, ReactNode, RefObject, Fragment } from 'react';
 
 /* ─── HOOKS ─────────────────────────────────────────────────── */
 function useReveal() {
@@ -61,7 +61,10 @@ function useCursorOrb() {
     };
     hero.addEventListener('mousemove', onMove);
     orb.style.transform = `translate(${window.innerWidth * 0.6}px, 320px)`;
-    return () => hero.removeEventListener('mousemove', onMove);
+    return () => {
+      hero.removeEventListener('mousemove', onMove);
+      cancelAnimationFrame(rafId);
+    };
   }, []);
 }
 
@@ -209,8 +212,8 @@ function Hero({ onBook }: { onBook: () => void }) {
       <div className="hero-orb" />
       <div className="zs-container hero-inner">
         <h1 style={{ marginTop: 28 }}>
-          <WordReveal className="d0">A sales engine</WordReveal><br />
-          <WordReveal className="d1">that <em>never sleeps.</em></WordReveal>
+          <WordReveal>A sales engine</WordReveal><br />
+          <WordReveal>that <em>never sleeps.</em></WordReveal>
         </h1>
         <p className="lead reveal-blur d3">
           ZionShift is a fully autonomous AI that finds small business owners who need what you offer, reaches out personally, and books them onto your calendar — while you focus on the work.
@@ -292,16 +295,16 @@ function Marquee() {
     <div className="marquee">
       <div className="marquee-track">
         {Array.from({ length: 2 }).map((_, k) => (
-          <>
-            <span key={`${k}-1`}>HVAC &amp; plumbing shops</span>
-            <span key={`${k}-2`}>Dental practices</span>
-            <span key={`${k}-3`}>Law firms</span>
-            <span key={`${k}-4`}>Design studios</span>
-            <span key={`${k}-5`}>E-commerce brands</span>
-            <span key={`${k}-6`}>Medical clinics</span>
-            <span key={`${k}-7`}>Real estate teams</span>
-            <span key={`${k}-8`}>Trades &amp; contractors</span>
-          </>
+          <Fragment key={k}>
+            <span>HVAC &amp; plumbing shops</span>
+            <span>Dental practices</span>
+            <span>Law firms</span>
+            <span>Design studios</span>
+            <span>E-commerce brands</span>
+            <span>Medical clinics</span>
+            <span>Real estate teams</span>
+            <span>Trades &amp; contractors</span>
+          </Fragment>
         ))}
       </div>
     </div>
