@@ -289,6 +289,11 @@ function LogoUploadModal({
   const [error, setError]       = useState('');
   const inputRef = useRef<HTMLInputElement>(null);
 
+  // Revoke object URL when preview changes or modal unmounts to avoid memory leak
+  useEffect(() => {
+    return () => { if (preview) URL.revokeObjectURL(preview); };
+  }, [preview]);
+
   const ACCEPTED = ['image/png', 'image/svg+xml', 'image/jpeg'];
   const MAX_MB   = 2;
 
@@ -447,7 +452,7 @@ export default function ClientPage() {
   // TODO (Stripe/Supabase): replace BILLING_PLACEHOLDER below with a real fetch.
   const [billingData, setBillingData]           = useState<BillingData | null>(null);
   const periodRef                           = useRef<HTMLDivElement>(null);
-  const [connectedCal, setConnectedCal]     = useState<CalProvider>('google');
+  const [connectedCal, setConnectedCal]     = useState<CalProvider | null>(null);
   const [calModal, setCalModal]             = useState<CalProvider | null>(null);
 
   // ── Load profile from Supabase on mount ───────────────────────────────
@@ -564,11 +569,11 @@ export default function ClientPage() {
 
   const p = profile;
   const greeting  = getGreeting();
-  const firstName = p?.client_name ?? null;
+  const firstName = p?.client_name?.split(' ')[0] ?? null;
 
   function getStatusProps(status: string | null) {
     switch (status) {
-      case 'warming': return { label: 'Warming Up — Day 3 of 14', variant: 'warming' };
+      case 'warming': return { label: 'Warming Up',               variant: 'warming' };
       case 'idle':    return { label: 'Idle',                      variant: 'idle'    };
       case 'paused':  return { label: 'Paused',                    variant: 'paused'  };
       case 'error':   return { label: 'Error',                     variant: 'error'   };
@@ -658,13 +663,13 @@ export default function ClientPage() {
                   </button>
                   {periodOpen && (
                     <div className="cd-period-menu">
-                      {(['week','month','alltime'] as const).map(p => (
+                      {(['week','month','alltime'] as const).map(opt => (
                         <button
-                          key={p}
-                          className={`cd-period-option${period === p ? ' active' : ''}`}
-                          onClick={() => { setPeriod(p); setPeriodOpen(false); }}
+                          key={opt}
+                          className={`cd-period-option${period === opt ? ' active' : ''}`}
+                          onClick={() => { setPeriod(opt); setPeriodOpen(false); }}
                         >
-                          {PERIOD_LABEL[p]}
+                          {PERIOD_LABEL[opt]}
                         </button>
                       ))}
                     </div>
@@ -715,7 +720,7 @@ export default function ClientPage() {
                 const hour = pd === 'PM' && h !== 12 ? h + 12 : pd === 'AM' && h === 12 ? 0 : h;
                 return hour * 60 + m;
               };
-              const sortedMeetings = [...CAL_MEETINGS].sort((a, b) => b.day - a.day || parseTime(b.time) - parseTime(a.time));
+              const sortedMeetings = [...CAL_MEETINGS].sort((a, b) => b.month - a.month || b.day - a.day || parseTime(b.time) - parseTime(a.time));
               return (
                 <>
                   {/* Calendar (left) + All Meetings (right) */}
@@ -776,8 +781,8 @@ export default function ClientPage() {
                           <Fragment key={i}>
                             {i > 0 && <div className="adm-divider" style={{ margin: '0 20px' }} />}
                             <div
-                              className={`adm-meet-row${selectedMeeting?.prospect === m.prospect && selectedMeeting?.day === m.day ? ' selected' : ''}`}
-                              onClick={() => setSelectedMeeting(prev => prev?.prospect === m.prospect && prev?.day === m.day ? null : m)}
+                              className={`adm-meet-row${selectedMeeting?.prospect === m.prospect && selectedMeeting?.day === m.day && selectedMeeting?.month === m.month ? ' selected' : ''}`}
+                              onClick={() => setSelectedMeeting(prev => prev?.prospect === m.prospect && prev?.day === m.day && prev?.month === m.month ? null : m)}
                             >
                               <div className="adm-meet-row-avatar">
                                 {m.prospect.split(' ').map(w => w[0]).join('')}
@@ -832,17 +837,17 @@ export default function ClientPage() {
                 </div>
               </div>
               <div className="cd-cal-options">
-                {(['google', 'outlook', 'apple'] as CalProvider[]).map(p => (
+                {(['google', 'outlook', 'apple'] as CalProvider[]).map(prov => (
                   <div
-                    key={p}
-                    className={`cd-cal-option cd-cal-option-btn${connectedCal === p ? ' cd-cal-option-active' : ''}`}
-                    onClick={() => setCalModal(p)}
+                    key={prov}
+                    className={`cd-cal-option cd-cal-option-btn${connectedCal === prov ? ' cd-cal-option-active' : ''}`}
+                    onClick={() => setCalModal(prov)}
                   >
-                    {p === 'google'  && <GoogleIcon />}
-                    {p === 'outlook' && <OutlookIcon />}
-                    {p === 'apple'   && <AppleIcon />}
-                    <span className="cd-cal-option-name">{CAL_INFO[p].name}</span>
-                    {connectedCal === p
+                    {prov === 'google'  && <GoogleIcon />}
+                    {prov === 'outlook' && <OutlookIcon />}
+                    {prov === 'apple'   && <AppleIcon />}
+                    <span className="cd-cal-option-name">{CAL_INFO[prov].name}</span>
+                    {connectedCal === prov
                       ? <span className="cd-cal-connected">Connected</span>
                       : <span className="cd-cal-tap">Tap to connect</span>
                     }
@@ -1002,7 +1007,7 @@ export default function ClientPage() {
           provider={calModal}
           isConnected={connectedCal === calModal}
           onConnect={() => setConnectedCal(calModal)}
-          onDisconnect={() => setConnectedCal('google')}
+          onDisconnect={() => setConnectedCal(null)}
           onClose={() => setCalModal(null)}
         />
       )}
