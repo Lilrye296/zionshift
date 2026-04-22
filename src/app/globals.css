@@ -988,7 +988,7 @@ footer.zs-footer { padding: 40px 0; border-top: 1px solid var(--zs-border); }
 .adm-meet-stat-divider { width: 1px; height: 32px; background: var(--zs-border); }
 
 /* Two-column grid */
-.adm-meet-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; align-items: start; }
+.adm-meet-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; align-items: stretch; }
 
 /* Mini calendar */
 .adm-cal-dow { display: grid; grid-template-columns: repeat(7,1fr); gap: 4px; margin-bottom: 6px; }
@@ -1021,7 +1021,7 @@ footer.zs-footer { padding: 40px 0; border-top: 1px solid var(--zs-border); }
 .adm-meet-pill--no-show   { background: #fff1f2; color: #dc2626; border: 1px solid #fecaca; }
 
 /* Meeting log (right card) */
-.adm-meet-log { overflow-y: auto; max-height: 460px; scrollbar-width: thin; scrollbar-color: var(--zs-line) transparent; }
+.adm-meet-log { overflow-y: auto; flex: 1; scrollbar-width: thin; scrollbar-color: var(--zs-line) transparent; }
 .adm-meet-log::-webkit-scrollbar { width: 4px; }
 .adm-meet-log::-webkit-scrollbar-track { background: transparent; }
 .adm-meet-log::-webkit-scrollbar-thumb { background: var(--zs-line); border-radius: 999px; }
