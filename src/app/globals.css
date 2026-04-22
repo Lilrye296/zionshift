@@ -966,6 +966,12 @@ footer.zs-footer { padding: 40px 0; border-top: 1px solid var(--zs-border); }
 .adm-meet-row-date { font: 400 10px var(--zs-mono); color: var(--zs-ink-5); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; width: 100%; text-align: right; }
 .adm-meet-row-time { font: 500 11px var(--zs-sans); color: var(--zs-ink-3); white-space: nowrap; text-align: right; }
 
+/* Admin impersonation banner — shown on client page when admin uses View → */
+.adm-view-banner { background: #fffbeb; border: 1px solid #fde68a; border-radius: 12px; padding: 10px 16px; display: flex; align-items: center; justify-content: space-between; gap: 12px; margin-bottom: 20px; }
+.adm-view-banner-text { font: 500 13px var(--zs-sans); color: #92400e; }
+.adm-view-banner-back { font: 500 12px var(--zs-sans); color: #92400e; background: none; border: 1px solid #fde68a; border-radius: 999px; padding: 5px 13px; cursor: pointer; transition: all 160ms; text-decoration: none; display: inline-block; }
+.adm-view-banner-back:hover { background: #fef3c7; border-color: #f59e0b; }
+
 @media (max-width: 900px) {
   .portal-metrics { grid-template-columns: repeat(2,1fr); }
   .adm-meet-grid { grid-template-columns: 1fr; }

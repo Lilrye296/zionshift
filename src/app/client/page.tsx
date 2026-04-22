@@ -430,6 +430,7 @@ interface BillingData {
 export default function ClientPage() {
   const [profile, setProfile] = useState<ClientProfile | null>(null);
   const [loading, setLoading] = useState(true);
+  const [isAdminView, setIsAdminView] = useState(false);
   const router = useRouter();
 
   // ── All state declarations up front so effects can reference them ──────
@@ -460,10 +461,28 @@ export default function ClientPage() {
       const { data: { user } } = await supabase.auth.getUser();
       if (!user) { router.push('/login'); return; }
 
+      // Admin view: if ?view=<clientId> is in the URL and the logged-in user is admin,
+      // load that client's data instead of the admin's own (non-existent) row.
+      // TODO (Supabase): fully wired — activates automatically once Supabase is live.
+      const viewId = new URLSearchParams(window.location.search).get('view');
+      let targetId = user.id;
+      if (viewId) {
+        const { data: roleData } = await supabase
+          .from('profiles')
+          .select('role')
+          .eq('id', user.id)
+          .single();
+        if (roleData?.role === 'admin') {
+          targetId = viewId;
+          setIsAdminView(true);
+        }
+        // Non-admin with ?view= param — silently ignored, falls through to their own data
+      }
+
       const { data } = await supabase
         .from('client_stats')
         .select('firm_name, logo_url, client_name, emails_sent, replies, reply_rate, meetings_booked, campaign_status')
-        .eq('client_id', user.id)
+        .eq('client_id', targetId)
         .single();
 
       setProfile(data);
@@ -592,6 +611,16 @@ export default function ClientPage() {
           <div className="portal-empty"><p>Loading your dashboard…</p></div>
         ) : (
           <>
+
+            {/* ── Admin view banner — visible only when accessing via View → in admin portal ── */}
+            {isAdminView && (
+              <div className="adm-view-banner">
+                <span className="adm-view-banner-text">
+                  Admin view — {p?.firm_name ?? 'Client'}{p?.client_name ? ` · ${p.client_name}` : ''}
+                </span>
+                <a href="/admin" className="adm-view-banner-back">← Back to Admin</a>
+              </div>
+            )}
 
             {/* ── Tab pills ── */}
             <div className="cd-tabs">
