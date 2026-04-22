@@ -152,14 +152,14 @@ function parseTime(t: string): number {
 // Returns true if the meeting month/day/time has already passed
 function isMeetingPast(day: number, time: string, month?: number): boolean {
   const now = new Date();
-  const [timePart, period] = time.split(' ');
-  const [h, m] = timePart.split(':').map(Number);
-  let hour = h;
-  if (period === 'PM' && h !== 12) hour += 12;
-  if (period === 'AM' && h === 12) hour = 0;
-  // Use the meeting's actual month if provided, otherwise fall back to current month
-  const meetingMonth = month ?? now.getMonth();
-  const meetingDate = new Date(now.getFullYear(), meetingMonth, day, hour, m);
+  const totalMinutes = parseTime(time);
+  const meetingDate = new Date(
+    now.getFullYear(),
+    month ?? now.getMonth(),
+    day,
+    Math.floor(totalMinutes / 60),
+    totalMinutes % 60,
+  );
   return now > meetingDate;
 }
 
@@ -988,7 +988,7 @@ export default function ClientPage() {
                     </div>
 
                     {/* Need to make changes */}
-                    <div className="cd-card bl-card bl-changes-card" style={{ marginTop: 16 }}>
+                    <div className="cd-card bl-card" style={{ marginTop: 16 }}>
                       <div className="bl-changes-title">Need to make changes?</div>
                       <p className="bl-changes-body">
                         To update your plan or cancel your subscription, reach out directly at{' '}
