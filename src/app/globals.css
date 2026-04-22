@@ -1021,19 +1021,19 @@ footer.zs-footer { padding: 40px 0; border-top: 1px solid var(--zs-border); }
 .adm-meet-pill--no-show   { background: #fff1f2; color: #dc2626; border: 1px solid #fecaca; }
 
 /* Meeting log (right card) */
-.adm-meet-log { overflow-y: auto; flex: 1; scrollbar-width: thin; scrollbar-color: var(--zs-line) transparent; }
+.adm-meet-log { overflow-y: auto; overflow-x: hidden; flex: 1; scrollbar-width: thin; scrollbar-color: var(--zs-line) transparent; }
 .adm-meet-log::-webkit-scrollbar { width: 4px; }
 .adm-meet-log::-webkit-scrollbar-track { background: transparent; }
 .adm-meet-log::-webkit-scrollbar-thumb { background: var(--zs-line); border-radius: 999px; }
-.adm-meet-row { display: flex; align-items: center; gap: 14px; padding: 16px 24px; cursor: pointer; transition: background 140ms; }
+.adm-meet-row { display: flex; align-items: center; gap: 12px; padding: 14px 20px; cursor: pointer; transition: background 140ms; min-width: 0; }
 .adm-meet-row:hover { background: var(--zs-paper); }
 .adm-meet-row.selected { background: var(--zs-mist); }
-.adm-meet-row-avatar { width: 36px; height: 36px; background: var(--zs-ink); color: #fff; border-radius: 50%; display: flex; align-items: center; justify-content: center; font: 600 12px var(--zs-sans); flex-shrink: 0; }
+.adm-meet-row-avatar { width: 34px; height: 34px; background: var(--zs-ink); color: #fff; border-radius: 50%; display: flex; align-items: center; justify-content: center; font: 600 11px var(--zs-sans); flex-shrink: 0; }
 .adm-meet-row-info { flex: 1; min-width: 0; }
-.adm-meet-row-name { font: 600 14px var(--zs-sans); color: var(--zs-ink); letter-spacing: -0.01em; display: block; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-.adm-meet-row-firm { font: 400 12px var(--zs-sans); color: var(--zs-ink-4); display: block; margin-top: 2px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-.adm-meet-row-right { display: flex; flex-direction: column; align-items: flex-end; gap: 6px; flex-shrink: 0; }
-.adm-meet-row-date { font: 400 11px var(--zs-mono); color: var(--zs-ink-5); white-space: nowrap; }
+.adm-meet-row-name { font: 600 13px var(--zs-sans); color: var(--zs-ink); letter-spacing: -0.01em; display: block; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.adm-meet-row-firm { font: 400 11px var(--zs-sans); color: var(--zs-ink-4); display: block; margin-top: 2px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.adm-meet-row-right { display: flex; flex-direction: column; align-items: flex-end; gap: 4px; flex-shrink: 0; max-width: 110px; }
+.adm-meet-row-date { font: 400 10px var(--zs-mono); color: var(--zs-ink-5); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; width: 100%; text-align: right; }
 
 /* Calendar sync tiles */
 .adm-cal-sync-row { display: grid; grid-template-columns: repeat(3,1fr); gap: 12px; }
