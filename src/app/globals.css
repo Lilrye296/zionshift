@@ -595,6 +595,7 @@ body { font-family: var(--zs-sans); color: var(--zs-ink-2); overflow-x: hidden; 
 .mini-cal-day.empty { background: transparent; pointer-events: none; }
 .mini-cal-day.today { outline: 2px solid var(--zs-ink); outline-offset: 2px; color: var(--zs-ink); font-weight: 700; }
 .mini-cal-day.has-dot { background: var(--zs-ink); color: #fff; }
+.mini-cal-day.selected { box-shadow: 0 0 0 3px rgba(11,11,12,0.25); }
 .mini-cal-day.clickable { cursor: pointer; }
 .mini-cal-day.clickable:hover { background: #d4d4d2; }
 .mini-cal-day.has-dot.clickable:hover { background: #222; }

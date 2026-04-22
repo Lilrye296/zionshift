@@ -32,9 +32,11 @@ const DOW = ['S','M','T','W','T','F','S'];
 function MiniCalendar({
   meetings = [],
   onDayClick,
+  selectedDay = null,
 }: {
   meetings?: CalMeeting[];
   onDayClick?: (day: number) => void;
+  selectedDay?: number | null;
 }) {
   const now   = new Date();
   const year  = now.getFullYear();
@@ -63,10 +65,11 @@ function MiniCalendar({
               key={i}
               className={[
                 'mini-cal-day',
-                day === null   ? 'empty'    : '',
-                day === today  ? 'today'    : '',
-                hasMeeting     ? 'has-dot'  : '',
-                hasMeeting     ? 'clickable': '',
+                day === null        ? 'empty'    : '',
+                day === today       ? 'today'    : '',
+                hasMeeting          ? 'has-dot'  : '',
+                hasMeeting          ? 'clickable': '',
+                day === selectedDay ? 'selected' : '',
               ].join(' ').trim()}
               onClick={() => hasMeeting && day && onDayClick?.(day)}
             >
@@ -449,7 +452,7 @@ export default function ClientPage() {
   const [activeTab, setActiveTab]               = useState<'overview' | 'billing'>('overview');
   const [showLogoUpload, setShowLogoUpload]     = useState(false);
   const [localLogoUrl, setLocalLogoUrl]         = useState<string | null>(null);
-  const [selectedDayMeetings, setSelectedDayMeetings] = useState<CalMeeting[] | null>(null);
+  const [selectedMeeting, setSelectedMeeting] = useState<CalMeeting | null>(null);
   const [period, setPeriod]                     = useState<'week' | 'month' | 'alltime'>('month');
   const [periodOpen, setPeriodOpen]             = useState(false);
   // Holds metric totals filtered to the selected period.
@@ -709,13 +712,40 @@ export default function ClientPage() {
                     <div className="cd-card">
                       <MiniCalendar
                         meetings={CAL_MEETINGS}
+                        selectedDay={selectedMeeting?.day ?? null}
                         onDayClick={(day) => {
-                          const dayMeetings = CAL_MEETINGS
-                            .filter(m => m.day === day)
-                            .sort((a, b) => parseTime(a.time) - parseTime(b.time));
-                          setSelectedDayMeetings(dayMeetings);
+                          const hit = [...CAL_MEETINGS]
+                            .sort((a, b) => parseTime(a.time) - parseTime(b.time))
+                            .find(m => m.day === day);
+                          setSelectedMeeting(prev => prev?.day === day && prev?.prospect === hit?.prospect ? null : (hit ?? null));
                         }}
                       />
+
+                      {/* Inline detail — appears below calendar on selection */}
+                      {selectedMeeting ? (
+                        <div className="adm-meet-detail">
+                          <div className="adm-meet-detail-head">
+                            <div>
+                              <div className="adm-meet-detail-name">{selectedMeeting.prospect}</div>
+                              <div className="adm-meet-detail-firm">{selectedMeeting.firm}</div>
+                            </div>
+                            <span className={`adm-meet-pill adm-meet-pill--${isMeetingPast(selectedMeeting.day, selectedMeeting.time, selectedMeeting.month) ? 'completed' : 'upcoming'}`}>
+                              {isMeetingPast(selectedMeeting.day, selectedMeeting.time, selectedMeeting.month) ? 'Completed' : 'Upcoming'}
+                            </span>
+                          </div>
+                          <div className="adm-meet-detail-row">
+                            <span className="adm-meet-detail-label">Date &amp; Time</span>
+                            <span className="adm-meet-detail-val">{MONTH_SHORT[selectedMeeting.month]} {selectedMeeting.day} · {selectedMeeting.time}</span>
+                          </div>
+                          {!isMeetingPast(selectedMeeting.day, selectedMeeting.time, selectedMeeting.month) && selectedMeeting.zoomUrl && (
+                            <a href={selectedMeeting.zoomUrl} target="_blank" rel="noopener noreferrer" className="adm-zoom-btn">
+                              Join Zoom →
+                            </a>
+                          )}
+                        </div>
+                      ) : (
+                        <p className="adm-cal-hint">Tap a highlighted date to see meeting details.</p>
+                      )}
                     </div>
 
                     {/* All Meetings log */}
@@ -729,8 +759,8 @@ export default function ClientPage() {
                           <Fragment key={i}>
                             {i > 0 && <div className="adm-divider" style={{ margin: '0 20px' }} />}
                             <div
-                              className="adm-meet-row"
-                              onClick={() => setSelectedDayMeetings([m])}
+                              className={`adm-meet-row${selectedMeeting?.prospect === m.prospect && selectedMeeting?.day === m.day ? ' selected' : ''}`}
+                              onClick={() => setSelectedMeeting(prev => prev?.prospect === m.prospect && prev?.day === m.day ? null : m)}
                             >
                               <div className="adm-meet-row-avatar">
                                 {m.prospect.split(' ').map(w => w[0]).join('')}
@@ -743,7 +773,7 @@ export default function ClientPage() {
                                 <span className="adm-meet-row-date">{MONTH_SHORT[m.month]} {m.day}</span>
                                 <span className="adm-meet-row-time">{m.time}</span>
                                 <span className={`adm-meet-pill adm-meet-pill--${isMeetingPast(m.day, m.time, m.month) ? 'completed' : 'upcoming'}`}>
-                                  {isMeetingPast(m.day, m.time, m.month) ? 'Completed' : 'Scheduled'}
+                                  {isMeetingPast(m.day, m.time, m.month) ? 'Completed' : 'Upcoming'}
                                 </span>
                               </div>
                             </div>
@@ -947,13 +977,6 @@ export default function ClientPage() {
         <LogoUploadModal
           onClose={() => setShowLogoUpload(false)}
           onSave={(url) => setLocalLogoUrl(url)}
-        />
-      )}
-
-      {selectedDayMeetings && (
-        <MeetingDetailModal
-          meetings={selectedDayMeetings}
-          onClose={() => setSelectedDayMeetings(null)}
         />
       )}
 
