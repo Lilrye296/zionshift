@@ -644,7 +644,7 @@ export default function AdminPage() {
                           </div>
                           <div className="adm-client-right">
                             <span className={`adm-client-pill adm-client-pill--${c.status}`}>
-                              ●&nbsp;{c.status.charAt(0).toUpperCase() + c.status.slice(1)}
+                              ●&nbsp;{c.status === 'live' ? 'Active' : c.status.charAt(0).toUpperCase() + c.status.slice(1)}
                             </span>
                             {/* TODO (Supabase): pass real client UUID as query param.
                                 Client page will check for ?view=<id> + admin role,
