@@ -63,14 +63,14 @@ function MiniCalendar({
               key={i}
               className={[
                 'mini-cal-day',
-                day === today  ? 'today'   : '',
-                hasMeeting     ? 'has-dot' : '',
-                hasMeeting     ? 'clickable' : '',
+                day === null   ? 'empty'    : '',
+                day === today  ? 'today'    : '',
+                hasMeeting     ? 'has-dot'  : '',
+                hasMeeting     ? 'clickable': '',
               ].join(' ').trim()}
               onClick={() => hasMeeting && day && onDayClick?.(day)}
             >
-              <span>{day ?? ''}</span>
-              {hasMeeting && <span className="mini-cal-dot" />}
+              {day ?? ''}
             </div>
           );
         })}

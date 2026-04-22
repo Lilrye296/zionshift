@@ -584,15 +584,16 @@ body { font-family: var(--zs-sans); color: var(--zs-ink-2); overflow-x: hidden; 
 .cd-activity-sub { font: 400 12px var(--zs-mono); color: var(--zs-ink-5); }
 
 .mini-cal-header { font: 500 11px var(--zs-mono); letter-spacing: 0.08em; text-transform: uppercase; color: var(--zs-ink-5); margin-bottom: 16px; }
-.mini-cal-grid { display: grid; grid-template-columns: repeat(7,1fr); gap: 2px; }
-.mini-cal-dow { font: 700 11px var(--zs-mono); color: var(--zs-ink); text-align: center; padding: 0 0 8px; }
-.mini-cal-day { font: 400 13px var(--zs-sans); color: var(--zs-ink-4); text-align: center; padding: 4px 2px; border-radius: 8px; display: flex; flex-direction: column; align-items: center; gap: 3px; min-height: 32px; justify-content: center; }
-.mini-cal-day.today { background: var(--zs-ink); color: #fff; font-weight: 600; border-radius: 8px; }
-.mini-cal-dot { width: 4px; height: 4px; border-radius: 50%; background: var(--zs-ink-4); flex-shrink: 0; }
-.mini-cal-day.today .mini-cal-dot { background: rgba(255,255,255,0.55); }
+.mini-cal-grid { display: grid; grid-template-columns: repeat(7,1fr); gap: 4px; }
+.mini-cal-dow { font: 500 10px var(--zs-mono); text-transform: uppercase; letter-spacing: 0.06em; color: var(--zs-ink-5); text-align: center; padding: 4px 0; }
+.mini-cal-day { font: 500 12px var(--zs-sans); color: var(--zs-ink-4); text-align: center; border-radius: 8px; display: flex; align-items: center; justify-content: center; aspect-ratio: 1; background: var(--zs-mist); transition: background 160ms; }
+.mini-cal-day.empty { background: transparent; pointer-events: none; }
+.mini-cal-day.today { outline: 2px solid var(--zs-ink); outline-offset: 2px; color: var(--zs-ink); font-weight: 700; }
+.mini-cal-day.has-dot { background: var(--zs-ink); color: #fff; }
 .mini-cal-day.clickable { cursor: pointer; }
-.mini-cal-day.clickable:hover { background: var(--zs-mist); border-radius: 8px; }
-.mini-cal-day.today.clickable:hover { background: var(--zs-ink); }
+.mini-cal-day.clickable:hover { background: #d4d4d2; }
+.mini-cal-day.has-dot.clickable:hover { background: #222; }
+.mini-cal-day.today.clickable:hover { background: var(--zs-mist); }
 
 .mdm-eyebrow { font: 500 11px var(--zs-mono); letter-spacing: 0.08em; text-transform: uppercase; color: var(--zs-ink-5); margin-bottom: 10px; }
 .mdm-name { font: 700 22px var(--zs-sans); letter-spacing: -0.03em; color: var(--zs-ink); margin: 0 0 4px; }
