@@ -457,7 +457,7 @@ function getStatusProps(status: string | null) {
     case 'idle':    return { label: 'Idle',           variant: 'idle'    };
     case 'paused':  return { label: 'Paused',         variant: 'paused'  };
     case 'error':   return { label: 'Error',          variant: 'error'   };
-    default:        return { label: 'Live — Sending', variant: 'live'    };
+    default:        return { label: 'Live',            variant: 'live'    };
   }
 }
 
