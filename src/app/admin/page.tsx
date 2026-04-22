@@ -143,15 +143,6 @@ interface PipelineLead {
   reEntryDate: string;
 }
 
-interface InboundLead {
-  id: number;
-  date: string;
-  name: string;
-  email: string;
-  message: string;
-  status: 'new' | 'replied';
-}
-
 interface ActiveClient {
   id: number;
   name: string;
@@ -191,12 +182,6 @@ const PIPELINE_LEADS: PipelineLead[] = [
   { id: 1, name: 'Patricia Howe', firm: 'Howe Asset Management',  whatTheySaid: 'Not the right time — check back in Q3.',          reEntryDate: 'Jul 7, 2026'  },
   { id: 2, name: 'Derek Yuen',    firm: 'Yuen Capital',           whatTheySaid: 'Heading into busy season, reach out after June.',  reEntryDate: 'Jun 15, 2026' },
   { id: 3, name: 'Angela Price',  firm: 'Price Wealth Partners',  whatTheySaid: 'Interested but budget review is in May.',          reEntryDate: 'May 20, 2026' },
-];
-
-const INBOUND_LEADS: InboundLead[] = [
-  { id: 1, date: 'Apr 20, 2026', name: 'James Okafor',  email: 'jokafor@ofcgroup.com',      message: 'Came across your site and wanted to learn more about how the outreach works. We\'re a mid-size RIA looking to grow our HNW book.', status: 'new'    },
-  { id: 2, date: 'Apr 17, 2026', name: 'Beth Navarro',  email: 'beth@navarrowm.com',        message: 'A colleague recommended ZionShift. Looking for a demo if possible.',                                                               status: 'replied' },
-  { id: 3, date: 'Apr 11, 2026', name: 'Carter Flynn',  email: 'carter@flynnfinancial.com', message: 'Interested in a proposal. We manage about $400M AUM and want to expand to UHNW prospects.',                                        status: 'new'    },
 ];
 
 // TODO (Supabase): replace ALL_CLIENTS with a live fetch from the clients table.
@@ -259,7 +244,7 @@ const MRR_MILESTONES = [2000, 6000, 10000, 20000, 30000, 40000, 50000, 60000, 70
 const DOW_LABELS = ['S','M','T','W','T','F','S'];
 const MONTH_NAMES_FULL = ['January','February','March','April','May','June','July','August','September','October','November','December'];
 
-const TABS = ['Overview', 'Meetings', 'Inbound', 'Pipeline', 'Opt-Outs'] as const;
+const TABS = ['Overview', 'Meetings', 'Pipeline', 'Opt-Outs'] as const;
 type Tab = typeof TABS[number];
 
 /* ── Component ──────────────────────────────────────────────────── */
@@ -603,47 +588,6 @@ export default function AdminPage() {
             </div>
           );
         })()}
-
-        {/* ══ INBOUND ═════════════════════════════════════════════ */}
-        {activeTab === 'Inbound' && (
-          <div>
-            <div className="adm-section-head" style={{ marginBottom: 24 }}>
-              <div>
-                <h2 className="portal-heading" style={{ marginBottom: 6 }}>Website Inbound</h2>
-                <p className="adm-subhead">Form fills submitted from zionshift.com.</p>
-              </div>
-            </div>
-            <div className="adm-table-wrap">
-              <table className="adm-table">
-                <thead>
-                  <tr>
-                    <th>Date</th>
-                    <th>Name</th>
-                    <th>Email</th>
-                    <th>Message</th>
-                    <th>Status</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {INBOUND_LEADS.map(lead => (
-                    <tr key={lead.id}>
-                      <td className="adm-td-muted">{lead.date}</td>
-                      <td className="adm-td-bold">{lead.name}</td>
-                      <td className="adm-td-mono">{lead.email}</td>
-                      <td className="adm-td-message">{lead.message}</td>
-                      <td>
-                        {lead.status === 'new'
-                          ? <span className="adm-pill-dark">New</span>
-                          : <span className="adm-pill-outline">Replied</span>
-                        }
-                      </td>
-                    </tr>
-                  ))}
-                </tbody>
-              </table>
-            </div>
-          </div>
-        )}
 
         {/* ══ PIPELINE ════════════════════════════════════════════ */}
         {activeTab === 'Pipeline' && (
