@@ -70,7 +70,7 @@ function MiniCalendar({
   }
 
   return (
-    <div className="mini-cal">
+    <div>
       <div className="mini-cal-nav">
         <button className="mini-cal-nav-btn" onClick={prevMonth} aria-label="Previous month">
           <svg width="14" height="14" viewBox="0 0 14 14" fill="none" aria-hidden>
@@ -555,8 +555,12 @@ export default function ClientPage() {
 
   async function handleSignOut() {
     if (process.env.NEXT_PUBLIC_SUPABASE_URL && process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY) {
-      const supabase = createClient();
-      await supabase.auth.signOut();
+      try {
+        const supabase = createClient();
+        await supabase.auth.signOut();
+      } catch {
+        // Ignore sign-out errors — always redirect to login regardless.
+      }
     }
     router.push('/login');
   }
