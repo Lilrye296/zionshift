@@ -792,7 +792,25 @@ function Modal({ open, onClose }: { open: boolean; onClose: () => void }) {
           ) : (
             <>
               <h3 style={{ fontSize: 22, fontWeight: 700, letterSpacing: '-0.025em', margin: 0 }}>Book a free strategy call</h3>
-              <p style={{ fontSize: 14, color: 'var(--zs-ink-4)', marginTop: 6, marginBottom: 24 }}>No commitment · No sales pitch · Just a real conversation.</p>
+              <p style={{ fontSize: 14, color: 'var(--zs-ink-4)', marginTop: 6, marginBottom: 20 }}>No commitment · No sales pitch · Just a real conversation.</p>
+
+              {/* ── Calendly quick-book ── */}
+              <div className="modal-cal-block">
+                <div>
+                  <div className="modal-cal-label">Ready to jump on now?</div>
+                  <div className="modal-cal-sub">Skip the form — pick a time and we&apos;ll meet on Zoom.</div>
+                </div>
+                {/* TODO (Calendly): replace href="#" with your Calendly link */}
+                <a href="#" target="_blank" rel="noopener noreferrer" className="btn btn-primary modal-cal-btn">
+                  See availability <span className="chev">→</span>
+                </a>
+              </div>
+
+              {/* ── Divider ── */}
+              <div className="modal-divider">
+                <span>or tell us about your business first</span>
+              </div>
+
               <form onSubmit={handleSubmit}>
                 <div className="field"><label>Your name</label><input required value={form.name} onChange={(e) => setForm({ ...form, name: e.target.value })} placeholder="Jane Rivera" /></div>
                 <div className="field"><label>Email</label><input type="email" required value={form.email} onChange={(e) => setForm({ ...form, email: e.target.value })} placeholder="jane@firm.com" /></div>
