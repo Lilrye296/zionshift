@@ -738,9 +738,7 @@ export default function ClientPage() {
             </div>
 
             {/* ── Calendar + All Meetings + Recent Activity ── */}
-            <>
-              {/* Calendar (left) + All Meetings (right) */}
-                  <div className="cd-meet-grid">
+            <div className="cd-meet-grid">
 
                     {/* Calendar */}
                     <div className="cd-card">
@@ -826,10 +824,10 @@ export default function ClientPage() {
                       </div>
                     </div>
 
-                  </div>
+            </div>
 
-                  {/* Recent Activity — full width below the grid */}
-                  <div className="cd-card" style={{ marginBottom: 20 }}>
+            {/* Recent Activity — full width below the grid */}
+            <div className="cd-card" style={{ marginBottom: 20 }}>
                     <div className="cd-card-label">Recent Activity</div>
                     <div className="cd-activity-scroll">
                       <ul className="cd-activity-list">
@@ -843,8 +841,7 @@ export default function ClientPage() {
                         ))}
                       </ul>
                     </div>
-                  </div>
-            </>
+            </div>
 
             {/* ── Calendar Sync ── */}
             <div className="cd-card">
