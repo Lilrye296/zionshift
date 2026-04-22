@@ -4,6 +4,126 @@ import { Fragment, useEffect, useRef, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { createClient } from '@/utils/supabase/client';
 
+/* ── Calendar icons (shared with client dashboard) ─────────────── */
+
+function GoogleIcon() {
+  return (
+    <svg width="28" height="28" viewBox="0 0 24 24" aria-hidden>
+      <path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"/>
+      <path fill="#34A853" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"/>
+      <path fill="#FBBC05" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l3.66-2.84z"/>
+      <path fill="#EA4335" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z"/>
+    </svg>
+  );
+}
+
+function AppleIcon() {
+  return (
+    <svg width="28" height="28" viewBox="0 0 24 24" fill="currentColor" aria-hidden>
+      <path d="M18.71 19.5c-.83 1.24-1.71 2.45-3.05 2.47-1.34.03-1.77-.79-3.29-.79-1.53 0-2 .77-3.27.82-1.31.05-2.3-1.32-3.14-2.53C4.25 17 2.94 12.45 4.7 9.39c.87-1.52 2.43-2.48 4.12-2.51 1.28-.02 2.5.87 3.29.87.78 0 2.26-1.07 3.8-.91.65.03 2.47.26 3.64 1.98-.09.06-2.17 1.28-2.15 3.81.03 3.02 2.65 4.03 2.68 4.04-.03.07-.42 1.44-1.38 2.83M13 3.5c.73-.83 1.94-1.46 2.94-1.5.13 1.17-.34 2.35-1.04 3.19-.69.85-1.83 1.51-2.95 1.42-.15-1.15.41-2.35 1.05-3.11z"/>
+    </svg>
+  );
+}
+
+function OutlookIcon() {
+  return (
+    // eslint-disable-next-line @next/next/no-img-element
+    <img
+      src="https://img.icons8.com/fluency/48/microsoft-outlook-2019.png"
+      width={28} height={28}
+      alt="Outlook"
+      style={{ objectFit: 'contain' }}
+    />
+  );
+}
+
+type CalProvider = 'google' | 'outlook' | 'apple';
+
+const CAL_INFO: Record<CalProvider, { name: string; icon: () => JSX.Element; steps: string[] }> = {
+  google: {
+    name: 'Google Calendar',
+    icon: GoogleIcon,
+    steps: [
+      'Click Connect below to authorize with your Google account.',
+      'Choose the Google account you want to sync with.',
+      'Allow ZionShift to view your calendar availability.',
+      'Your meetings will appear in Google Calendar automatically.',
+    ],
+  },
+  outlook: {
+    name: 'Outlook / Microsoft 365',
+    icon: OutlookIcon,
+    steps: [
+      'Click Connect below to authorize with your Microsoft account.',
+      'Sign in with the Microsoft 365 or Outlook account you use.',
+      'Grant calendar access when prompted.',
+      'Your meetings will appear in Outlook automatically.',
+    ],
+  },
+  apple: {
+    name: 'Apple Calendar',
+    icon: AppleIcon,
+    steps: [
+      'Open your Apple ID settings at appleid.apple.com.',
+      'Under Sign-In & Security, generate an App-Specific Password.',
+      'Click Connect below and enter that password when prompted.',
+      'Your meetings will sync to Apple Calendar automatically.',
+    ],
+  },
+};
+
+function AdminCalModal({
+  provider,
+  isConnected,
+  onConnect,
+  onDisconnect,
+  onClose,
+}: {
+  provider: CalProvider;
+  isConnected: boolean;
+  onConnect: () => void;
+  onDisconnect: () => void;
+  onClose: () => void;
+}) {
+  const info = CAL_INFO[provider];
+  const Icon = info.icon;
+  return (
+    <div className="modal-overlay" onClick={onClose}>
+      <div className="modal" style={{ maxWidth: 420 }} onClick={e => e.stopPropagation()}>
+        <button className="modal-close" onClick={onClose}>✕</button>
+        <div className="modal-scroll">
+          <div className="ccm-header">
+            <Icon />
+            <div>
+              <div className="ccm-title">{info.name}</div>
+              {isConnected && <div className="ccm-connected-label">Connected</div>}
+            </div>
+          </div>
+          <div className="ccm-steps-label">How it works</div>
+          <ol className="ccm-steps">
+            {info.steps.map((s, i) => <li key={i}>{s}</li>)}
+          </ol>
+          <div className="ccm-note">
+            Full OAuth integration coming soon. Connection state is saved for this session.
+          </div>
+          <div className="ccm-actions">
+            {isConnected ? (
+              <button className="ccm-btn-disconnect" onClick={() => { onDisconnect(); onClose(); }}>
+                Disconnect
+              </button>
+            ) : (
+              <button className="ccm-btn-connect" onClick={() => { onConnect(); onClose(); }}>
+                Connect {info.name}
+              </button>
+            )}
+            <button className="ccm-btn-cancel" onClick={onClose}>Cancel</button>
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+}
+
 /* ── Types ─────────────────────────────────────────────────────── */
 
 interface ReplyLog {
@@ -178,6 +298,8 @@ export default function AdminPage() {
   const [metricPeriod, setMetricPeriod]   = useState<MetricPeriod>('alltime');
   const [periodOpen, setPeriodOpen]       = useState(false);
   const [selectedMeeting, setSelectedMeeting] = useState<ProspectMeeting | null>(null);
+  const [connectedCal, setConnectedCal]       = useState<CalProvider | null>(null);
+  const [calModal, setCalModal]               = useState<CalProvider | null>(null);
   // TODO (Supabase + Smartlead): replace null with real aggregated stats per period.
   // Query Supabase view that sums Smartlead campaign stats across all active clients.
   const [periodStats, setPeriodStats]     = useState<AdminPeriodStats | null>(null);
@@ -431,21 +553,31 @@ export default function AdminPage() {
 
               </div>
 
-              {/* Calendar sync */}
-              <div className="adm-biz-card" style={{ marginTop: 20 }}>
-                <div className="adm-biz-card-head">
-                  <span className="adm-biz-card-title">Sync to Your Calendar</span>
-                  <span className="adm-subhead">New bookings will appear automatically once connected.</span>
+              {/* Calendar sync — matches client dashboard */}
+              <div className="cd-card cd-cal-sync" style={{ marginTop: 20 }}>
+                <div className="cd-cal-sync-top">
+                  <div>
+                    <div className="cd-cal-sync-title">Sync to your calendar</div>
+                    <div className="cd-cal-sync-sub">
+                      New Calendly bookings will appear automatically once connected.
+                    </div>
+                  </div>
                 </div>
-                <div className="adm-cal-sync-row">
-                  {[
-                    { name: 'Google Calendar',         key: 'google'  },
-                    { name: 'Outlook / Microsoft 365', key: 'outlook' },
-                    { name: 'Apple Calendar',          key: 'apple'   },
-                  ].map(c => (
-                    <div key={c.key} className="adm-cal-sync-tile">
-                      <span className="adm-cal-sync-name">{c.name}</span>
-                      <span className="adm-cal-sync-cta">Tap to connect</span>
+                <div className="cd-cal-options">
+                  {(['google', 'outlook', 'apple'] as CalProvider[]).map(p => (
+                    <div
+                      key={p}
+                      className={`cd-cal-option cd-cal-option-btn${connectedCal === p ? ' cd-cal-option-active' : ''}`}
+                      onClick={() => setCalModal(p)}
+                    >
+                      {p === 'google'  && <GoogleIcon />}
+                      {p === 'outlook' && <OutlookIcon />}
+                      {p === 'apple'   && <AppleIcon />}
+                      <span className="cd-cal-option-name">{CAL_INFO[p].name}</span>
+                      {connectedCal === p
+                        ? <span className="cd-cal-connected">Connected</span>
+                        : <span className="cd-cal-tap">Tap to connect</span>
+                      }
                     </div>
                   ))}
                 </div>
@@ -815,6 +947,18 @@ export default function AdminPage() {
         )}
 
       </main>
+
+      {/* Calendar connect modal — shared with Meetings tab sync section */}
+      {calModal && (
+        <AdminCalModal
+          provider={calModal}
+          isConnected={connectedCal === calModal}
+          onConnect={() => setConnectedCal(calModal)}
+          onDisconnect={() => setConnectedCal(null)}
+          onClose={() => setCalModal(null)}
+        />
+      )}
+
     </div>
   );
 }

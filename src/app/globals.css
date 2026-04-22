@@ -851,7 +851,7 @@ footer.zs-footer { padding: 40px 0; border-top: 1px solid var(--zs-border); }
 .adm-auto-chip { font: 500 10px var(--zs-mono); letter-spacing: 0.06em; text-transform: uppercase; background: #f0fdf4; color: #16a34a; border: 1px solid #bbf7d0; border-radius: 4px; padding: 2px 7px; }
 
 /* Section header */
-.adm-section-head { display: flex; align-items: flex-start; justify-content: space-between; gap: 24px; margin-bottom: 32px; flex-wrap: wrap; }
+.adm-section-head { display: flex; align-items: center; justify-content: space-between; gap: 24px; margin-bottom: 32px; flex-wrap: wrap; }
 .adm-subhead { font: 400 13px var(--zs-mono); color: var(--zs-ink-4); margin: 0; }
 .adm-bulk-row { display: flex; gap: 8px; align-items: center; padding-top: 8px; flex-shrink: 0; }
 
