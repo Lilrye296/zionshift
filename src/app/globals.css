@@ -1053,9 +1053,6 @@ footer.zs-footer { padding: 40px 0; border-top: 1px solid var(--zs-border); }
 @media (max-width: 900px) {
   .adm-meet-grid { grid-template-columns: 1fr; }
   .adm-meetings-stats { gap: 12px; }
-}
-
-@media (max-width: 900px) {
   .adm-biz-grid { grid-template-columns: 1fr; }
   .adm-table-wrap { overflow-x: auto; }
 }
