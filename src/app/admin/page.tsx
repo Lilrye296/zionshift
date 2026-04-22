@@ -126,17 +126,6 @@ function AdminCalModal({
 
 /* ── Types ─────────────────────────────────────────────────────── */
 
-interface ReplyLog {
-  id: number;
-  prospect: string;
-  firm: string;
-  email: string;
-  theirMessage: string;
-  aiSent: string;      // what the AI auto-sent — read-only
-  sentAt: string;
-  flagged: boolean;
-}
-
 interface OptOut {
   id: number;
   date: string;
@@ -191,29 +180,6 @@ interface AdminPeriodStats {
 }
 
 /* ── Static placeholder data ────────────────────────────────────── */
-
-const REPLY_LOG: ReplyLog[] = [
-  {
-    id: 1,
-    prospect: 'Marcus Webb',
-    firm: 'Webb Capital Partners',
-    email: 'marcus@webbcapital.com',
-    theirMessage: 'Thanks for reaching out — I\'m open to hearing more. What does your process look like?',
-    aiSent: 'Hi Marcus, great to hear back from you. Our process starts with a 20-minute discovery call where we map out your ideal client profile and build a targeted outreach sequence from there. We handle everything end-to-end — copywriting, sending, and reply management — so you can stay focused on closing. Would Thursday or Friday work for a quick call?',
-    sentAt: 'Apr 21, 2026 · 10:14 AM',
-    flagged: false,
-  },
-  {
-    id: 2,
-    prospect: 'Diana Solis',
-    firm: 'Solis Wealth Management',
-    email: 'diana@soliswealth.com',
-    theirMessage: 'I\'ve been burned by outreach agencies before. What makes you different?',
-    aiSent: 'Hi Diana, I completely understand that hesitation — it\'s the most common thing we hear. The difference with ZionShift is that we don\'t do blast campaigns. Every sequence is written specifically for your firm, your voice, and your ideal client. We also only work with a small number of advisors at a time so your results don\'t get diluted. Happy to show you some recent examples if that would help.',
-    sentAt: 'Apr 21, 2026 · 8:02 AM',
-    flagged: false,
-  },
-];
 
 const OPT_OUTS: OptOut[] = [
   { id: 1, date: 'Apr 18, 2026', name: 'Kevin Marsh',   firm: 'Marsh Financial',     email: 'kmarsh@marshfinancial.com', triggeredBy: 'Email sequence #3' },
@@ -293,7 +259,7 @@ const MRR_MILESTONES = [2000, 6000, 10000, 20000, 30000, 40000, 50000, 60000, 70
 const DOW_LABELS = ['S','M','T','W','T','F','S'];
 const MONTH_NAMES_FULL = ['January','February','March','April','May','June','July','August','September','October','November','December'];
 
-const TABS = ['Overview', 'Meetings', 'Replies', 'Inbound', 'Pipeline', 'Opt-Outs'] as const;
+const TABS = ['Overview', 'Meetings', 'Inbound', 'Pipeline', 'Opt-Outs'] as const;
 type Tab = typeof TABS[number];
 
 /* ── Component ──────────────────────────────────────────────────── */
@@ -303,7 +269,6 @@ const PERIOD_LABEL: Record<MetricPeriod, string> = { week: 'This Week', month: '
 
 export default function AdminPage() {
   const [activeTab, setActiveTab]         = useState<Tab>('Overview');
-  const [replyLog, setReplyLog]           = useState<ReplyLog[]>(REPLY_LOG);
   const [metricPeriod, setMetricPeriod]   = useState<MetricPeriod>('alltime');
   const [periodOpen, setPeriodOpen]       = useState(false);
   const [selectedMeeting, setSelectedMeeting] = useState<ProspectMeeting | null>(null);
@@ -361,10 +326,6 @@ export default function AdminPage() {
     router.push('/login');
   }
 
-  function toggleFlag(id: number) {
-    setReplyLog(log => log.map(r => r.id === id ? { ...r, flagged: !r.flagged } : r));
-  }
-
   // TODO (Supabase): replace ALL_CLIENTS with a live fetch from the clients table.
   // ALL_CLIENTS is placeholder — swap for: supabase.from('clients').select('*')
 
@@ -397,7 +358,7 @@ export default function AdminPage() {
     ? `${((periodStats.total_replies / periodStats.emails_sent) * 100).toFixed(1)}%`
     : '—';
 
-  const flaggedCount = replyLog.filter(r => r.flagged).length;
+  const upcomingCount = meetings.filter(m => m.status === 'upcoming').length;
 
   return (
     <div className="portal-page">
@@ -417,28 +378,20 @@ export default function AdminPage() {
       <main className="portal-main">
 
         {/* ── Tab pills ── */}
-        {(() => {
-          const upcomingCount = meetings.filter(m => m.status === 'upcoming').length;
-          return (
-            <div className="cd-tabs" style={{ marginBottom: 32 }}>
-              {TABS.map(tab => (
-                <button
-                  key={tab}
-                  className={`cd-tab${activeTab === tab ? ' active' : ''}`}
-                  onClick={() => setActiveTab(tab)}
-                >
-                  {tab}
-                  {tab === 'Meetings' && upcomingCount > 0 && (
-                    <span className="adm-badge adm-badge-meet">{upcomingCount}</span>
-                  )}
-                  {tab === 'Replies' && flaggedCount > 0 && (
-                    <span className="adm-badge adm-badge-flag">{flaggedCount}</span>
-                  )}
-                </button>
-              ))}
-            </div>
-          );
-        })()}
+        <div className="cd-tabs" style={{ marginBottom: 32 }}>
+          {TABS.map(tab => (
+            <button
+              key={tab}
+              className={`cd-tab${activeTab === tab ? ' active' : ''}`}
+              onClick={() => setActiveTab(tab)}
+            >
+              {tab}
+              {tab === 'Meetings' && upcomingCount > 0 && (
+                <span className="adm-badge adm-badge-meet">{upcomingCount}</span>
+              )}
+            </button>
+          ))}
+        </div>
 
         {/* ══ MEETINGS ════════════════════════════════════════════ */}
         {activeTab === 'Meetings' && (() => {
@@ -650,77 +603,6 @@ export default function AdminPage() {
             </div>
           );
         })()}
-
-        {/* ══ REPLIES — read-only auto-send log ═══════════════════ */}
-        {activeTab === 'Replies' && (
-          <div>
-            <div className="adm-section-head">
-              <div>
-                <h2 className="portal-heading" style={{ marginBottom: 6 }}>Reply Log</h2>
-                <p className="adm-subhead">
-                  All replies are sent automatically. Flag any exchange that looks off for later review.
-                </p>
-              </div>
-              <div className="adm-log-meta">
-                <span className="adm-log-count">{replyLog.length} exchanges today</span>
-                {flaggedCount > 0 && (
-                  <span className="adm-flag-count">⚑ {flaggedCount} flagged</span>
-                )}
-              </div>
-            </div>
-
-            {replyLog.length === 0 ? (
-              <div className="portal-tab-body portal-empty">
-                <p>No replies yet today.</p>
-                <span>Auto-sent exchanges will appear here.</span>
-              </div>
-            ) : (
-              <div className="adm-reply-list">
-                {replyLog.map(r => (
-                  <div key={r.id} className={`adm-reply-card${r.flagged ? ' flagged' : ''}`}>
-
-                    {/* Header row */}
-                    <div className="adm-reply-header">
-                      <div className="adm-reply-avatar">
-                        {r.prospect.split(' ').map(w => w[0]).join('')}
-                      </div>
-                      <div className="adm-reply-who">
-                        <div className="adm-reply-name">{r.prospect}</div>
-                        <div className="adm-reply-meta">{r.firm} &middot; {r.email}</div>
-                      </div>
-                      <div className="adm-reply-header-right">
-                        <span className="adm-sent-time">{r.sentAt}</span>
-                        <button
-                          className={`adm-flag-btn${r.flagged ? ' active' : ''}`}
-                          onClick={() => toggleFlag(r.id)}
-                          title={r.flagged ? 'Remove flag' : 'Flag this exchange'}
-                        >
-                          ⚑ {r.flagged ? 'Flagged' : 'Flag'}
-                        </button>
-                      </div>
-                    </div>
-
-                    {/* Their message */}
-                    <div className="adm-their-block">
-                      <span className="adm-block-label">Their reply</span>
-                      <p className="adm-their-text">&ldquo;{r.theirMessage}&rdquo;</p>
-                    </div>
-
-                    {/* AI auto-sent */}
-                    <div className="adm-draft-block">
-                      <div className="adm-block-label-row">
-                        <span className="adm-block-label">AI auto-sent</span>
-                        <span className="adm-auto-chip">Sent automatically</span>
-                      </div>
-                      <p className="adm-draft-text">{r.aiSent}</p>
-                    </div>
-
-                  </div>
-                ))}
-              </div>
-            )}
-          </div>
-        )}
 
         {/* ══ INBOUND ═════════════════════════════════════════════ */}
         {activeTab === 'Inbound' && (

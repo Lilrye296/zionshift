@@ -843,48 +843,12 @@ footer.zs-footer { padding: 40px 0; border-top: 1px solid var(--zs-border); }
 
 /* Tab badge */
 .adm-badge { display: inline-flex; align-items: center; justify-content: center; min-width: 17px; height: 17px; padding: 0 4px; border-radius: 999px; background: var(--zs-ink); color: #fff; font: 700 10px var(--zs-sans); margin-left: 4px; }
-.adm-badge-flag { background: #b45309; }
 .adm-badge-meet { background: #2563eb; }
-
-/* Reply log header meta */
-.adm-log-meta { display: flex; flex-direction: column; align-items: flex-end; gap: 4px; padding-top: 6px; flex-shrink: 0; }
-.adm-log-count { font: 400 12px var(--zs-mono); color: var(--zs-ink-5); }
-.adm-flag-count { font: 600 12px var(--zs-mono); color: #b45309; }
-
-/* Reply card — flagged state */
-.adm-reply-card.flagged { border-color: #fde68a; background: #fffdf5; }
-
-/* Reply card header extras */
-.adm-reply-header-right { display: flex; align-items: center; gap: 12px; margin-left: auto; flex-shrink: 0; }
-.adm-sent-time { font: 400 11px var(--zs-mono); color: var(--zs-ink-5); white-space: nowrap; }
-.adm-flag-btn { font: 500 12px var(--zs-sans); color: var(--zs-ink-5); background: none; border: 1px solid var(--zs-border); border-radius: 999px; padding: 5px 12px; cursor: pointer; transition: all 160ms; }
-.adm-flag-btn:hover { border-color: #b45309; color: #b45309; }
-.adm-flag-btn.active { background: #fffbeb; border-color: #fde68a; color: #b45309; font-weight: 600; }
-
-/* Auto-sent chip */
-.adm-auto-chip { font: 500 10px var(--zs-mono); letter-spacing: 0.06em; text-transform: uppercase; background: #f0fdf4; color: #16a34a; border: 1px solid #bbf7d0; border-radius: 4px; padding: 2px 7px; }
 
 /* Section header */
 .adm-section-head { display: flex; align-items: center; justify-content: space-between; gap: 24px; margin-bottom: 32px; flex-wrap: wrap; }
 .adm-subhead { font: 400 13px var(--zs-mono); color: var(--zs-ink-4); margin: 0; }
 .adm-bulk-row { display: flex; gap: 8px; align-items: center; padding-top: 8px; flex-shrink: 0; }
-
-/* Reply cards */
-.adm-reply-list { display: flex; flex-direction: column; gap: 20px; }
-.adm-reply-card { background: #fff; border: 1px solid var(--zs-border); border-radius: 20px; padding: 28px; }
-.adm-reply-header { display: flex; align-items: center; gap: 12px; margin-bottom: 20px; }
-.adm-reply-avatar { width: 38px; height: 38px; background: var(--zs-ink); color: #fff; border-radius: 50%; display: flex; align-items: center; justify-content: center; font: 600 13px var(--zs-sans); flex-shrink: 0; }
-.adm-reply-name { font: 600 15px var(--zs-sans); color: var(--zs-ink); letter-spacing: -0.01em; display: block; }
-.adm-reply-meta { font: 400 12px var(--zs-mono); color: var(--zs-ink-4); display: block; margin-top: 2px; }
-.adm-their-block { background: var(--zs-mist); border-radius: 12px; padding: 16px; margin-bottom: 16px; }
-.adm-block-label { font: 500 10px var(--zs-mono); text-transform: uppercase; letter-spacing: 0.12em; color: var(--zs-ink-5); display: block; margin-bottom: 8px; }
-.adm-their-text { font: 400 14px var(--zs-sans); color: var(--zs-ink-3); line-height: 1.55; margin: 0; font-style: italic; max-height: 120px; overflow-y: auto; scrollbar-width: thin; scrollbar-color: var(--zs-line) transparent; }
-.adm-draft-block { border: 1px solid var(--zs-border); border-radius: 12px; padding: 16px; margin-bottom: 16px; }
-.adm-block-label-row { display: flex; align-items: center; gap: 8px; margin-bottom: 8px; }
-.adm-ai-chip { font: 600 10px var(--zs-mono); letter-spacing: 0.08em; text-transform: uppercase; background: var(--zs-ink); color: #fff; border-radius: 4px; padding: 2px 6px; }
-.adm-draft-text { font: 400 14px var(--zs-sans); color: var(--zs-ink-2); line-height: 1.65; margin: 0; }
-.adm-textarea { width: 100%; font: 400 14px var(--zs-sans); color: var(--zs-ink-2); line-height: 1.65; border: none; outline: none; resize: vertical; background: transparent; min-height: 120px; }
-.adm-reply-actions { display: flex; gap: 8px; justify-content: flex-end; }
 
 /* Tables */
 .adm-table-wrap { background: #fff; border: 1px solid var(--zs-border); border-radius: 20px; overflow: hidden; }
