@@ -276,6 +276,9 @@ function CalendarConnectModal({
 }
 
 /* ── Logo Upload Modal ── */
+const LOGO_ACCEPTED_TYPES = ['image/png', 'image/svg+xml', 'image/jpeg'];
+const LOGO_MAX_MB         = 2;
+
 function LogoUploadModal({
   onClose,
   onSave,
@@ -295,17 +298,14 @@ function LogoUploadModal({
     return () => { if (preview && !savedRef.current) URL.revokeObjectURL(preview); };
   }, [preview]);
 
-  const ACCEPTED = ['image/png', 'image/svg+xml', 'image/jpeg'];
-  const MAX_MB   = 2;
-
   function handleFile(file: File) {
     setError('');
-    if (!ACCEPTED.includes(file.type)) {
+    if (!LOGO_ACCEPTED_TYPES.includes(file.type)) {
       setError('Please upload a PNG, SVG, or JPG file.');
       return;
     }
-    if (file.size > MAX_MB * 1024 * 1024) {
-      setError(`File must be under ${MAX_MB}MB.`);
+    if (file.size > LOGO_MAX_MB * 1024 * 1024) {
+      setError(`File must be under ${LOGO_MAX_MB}MB.`);
       return;
     }
     setPreview(URL.createObjectURL(file));
@@ -433,6 +433,16 @@ interface BillingData {
 }
 
 const PERIOD_LABEL = { week: 'This Week', month: 'This Month', alltime: 'All Time' };
+
+function getStatusProps(status: string | null) {
+  switch (status) {
+    case 'warming': return { label: 'Warming Up',   variant: 'warming' };
+    case 'idle':    return { label: 'Idle',           variant: 'idle'    };
+    case 'paused':  return { label: 'Paused',         variant: 'paused'  };
+    case 'error':   return { label: 'Error',          variant: 'error'   };
+    default:        return { label: 'Live — Sending', variant: 'live'    };
+  }
+}
 
 /* ── Page ── */
 export default function ClientPage() {
@@ -580,15 +590,6 @@ export default function ClientPage() {
   const greeting  = getGreeting();
   const firstName = p?.client_name?.split(' ')[0] ?? null;
 
-  function getStatusProps(status: string | null) {
-    switch (status) {
-      case 'warming': return { label: 'Warming Up',               variant: 'warming' };
-      case 'idle':    return { label: 'Idle',                      variant: 'idle'    };
-      case 'paused':  return { label: 'Paused',                    variant: 'paused'  };
-      case 'error':   return { label: 'Error',                     variant: 'error'   };
-      default:        return { label: 'Live — Sending',             variant: 'live'    };
-    }
-  }
   const statusProps = getStatusProps(p?.campaign_status ?? null);
 
   return (
@@ -753,28 +754,31 @@ export default function ClientPage() {
                       />
 
                       {/* Inline detail — appears below calendar on selection */}
-                      {selectedMeeting ? (
-                        <div className="adm-meet-detail">
-                          <div className="adm-meet-detail-head">
-                            <div>
-                              <div className="adm-meet-detail-name">{selectedMeeting.prospect}</div>
-                              <div className="adm-meet-detail-firm">{selectedMeeting.firm}</div>
+                      {selectedMeeting ? (() => {
+                        const isPast = isMeetingPast(selectedMeeting.day, selectedMeeting.time, selectedMeeting.month);
+                        return (
+                          <div className="adm-meet-detail">
+                            <div className="adm-meet-detail-head">
+                              <div>
+                                <div className="adm-meet-detail-name">{selectedMeeting.prospect}</div>
+                                <div className="adm-meet-detail-firm">{selectedMeeting.firm}</div>
+                              </div>
+                              <span className={`adm-meet-pill adm-meet-pill--${isPast ? 'completed' : 'upcoming'}`}>
+                                {isPast ? 'Completed' : 'Upcoming'}
+                              </span>
                             </div>
-                            <span className={`adm-meet-pill adm-meet-pill--${isMeetingPast(selectedMeeting.day, selectedMeeting.time, selectedMeeting.month) ? 'completed' : 'upcoming'}`}>
-                              {isMeetingPast(selectedMeeting.day, selectedMeeting.time, selectedMeeting.month) ? 'Completed' : 'Upcoming'}
-                            </span>
+                            <div className="adm-meet-detail-row">
+                              <span className="adm-meet-detail-label">Date &amp; Time</span>
+                              <span className="adm-meet-detail-val">{MONTH_SHORT[selectedMeeting.month]} {selectedMeeting.day} · {selectedMeeting.time}</span>
+                            </div>
+                            {!isPast && selectedMeeting.zoomUrl && (
+                              <a href={selectedMeeting.zoomUrl} target="_blank" rel="noopener noreferrer" className="adm-zoom-btn">
+                                Join Zoom →
+                              </a>
+                            )}
                           </div>
-                          <div className="adm-meet-detail-row">
-                            <span className="adm-meet-detail-label">Date &amp; Time</span>
-                            <span className="adm-meet-detail-val">{MONTH_SHORT[selectedMeeting.month]} {selectedMeeting.day} · {selectedMeeting.time}</span>
-                          </div>
-                          {!isMeetingPast(selectedMeeting.day, selectedMeeting.time, selectedMeeting.month) && selectedMeeting.zoomUrl && (
-                            <a href={selectedMeeting.zoomUrl} target="_blank" rel="noopener noreferrer" className="adm-zoom-btn">
-                              Join Zoom →
-                            </a>
-                          )}
-                        </div>
-                      ) : (
+                        );
+                      })() : (
                         <p className="adm-cal-hint">Tap a highlighted date to see meeting details.</p>
                       )}
                     </div>
@@ -786,30 +790,33 @@ export default function ClientPage() {
                         <span className="adm-count-chip">{CAL_MEETINGS.length} Total</span>
                       </div>
                       <div className="cd-meet-log">
-                        {sortedMeetings.map((m, i) => (
-                          <Fragment key={i}>
-                            {i > 0 && <div className="adm-divider" style={{ margin: '0 20px' }} />}
-                            <div
-                              className={`adm-meet-row${selectedMeeting?.prospect === m.prospect && selectedMeeting?.day === m.day && selectedMeeting?.month === m.month ? ' selected' : ''}`}
-                              onClick={() => setSelectedMeeting(prev => prev?.prospect === m.prospect && prev?.day === m.day && prev?.month === m.month ? null : m)}
-                            >
-                              <div className="adm-meet-row-avatar">
-                                {m.prospect.split(' ').map(w => w[0]).join('')}
+                        {sortedMeetings.map((m, i) => {
+                          const isPast = isMeetingPast(m.day, m.time, m.month);
+                          return (
+                            <Fragment key={i}>
+                              {i > 0 && <div className="adm-divider" style={{ margin: '0 20px' }} />}
+                              <div
+                                className={`adm-meet-row${selectedMeeting?.prospect === m.prospect && selectedMeeting?.day === m.day && selectedMeeting?.month === m.month ? ' selected' : ''}`}
+                                onClick={() => setSelectedMeeting(prev => prev?.prospect === m.prospect && prev?.day === m.day && prev?.month === m.month ? null : m)}
+                              >
+                                <div className="adm-meet-row-avatar">
+                                  {m.prospect.split(' ').map(w => w[0]).join('')}
+                                </div>
+                                <div className="adm-meet-row-info">
+                                  <span className="adm-meet-row-name">{m.prospect}</span>
+                                  <span className="adm-meet-row-firm">{m.firm}</span>
+                                </div>
+                                <div className="adm-meet-row-right">
+                                  <span className="adm-meet-row-date">{MONTH_SHORT[m.month]} {m.day}</span>
+                                  <span className="adm-meet-row-time">{m.time}</span>
+                                  <span className={`adm-meet-pill adm-meet-pill--${isPast ? 'completed' : 'upcoming'}`}>
+                                    {isPast ? 'Completed' : 'Upcoming'}
+                                  </span>
+                                </div>
                               </div>
-                              <div className="adm-meet-row-info">
-                                <span className="adm-meet-row-name">{m.prospect}</span>
-                                <span className="adm-meet-row-firm">{m.firm}</span>
-                              </div>
-                              <div className="adm-meet-row-right">
-                                <span className="adm-meet-row-date">{MONTH_SHORT[m.month]} {m.day}</span>
-                                <span className="adm-meet-row-time">{m.time}</span>
-                                <span className={`adm-meet-pill adm-meet-pill--${isMeetingPast(m.day, m.time, m.month) ? 'completed' : 'upcoming'}`}>
-                                  {isMeetingPast(m.day, m.time, m.month) ? 'Completed' : 'Upcoming'}
-                                </span>
-                              </div>
-                            </div>
-                          </Fragment>
-                        ))}
+                            </Fragment>
+                          );
+                        })}
                       </div>
                     </div>
 
