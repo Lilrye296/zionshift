@@ -82,52 +82,6 @@ function MiniCalendar({
   );
 }
 
-/* ── Meeting Detail Modal ── */
-function MeetingDetailModal({ meetings, onClose }: { meetings: CalMeeting[]; onClose: () => void }) {
-  const first = meetings[0];
-  const monthName = MONTH_NAMES[first.month];
-
-  return (
-    <div className="modal-overlay" onClick={onClose}>
-      <div className="modal" style={{ maxWidth: 400 }} onClick={e => e.stopPropagation()}>
-        <button className="modal-close" onClick={onClose}>✕</button>
-        <div className="modal-scroll">
-          <div className="mdm-eyebrow">
-            {meetings.length > 1
-              ? `${meetings.length} ${isMeetingPast(first.day, first.time, first.month) ? 'Completed' : 'Scheduled'} Meetings`
-              : isMeetingPast(first.day, first.time, first.month) ? 'Completed Meeting'
-              : 'Scheduled Meeting'
-            } · {monthName} {first.day}
-          </div>
-          {meetings.map((meeting, i) => (
-            <div key={i}>
-              {i > 0 && <div className="mdm-divider" />}
-              <h2 className="mdm-name">{meeting.prospect}</h2>
-              <div className="mdm-firm">{meeting.firm}</div>
-              <div className="mdm-row" style={{ marginTop: 14 }}>
-                <span className="mdm-icon">🕐</span>
-                <span>{meeting.time}</span>
-              </div>
-              {!isMeetingPast(meeting.day, meeting.time, meeting.month) && (
-                <div className="mdm-row">
-                  <span className="mdm-icon">📹</span>
-                  {meeting.zoomUrl ? (
-                    <a href={meeting.zoomUrl} target="_blank" rel="noopener noreferrer" className="mdm-zoom-btn">
-                      Join Zoom →
-                    </a>
-                  ) : (
-                    <span className="mdm-zoom-pending">Zoom link will appear here</span>
-                  )}
-                </div>
-              )}
-            </div>
-          ))}
-        </div>
-      </div>
-    </div>
-  );
-}
-
 /* ── Placeholder data (replaced by Supabase per-client data later) ── */
 
 interface CalMeeting {
