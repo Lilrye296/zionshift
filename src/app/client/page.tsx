@@ -287,11 +287,13 @@ function LogoUploadModal({
   const [dragging, setDragging] = useState(false);
   const [preview, setPreview]   = useState<string | null>(null);
   const [error, setError]       = useState('');
-  const inputRef = useRef<HTMLInputElement>(null);
+  const inputRef  = useRef<HTMLInputElement>(null);
+  // Tracks whether onSave was called — prevents revoking a URL the parent is still using
+  const savedRef  = useRef(false);
 
-  // Revoke object URL when preview changes or modal unmounts to avoid memory leak
+  // Revoke object URLs to avoid memory leaks, but only if the URL wasn't saved to the parent
   useEffect(() => {
-    return () => { if (preview) URL.revokeObjectURL(preview); };
+    return () => { if (preview && !savedRef.current) URL.revokeObjectURL(preview); };
   }, [preview]);
 
   const ACCEPTED = ['image/png', 'image/svg+xml', 'image/jpeg'];
@@ -318,7 +320,7 @@ function LogoUploadModal({
   }
 
   function handleSave() {
-    if (preview) { onSave(preview); onClose(); }
+    if (preview) { savedRef.current = true; onSave(preview); onClose(); }
   }
 
   return (
@@ -430,6 +432,8 @@ interface BillingData {
     status: 'paid' | 'open' | 'failed'; // maps directly to Stripe invoice status
   }[];
 }
+
+const PERIOD_LABEL = { week: 'This Week', month: 'This Month', alltime: 'All Time' };
 
 /* ── Page ── */
 export default function ClientPage() {
@@ -564,8 +568,6 @@ export default function ClientPage() {
     document.addEventListener('mousedown', handleClick);
     return () => document.removeEventListener('mousedown', handleClick);
   }, []);
-
-  const PERIOD_LABEL = { week: 'This Week', month: 'This Month', alltime: 'All Time' };
 
   const p = profile;
   const greeting  = getGreeting();
