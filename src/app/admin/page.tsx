@@ -261,10 +261,11 @@ const ACTIVITY_FEED: ActivityItem[] = [
 // Supabase table shape (meetings):
 //   id uuid PK, prospect text, firm text, date text, day int2, month int2, year int4,
 //   time text, zoom_url text, status text CHECK status IN ('upcoming','completed')
+// Interface fields map 1-to-1 with column names — no aliasing needed in the Supabase query.
 // Calendly webhook fires POST → Supabase Edge Function → INSERT into meetings.
 // Completed status flipped automatically by a cron job comparing meeting datetime to now().
 interface ProspectMeeting {
-  id: number;
+  id: string;         // uuid from Supabase (seed data uses string ids to match)
   prospect: string;
   firm: string;
   date: string;       // e.g. "Apr 24, 2026"
@@ -272,17 +273,17 @@ interface ProspectMeeting {
   month: number;      // 0-indexed (0=Jan, 3=Apr) — used for month navigation filtering
   year: number;       // e.g. 2026
   time: string;       // e.g. "10:00 AM"
-  zoomUrl: string;
+  zoom_url: string;   // snake_case matches Supabase column name directly
   status: 'upcoming' | 'completed';
 }
 
 // Seed data — swap for Supabase fetch when ready (see TODO above)
 const PROSPECT_MEETINGS_SEED: ProspectMeeting[] = [
-  { id: 1, prospect: 'Carter Flynn',   firm: 'Flynn Financial',         date: 'Apr 24, 2026', day: 24, month: 3, year: 2026, time: '10:00 AM', zoomUrl: 'https://zoom.us/j/placeholder', status: 'upcoming'  },
-  { id: 2, prospect: 'James Okafor',   firm: 'OFC Group',               date: 'Apr 22, 2026', day: 22, month: 3, year: 2026, time: '2:00 PM',  zoomUrl: 'https://zoom.us/j/placeholder', status: 'upcoming'  },
-  { id: 3, prospect: 'Beth Navarro',   firm: 'Navarro Wealth Mgmt',     date: 'Apr 17, 2026', day: 17, month: 3, year: 2026, time: '11:00 AM', zoomUrl: 'https://zoom.us/j/placeholder', status: 'completed' },
-  { id: 4, prospect: 'Marcus Webb',    firm: 'Webb Capital Partners',   date: 'Apr 14, 2026', day: 14, month: 3, year: 2026, time: '3:00 PM',  zoomUrl: 'https://zoom.us/j/placeholder', status: 'completed' },
-  { id: 5, prospect: 'Diana Solis',    firm: 'Solis Wealth Management', date: 'Apr 10, 2026', day: 10, month: 3, year: 2026, time: '9:00 AM',  zoomUrl: 'https://zoom.us/j/placeholder', status: 'completed' },
+  { id: '1', prospect: 'Carter Flynn',   firm: 'Flynn Financial',         date: 'Apr 24, 2026', day: 24, month: 3, year: 2026, time: '10:00 AM', zoom_url: 'https://zoom.us/j/placeholder', status: 'upcoming'  },
+  { id: '2', prospect: 'James Okafor',   firm: 'OFC Group',               date: 'Apr 22, 2026', day: 22, month: 3, year: 2026, time: '2:00 PM',  zoom_url: 'https://zoom.us/j/placeholder', status: 'upcoming'  },
+  { id: '3', prospect: 'Beth Navarro',   firm: 'Navarro Wealth Mgmt',     date: 'Apr 17, 2026', day: 17, month: 3, year: 2026, time: '11:00 AM', zoom_url: 'https://zoom.us/j/placeholder', status: 'completed' },
+  { id: '4', prospect: 'Marcus Webb',    firm: 'Webb Capital Partners',   date: 'Apr 14, 2026', day: 14, month: 3, year: 2026, time: '3:00 PM',  zoom_url: 'https://zoom.us/j/placeholder', status: 'completed' },
+  { id: '5', prospect: 'Diana Solis',    firm: 'Solis Wealth Management', date: 'Apr 10, 2026', day: 10, month: 3, year: 2026, time: '9:00 AM',  zoom_url: 'https://zoom.us/j/placeholder', status: 'completed' },
 ];
 
 // Milestone ladder — defined outside component so it isn't re-created on every render
@@ -558,7 +559,7 @@ export default function AdminPage() {
                         <span className="adm-meet-detail-val">{selectedMeeting.date} · {selectedMeeting.time}</span>
                       </div>
                       {selectedMeeting.status === 'upcoming' && (
-                        <a href={selectedMeeting.zoomUrl} target="_blank" rel="noopener noreferrer" className="adm-zoom-btn">
+                        <a href={selectedMeeting.zoom_url} target="_blank" rel="noopener noreferrer" className="adm-zoom-btn">
                           Join Zoom →
                         </a>
                       )}
