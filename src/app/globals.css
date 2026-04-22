@@ -976,4 +976,14 @@ footer.zs-footer { padding: 40px 0; border-top: 1px solid var(--zs-border); }
   .cd-meet-grid { grid-template-columns: 1fr; }
   .bl-grid { grid-template-columns: 1fr; }
   .cd-cal-options { grid-template-columns: 1fr; }
+
+  /* Admin portal mobile fixes */
+  /* Hide center label — prevents it from overlapping the logo/sign-out on narrow screens */
+  .adm-center-label { display: none; }
+  /* Stack pill + view button vertically so the client row fits within card width */
+  .adm-client-right { flex-direction: column; align-items: flex-end; gap: 4px; }
+  /* Prevent horizontal bleed from scrollable containers pushing cards off-screen */
+  .adm-client-scroll,
+  .adm-revenue-rows,
+  .adm-activity-list { overflow-x: hidden; }
 }
