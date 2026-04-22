@@ -605,6 +605,14 @@ export default function ClientPage() {
 
   const statusProps = getStatusProps(p?.campaign_status ?? null);
 
+  // Computed here so filteredActivity can reference `period` state
+  const today           = new Date().getDate();
+  const filteredActivity = ACTIVITY.filter(a => {
+    if (period === 'alltime') return true;
+    if (period === 'week')    return a.day >= today - 7;
+    return true; // 'month' — shows all; full filtering requires month field in seed data
+  });
+
   return (
     <div className="portal-page">
 
@@ -730,16 +738,8 @@ export default function ClientPage() {
             </div>
 
             {/* ── Calendar + All Meetings + Recent Activity ── */}
-            {(() => {
-              const today = new Date().getDate();
-              const filteredActivity = ACTIVITY.filter(a => {
-                if (period === 'alltime') return true;
-                if (period === 'week') return a.day >= today - 7;
-                return true;
-              });
-              return (
-                <>
-                  {/* Calendar (left) + All Meetings (right) */}
+            <>
+              {/* Calendar (left) + All Meetings (right) */}
                   <div className="cd-meet-grid">
 
                     {/* Calendar */}
@@ -844,9 +844,7 @@ export default function ClientPage() {
                       </ul>
                     </div>
                   </div>
-                </>
-              );
-            })()}
+            </>
 
             {/* ── Calendar Sync ── */}
             <div className="cd-card">
