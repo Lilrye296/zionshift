@@ -260,7 +260,6 @@ export default function AdminPage() {
           while (cells.length % 7 !== 0) cells.push(null);
 
           const upcoming  = PROSPECT_MEETINGS.filter(m => m.status === 'upcoming');
-          const past      = PROSPECT_MEETINGS.filter(m => m.status !== 'upcoming');
 
           return (
             <div>
