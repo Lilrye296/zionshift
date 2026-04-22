@@ -463,10 +463,12 @@ export default function AdminPage() {
           const upcoming = meetings.filter(m => m.status === 'upcoming');
 
           function prevMonth() {
+            setSelectedMeeting(null); // clear detail panel — it belongs to the month being left
             if (calMonth === 0) { setCalMonth(11); setCalYear(y => y - 1); }
             else setCalMonth(m => m - 1);
           }
           function nextMonth() {
+            setSelectedMeeting(null); // clear detail panel — it belongs to the month being left
             if (calMonth === 11) { setCalMonth(0); setCalYear(y => y + 1); }
             else setCalMonth(m => m + 1);
           }
