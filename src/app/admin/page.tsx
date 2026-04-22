@@ -312,6 +312,7 @@ export default function AdminPage() {
   const [calYear, setCalYear]                 = useState(() => new Date().getFullYear());
   // Meetings — seeded from static data; swap for Supabase fetch when ready.
   // TODO (Supabase): change initializer to [] and uncomment the useEffect below.
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars -- setMeetings used when Supabase fetch is uncommented
   const [meetings, setMeetings]               = useState<ProspectMeeting[]>(PROSPECT_MEETINGS_SEED);
   // TODO (Supabase + Smartlead): replace null with real aggregated stats per period.
   // Query Supabase view that sums Smartlead campaign stats across all active clients.
