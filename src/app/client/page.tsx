@@ -466,35 +466,39 @@ export default function ClientPage() {
         setLoading(false);
         return;
       }
-      const supabase = createClient();
-      const { data: { user } } = await supabase.auth.getUser();
-      if (!user) { router.push('/login'); return; }
+      try {
+        const supabase = createClient();
+        const { data: { user } } = await supabase.auth.getUser();
+        if (!user) { router.push('/login'); return; }
 
-      // Admin view: if ?view=<clientId> is in the URL and the logged-in user is admin,
-      // load that client's data instead of the admin's own (non-existent) row.
-      // TODO (Supabase): fully wired — activates automatically once Supabase is live.
-      const viewId = new URLSearchParams(window.location.search).get('view');
-      let targetId = user.id;
-      if (viewId) {
-        const { data: roleData } = await supabase
-          .from('profiles')
-          .select('role')
-          .eq('id', user.id)
-          .single();
-        if (roleData?.role === 'admin') {
-          targetId = viewId;
-          setIsAdminView(true);
+        // Admin view: if ?view=<clientId> is in the URL and the logged-in user is admin,
+        // load that client's data instead of the admin's own (non-existent) row.
+        // TODO (Supabase): fully wired — activates automatically once Supabase is live.
+        const viewId = new URLSearchParams(window.location.search).get('view');
+        let targetId = user.id;
+        if (viewId) {
+          const { data: roleData } = await supabase
+            .from('profiles')
+            .select('role')
+            .eq('id', user.id)
+            .single();
+          if (roleData?.role === 'admin') {
+            targetId = viewId;
+            setIsAdminView(true);
+          }
+          // Non-admin with ?view= param — silently ignored, falls through to their own data
         }
-        // Non-admin with ?view= param — silently ignored, falls through to their own data
+
+        const { data } = await supabase
+          .from('client_stats')
+          .select('firm_name, logo_url, client_name, emails_sent, replies, reply_rate, meetings_booked, campaign_status')
+          .eq('client_id', targetId)
+          .single();
+
+        setProfile(data);
+      } catch {
+        // Network or Supabase error — profile stays null, dashboard renders gracefully.
       }
-
-      const { data } = await supabase
-        .from('client_stats')
-        .select('firm_name, logo_url, client_name, emails_sent, replies, reply_rate, meetings_booked, campaign_status')
-        .eq('client_id', targetId)
-        .single();
-
-      setProfile(data);
       setLoading(false);
     }
     load();
@@ -697,7 +701,7 @@ export default function ClientPage() {
               <div className="cd-metric-card">
                 <div className="cd-metric-label">Reply Rate</div>
                 <div className="cd-metric-value">
-                  {periodStats?.reply_rate != null ? `${periodStats.reply_rate}%` : '—'}
+                  {periodStats?.reply_rate != null ? `${Number(periodStats.reply_rate).toFixed(1)}%` : '—'}
                 </div>
                 <div className="cd-metric-period">{PERIOD_LABEL[period]}</div>
               </div>
