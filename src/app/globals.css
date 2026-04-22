@@ -744,6 +744,7 @@ footer.zs-footer { padding: 40px 0; border-top: 1px solid var(--zs-border); }
   .h-panel-dark { height: 420px; }
   .hero .reveal { transition-duration: 500ms; }
   .hero .reveal.d3 { transition-delay: 0ms; }
+  .hero .reveal-blur.d3 { transition-delay: 0ms; }  /* lead paragraph — uses reveal-blur, not reveal */
   .hero .reveal.d4 { transition-delay: 80ms; }
   .hero .reveal.d5 { transition-delay: 160ms; }
   .hero-visual { margin-top: 60px; overflow: hidden; }
