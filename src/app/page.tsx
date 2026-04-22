@@ -256,7 +256,7 @@ function Hero({ onBook }: { onBook: () => void }) {
                 <span className="h-panel-title">
                   <span className="live" />This week · booked by AI
                 </span>
-                <span style={{ font: '500 11px var(--zs-mono)', color: 'var(--zs-ink-5)', letterSpacing: '0.1em' }}>4 QUALIFIED</span>
+                <span className="h-panel-count" style={{ font: '500 11px var(--zs-mono)', color: 'var(--zs-ink-5)', letterSpacing: '0.1em' }}>4 QUALIFIED</span>
               </div>
               <div className="h-panel-body" style={{ padding: '4px 22px 22px' }}>
                 {meetings.map((m, i) => (

@@ -756,6 +756,7 @@ footer.zs-footer { padding: 40px 0; border-top: 1px solid var(--zs-border); }
   .hero .reveal.d5 { transition-delay: 160ms; }
   .hero-visual { margin-top: 60px; overflow: hidden; }
   .visual-grid { grid-template-columns: 1fr; gap: 16px; }
+  .h-panel-count { display: none; } /* title fits cleanly on one line without it; pills already say Qualified */
   .hero-badge-1 { display: none; }
   .hero-badge-2 { display: none; }
 
