@@ -949,7 +949,7 @@ footer.zs-footer { padding: 40px 0; border-top: 1px solid var(--zs-border); }
 .adm-revenue-val--total   { font: 700 15px var(--zs-sans); color: var(--zs-ink); letter-spacing: -0.03em; }
 
 /* Milestone progress */
-.adm-milestone { margin-top: 20px; padding-top: 16px; border-top: 1px solid var(--zs-border-soft); }
+.adm-milestone { margin-top: 12px; padding-top: 12px; border-top: 1px solid var(--zs-border-soft); }
 .adm-milestone-labels { display: flex; align-items: center; justify-content: space-between; margin-bottom: 10px; }
 .adm-milestone-tag { font: 500 11px var(--zs-mono); text-transform: uppercase; letter-spacing: 0.1em; color: var(--zs-ink-5); }
 .adm-milestone-target { font: 600 13px var(--zs-sans); color: var(--zs-ink); letter-spacing: -0.01em; }
