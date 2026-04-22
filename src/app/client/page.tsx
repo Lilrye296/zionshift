@@ -87,8 +87,8 @@ function MiniCalendar({
       <div className="mini-cal-grid">
         {DOW.map((d, i) => <div key={i} className="mini-cal-dow">{d}</div>)}
         {cells.map((day, i) => {
-          // Empty cells — plain div, no class, no background
-          if (day === null) return <div key={i} />;
+          // Empty cells — mini-cal-day + empty applies pointer-events:none from CSS
+          if (day === null) return <div key={i} className="mini-cal-day empty" />;
           const hasMeeting  = meetingDays.includes(day);
           const isSelected  = day === selectedDay && displayMonth === selectedMonth;
           return (
@@ -120,15 +120,14 @@ interface CalMeeting {
   prospect: string;
   firm: string;
   time: string;
-  status: string;
   zoomUrl?: string;
 }
 
 const CAL_MEETINGS: CalMeeting[] = [
-  { day: 11, month: 3, prospect: 'James Rivera',    firm: 'Apex Financial Services',   time: '10:00 AM EST', status: 'Completed' },
-  { day: 17, month: 3, prospect: 'Sarah Mitchell',  firm: 'Clarity Point Bookkeeping', time: '2:00 PM EST',  status: 'Completed' },
-  { day: 23, month: 3, prospect: 'Marcus Thompson', firm: 'Northstar CFO Group',        time: '9:00 AM EST',  status: 'Scheduled', zoomUrl: 'https://zoom.us/j/placeholder' },
-  { day: 23, month: 3, prospect: 'Linda Park',      firm: 'Summit Tax Advisors',        time: '2:00 PM EST',  status: 'Scheduled', zoomUrl: 'https://zoom.us/j/placeholder2' },
+  { day: 11, month: 3, prospect: 'James Rivera',    firm: 'Apex Financial Services',   time: '10:00 AM EST' },
+  { day: 17, month: 3, prospect: 'Sarah Mitchell',  firm: 'Clarity Point Bookkeeping', time: '2:00 PM EST'  },
+  { day: 23, month: 3, prospect: 'Marcus Thompson', firm: 'Northstar CFO Group',        time: '9:00 AM EST',  zoomUrl: 'https://zoom.us/j/placeholder'  },
+  { day: 23, month: 3, prospect: 'Linda Park',      firm: 'Summit Tax Advisors',        time: '2:00 PM EST',  zoomUrl: 'https://zoom.us/j/placeholder2' },
 ];
 
 // Activity items tagged with day number for period filtering
@@ -833,7 +832,7 @@ export default function ClientPage() {
             })()}
 
             {/* ── Calendar Sync ── */}
-            <div className="cd-card cd-cal-sync">
+            <div className="cd-card">
               <div className="cd-cal-sync-top">
                 <div>
                   <div className="cd-cal-sync-title">Sync to your calendar</div>
