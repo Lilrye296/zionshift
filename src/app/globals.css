@@ -1033,7 +1033,6 @@ footer.zs-footer { padding: 40px 0; border-top: 1px solid var(--zs-border); }
 .adm-meet-pill { font: 600 11px var(--zs-sans); border-radius: 999px; padding: 3px 10px; white-space: nowrap; display: inline-block; }
 .adm-meet-pill--upcoming  { background: #eff6ff; color: #2563eb; border: 1px solid #bfdbfe; }
 .adm-meet-pill--completed { background: #f0fdf4; color: #16a34a; border: 1px solid #bbf7d0; }
-.adm-meet-pill--no-show   { background: #fff1f2; color: #dc2626; border: 1px solid #fecaca; }
 
 /* Meeting log (right card) */
 .adm-meet-log { overflow-y: auto; overflow-x: hidden; flex: 1; scrollbar-width: thin; scrollbar-color: var(--zs-line) transparent; }

@@ -256,8 +256,13 @@ const ACTIVITY_FEED: ActivityItem[] = [
   { id: 5, text: 'Setup fee received — Sarah Mitchell ($1,000)',   time: 'Apr 11', type: 'mrr'     },
 ];
 
-// TODO (Calendly): replace with live webhook data from Supabase meetings table.
-// Each booking from Calendly fires a webhook → Supabase insert → this list updates.
+// TODO (Calendly → Supabase): when wired, remove PROSPECT_MEETINGS_SEED and replace the
+// useState initializer below with an empty array []. Then uncomment the useEffect fetch.
+// Supabase table shape (meetings):
+//   id uuid PK, prospect text, firm text, date text, day int2, month int2, year int4,
+//   time text, zoom_url text, status text CHECK status IN ('upcoming','completed')
+// Calendly webhook fires POST → Supabase Edge Function → INSERT into meetings.
+// Completed status flipped automatically by a cron job comparing meeting datetime to now().
 interface ProspectMeeting {
   id: number;
   prospect: string;
@@ -268,15 +273,16 @@ interface ProspectMeeting {
   year: number;       // e.g. 2026
   time: string;       // e.g. "10:00 AM"
   zoomUrl: string;
-  status: 'upcoming' | 'completed' | 'no-show';
+  status: 'upcoming' | 'completed';
 }
 
-const PROSPECT_MEETINGS: ProspectMeeting[] = [
-  { id: 1, prospect: 'Carter Flynn',   firm: 'Flynn Financial',        date: 'Apr 24, 2026', day: 24, month: 3, year: 2026, time: '10:00 AM', zoomUrl: 'https://zoom.us/j/placeholder', status: 'upcoming'  },
-  { id: 2, prospect: 'James Okafor',   firm: 'OFC Group',              date: 'Apr 22, 2026', day: 22, month: 3, year: 2026, time: '2:00 PM',  zoomUrl: 'https://zoom.us/j/placeholder', status: 'upcoming'  },
-  { id: 3, prospect: 'Beth Navarro',   firm: 'Navarro Wealth Mgmt',    date: 'Apr 17, 2026', day: 17, month: 3, year: 2026, time: '11:00 AM', zoomUrl: 'https://zoom.us/j/placeholder', status: 'completed' },
-  { id: 4, prospect: 'Marcus Webb',    firm: 'Webb Capital Partners',  date: 'Apr 14, 2026', day: 14, month: 3, year: 2026, time: '3:00 PM',  zoomUrl: 'https://zoom.us/j/placeholder', status: 'completed' },
-  { id: 5, prospect: 'Diana Solis',    firm: 'Solis Wealth Management',date: 'Apr 10, 2026', day: 10, month: 3, year: 2026, time: '9:00 AM',  zoomUrl: 'https://zoom.us/j/placeholder', status: 'no-show'   },
+// Seed data — swap for Supabase fetch when ready (see TODO above)
+const PROSPECT_MEETINGS_SEED: ProspectMeeting[] = [
+  { id: 1, prospect: 'Carter Flynn',   firm: 'Flynn Financial',         date: 'Apr 24, 2026', day: 24, month: 3, year: 2026, time: '10:00 AM', zoomUrl: 'https://zoom.us/j/placeholder', status: 'upcoming'  },
+  { id: 2, prospect: 'James Okafor',   firm: 'OFC Group',               date: 'Apr 22, 2026', day: 22, month: 3, year: 2026, time: '2:00 PM',  zoomUrl: 'https://zoom.us/j/placeholder', status: 'upcoming'  },
+  { id: 3, prospect: 'Beth Navarro',   firm: 'Navarro Wealth Mgmt',     date: 'Apr 17, 2026', day: 17, month: 3, year: 2026, time: '11:00 AM', zoomUrl: 'https://zoom.us/j/placeholder', status: 'completed' },
+  { id: 4, prospect: 'Marcus Webb',    firm: 'Webb Capital Partners',   date: 'Apr 14, 2026', day: 14, month: 3, year: 2026, time: '3:00 PM',  zoomUrl: 'https://zoom.us/j/placeholder', status: 'completed' },
+  { id: 5, prospect: 'Diana Solis',    firm: 'Solis Wealth Management', date: 'Apr 10, 2026', day: 10, month: 3, year: 2026, time: '9:00 AM',  zoomUrl: 'https://zoom.us/j/placeholder', status: 'completed' },
 ];
 
 // Milestone ladder — defined outside component so it isn't re-created on every render
@@ -304,6 +310,9 @@ export default function AdminPage() {
   const [calModal, setCalModal]               = useState<CalProvider | null>(null);
   const [calMonth, setCalMonth]               = useState(() => new Date().getMonth());
   const [calYear, setCalYear]                 = useState(() => new Date().getFullYear());
+  // Meetings — seeded from static data; swap for Supabase fetch when ready.
+  // TODO (Supabase): change initializer to [] and uncomment the useEffect below.
+  const [meetings, setMeetings]               = useState<ProspectMeeting[]>(PROSPECT_MEETINGS_SEED);
   // TODO (Supabase + Smartlead): replace null with real aggregated stats per period.
   // Query Supabase view that sums Smartlead campaign stats across all active clients.
   const [periodStats, setPeriodStats]     = useState<AdminPeriodStats | null>(null);
@@ -329,6 +338,14 @@ export default function AdminPage() {
     // const { data } = await supabase.from('admin_period_stats').select('*').eq('period', metricPeriod).single();
     // setPeriodStats(data);
   }, [metricPeriod]);
+
+  // TODO (Supabase): uncomment to load live meetings from Supabase.
+  // Remove PROSPECT_MEETINGS_SEED initializer above and use [] instead.
+  // useEffect(() => {
+  //   const supabase = createClient();
+  //   supabase.from('meetings').select('*').order('year').order('month').order('day')
+  //     .then(({ data }) => { if (data) setMeetings(data as ProspectMeeting[]); });
+  // }, []);
 
   async function handleSignOut() {
     if (process.env.NEXT_PUBLIC_SUPABASE_URL && process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY) {
@@ -419,7 +436,7 @@ export default function AdminPage() {
           const daysInMonth = new Date(calYear, calMonth + 1, 0).getDate();
           // Only show meeting dots for meetings in the displayed month/year
           const meetingDays = new Set(
-            PROSPECT_MEETINGS
+            meetings
               .filter(m => m.month === calMonth && m.year === calYear)
               .map(m => m.day)
           );
@@ -429,7 +446,7 @@ export default function AdminPage() {
           for (let d = 1; d <= daysInMonth; d++) cells.push(d);
           while (cells.length % 7 !== 0) cells.push(null);
 
-          const upcoming = PROSPECT_MEETINGS.filter(m => m.status === 'upcoming');
+          const upcoming = meetings.filter(m => m.status === 'upcoming');
 
           function prevMonth() {
             if (calMonth === 0) { setCalMonth(11); setCalYear(y => y - 1); }
@@ -455,13 +472,8 @@ export default function AdminPage() {
                   </div>
                   <div className="adm-meet-stat-divider" />
                   <div className="adm-meet-stat">
-                    <span className="adm-meet-stat-val">{PROSPECT_MEETINGS.filter(m => m.status === 'completed').length}</span>
+                    <span className="adm-meet-stat-val">{meetings.filter(m => m.status === 'completed').length}</span>
                     <span className="adm-meet-stat-label">Completed</span>
-                  </div>
-                  <div className="adm-meet-stat-divider" />
-                  <div className="adm-meet-stat">
-                    <span className="adm-meet-stat-val">{PROSPECT_MEETINGS.filter(m => m.status === 'no-show').length}</span>
-                    <span className="adm-meet-stat-label">No-show</span>
                   </div>
                 </div>
               </div>
@@ -499,7 +511,7 @@ export default function AdminPage() {
                           key={i}
                           disabled={!hasMeet}
                           onClick={() => {
-                            const m = PROSPECT_MEETINGS.find(x => x.day === d && x.month === calMonth && x.year === calYear);
+                            const m = meetings.find(x => x.day === d && x.month === calMonth && x.year === calYear);
                             setSelectedMeeting(prev => prev?.id === m?.id ? null : (m ?? null));
                           }}
                           className={[
@@ -525,8 +537,7 @@ export default function AdminPage() {
                           <div className="adm-meet-detail-firm">{selectedMeeting.firm}</div>
                         </div>
                         <span className={`adm-meet-pill adm-meet-pill--${selectedMeeting.status}`}>
-                          {selectedMeeting.status === 'upcoming'  ? 'Upcoming'  :
-                           selectedMeeting.status === 'completed' ? 'Completed' : 'No-show'}
+                          {selectedMeeting.status === 'upcoming' ? 'Upcoming' : 'Completed'}
                         </span>
                       </div>
                       <div className="adm-meet-detail-row">
@@ -549,11 +560,13 @@ export default function AdminPage() {
                   <div style={{ padding: '24px 24px 0' }}>
                     <div className="adm-biz-card-head">
                       <span className="adm-biz-card-title">All Meetings</span>
-                      <span className="adm-count-chip">{PROSPECT_MEETINGS.length} Total</span>
+                      <span className="adm-count-chip">{meetings.length} Total</span>
                     </div>
                   </div>
                   <div className="adm-meet-log">
-                    {PROSPECT_MEETINGS.map((m, i) => (
+                    {meetings.length === 0 ? (
+                      <p className="adm-empty-text" style={{ padding: '24px' }}>No meetings yet. Calendly bookings will appear here automatically.</p>
+                    ) : meetings.map((m, i) => (
                       <Fragment key={m.id}>
                         {i > 0 && <div className="adm-divider" style={{ margin: '0 24px' }} />}
                         <div
@@ -571,8 +584,7 @@ export default function AdminPage() {
                             <span className="adm-meet-row-date">{m.date}</span>
                             <span className="adm-meet-row-time">{m.time}</span>
                             <span className={`adm-meet-pill adm-meet-pill--${m.status}`}>
-                              {m.status === 'upcoming'  ? 'Upcoming'  :
-                               m.status === 'completed' ? 'Completed' : 'No-show'}
+                              {m.status === 'upcoming' ? 'Upcoming' : 'Completed'}
                             </span>
                           </div>
                         </div>
@@ -584,6 +596,12 @@ export default function AdminPage() {
               </div>
 
               {/* Calendar sync — matches client dashboard */}
+              {/* TODO (OAuth): wire each provider button to its OAuth flow.
+                  Google  → /api/auth/google-calendar   (scope: calendar.events.readonly)
+                  Outlook → /api/auth/outlook-calendar  (scope: Calendars.Read)
+                  Apple   → App-Specific Password prompt (CalDAV)
+                  On success, store provider token in Supabase user_integrations table.
+                  connectedCal state drives the UI — swap setConnectedCal(p) for the real token check. */}
               <div className="cd-card cd-cal-sync" style={{ marginTop: 20 }}>
                 <div className="cd-cal-sync-top">
                   <div>
