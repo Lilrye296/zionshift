@@ -138,7 +138,7 @@ interface ActiveClient {
 }
 
 interface ActivityItem {
-  id: number;
+  id: string;         // uuid from Supabase (seed data uses string ids to match)
   text: string;
   time: string;
   type: 'onboard' | 'churn' | 'milestone' | 'meeting' | 'mrr';
@@ -171,11 +171,11 @@ const ALL_CLIENTS: ActiveClient[] = [
 // TODO (Supabase): replace ACTIVITY_FEED with a live fetch from the business_events table.
 // Events written by: onboarding webhook (onboard), Stripe webhook (mrr, churn), Calendly webhook (meeting).
 const ACTIVITY_FEED: ActivityItem[] = [
-  { id: 1, text: 'James Okafor onboarded — campaign going live',  time: 'Apr 20', type: 'onboard' },
-  { id: 2, text: 'Setup fee received — James Okafor ($1,000)',     time: 'Apr 20', type: 'mrr'     },
-  { id: 3, text: 'Meeting booked via Calendly — prospect TBD',     time: 'Apr 18', type: 'meeting' },
-  { id: 4, text: 'Sarah Mitchell onboarded — campaign going live', time: 'Apr 11', type: 'onboard' },
-  { id: 5, text: 'Setup fee received — Sarah Mitchell ($1,000)',   time: 'Apr 11', type: 'mrr'     },
+  { id: '1', text: 'James Okafor onboarded — campaign going live',  time: 'Apr 20', type: 'onboard' },
+  { id: '2', text: 'Setup fee received — James Okafor ($1,000)',     time: 'Apr 20', type: 'mrr'     },
+  { id: '3', text: 'Meeting booked via Calendly — prospect TBD',     time: 'Apr 18', type: 'meeting' },
+  { id: '4', text: 'Sarah Mitchell onboarded — campaign going live', time: 'Apr 11', type: 'onboard' },
+  { id: '5', text: 'Setup fee received — Sarah Mitchell ($1,000)',   time: 'Apr 11', type: 'mrr'     },
 ];
 
 // TODO (Calendly → Supabase): when wired, remove PROSPECT_MEETINGS_SEED and replace the

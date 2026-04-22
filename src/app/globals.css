@@ -543,8 +543,6 @@ body { font-family: var(--zs-sans); color: var(--zs-ink-2); overflow-x: hidden; 
 .cd-status-badge.error   .cd-status-dot { background: #dc2626; animation: pulse 0.8s ease-in-out infinite; }
 @keyframes pulse { 0%,100% { opacity: 1; } 50% { opacity: 0.4; } }
 .cd-status-preview { display: flex; flex-wrap: wrap; gap: 10px; margin-bottom: 24px; }
-.cd-period { font: 500 13px var(--zs-sans); color: var(--zs-ink-4); background: #fff; border: 1px solid var(--zs-border); border-radius: 999px; padding: 5px 14px; }
-
 .cd-period-dropdown { position: relative; }
 .cd-period-btn { display: flex; align-items: center; gap: 6px; font: 500 13px var(--zs-sans); color: var(--zs-ink-4); background: #fff; border: 1px solid var(--zs-border); border-radius: 999px; padding: 5px 14px; cursor: pointer; transition: color 160ms, border-color 160ms; }
 .cd-period-btn:hover { color: var(--zs-ink); border-color: var(--zs-ink-3); }
@@ -619,7 +617,7 @@ body { font-family: var(--zs-sans); color: var(--zs-ink-2); overflow-x: hidden; 
 
 .cd-cal-sync-top { margin-bottom: 18px; }
 .cd-cal-sync-title { font: 600 16px var(--zs-sans); letter-spacing: -0.02em; color: var(--zs-ink); margin-bottom: 4px; }
-.cd-cal-sync-sub { font: 400 13px var(--zs-sans); color: var(--zs-ink-4); white-space: nowrap; }
+.cd-cal-sync-sub { font: 400 13px var(--zs-sans); color: var(--zs-ink-4); }
 .cd-cal-options { display: grid; grid-template-columns: repeat(3,1fr); gap: 14px; }
 .cd-cal-option { border: 1px solid var(--zs-border); border-radius: 14px; padding: 18px 16px; display: flex; flex-direction: column; align-items: center; gap: 8px; }
 .cd-cal-option-btn { cursor: pointer; transition: border-color 160ms, background 160ms; }
@@ -969,6 +967,7 @@ footer.zs-footer { padding: 40px 0; border-top: 1px solid var(--zs-border); }
 .adm-meet-row-time { font: 500 11px var(--zs-sans); color: var(--zs-ink-3); white-space: nowrap; text-align: right; }
 
 @media (max-width: 900px) {
+  .portal-metrics { grid-template-columns: repeat(2,1fr); }
   .adm-meet-grid { grid-template-columns: 1fr; }
   .adm-meetings-stats { gap: 12px; }
   .adm-biz-grid { grid-template-columns: 1fr; }
