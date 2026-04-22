@@ -442,6 +442,11 @@ interface BillingData {
 
 const PERIOD_LABEL = { week: 'This Week', month: 'This Month', alltime: 'All Time' };
 
+// Pre-sorted once at module level — descending by month, day, then time
+const SORTED_MEETINGS = [...CAL_MEETINGS].sort(
+  (a, b) => b.month - a.month || b.day - a.day || parseTime(b.time) - parseTime(a.time),
+);
+
 function getStatusProps(status: string | null) {
   switch (status) {
     case 'warming': return { label: 'Warming Up',   variant: 'warming' };
@@ -732,7 +737,6 @@ export default function ClientPage() {
                 if (period === 'week') return a.day >= today - 7;
                 return true;
               });
-              const sortedMeetings = [...CAL_MEETINGS].sort((a, b) => b.month - a.month || b.day - a.day || parseTime(b.time) - parseTime(a.time));
               return (
                 <>
                   {/* Calendar (left) + All Meetings (right) */}
@@ -792,7 +796,7 @@ export default function ClientPage() {
                         <span className="adm-count-chip">{CAL_MEETINGS.length} Total</span>
                       </div>
                       <div className="cd-meet-log">
-                        {sortedMeetings.map((m, i) => {
+                        {SORTED_MEETINGS.map((m, i) => {
                           const isPast = isMeetingPast(m.day, m.time, m.month);
                           return (
                             <Fragment key={i}>
