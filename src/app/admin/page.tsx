@@ -276,8 +276,12 @@ export default function AdminPage() {
 
   async function handleSignOut() {
     if (process.env.NEXT_PUBLIC_SUPABASE_URL && process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY) {
-      const supabase = createClient();
-      await supabase.auth.signOut();
+      try {
+        const supabase = createClient();
+        await supabase.auth.signOut();
+      } catch {
+        // Ignore sign-out errors — always redirect to login regardless.
+      }
     }
     router.push('/login');
   }
@@ -406,7 +410,7 @@ export default function AdminPage() {
               <div className="adm-meet-grid">
 
                 {/* Calendar */}
-                <div className="adm-biz-card" style={{ padding: '24px' }}>
+                <div className="adm-biz-card">
                   {/* Month nav */}
                   <div className="adm-cal-nav">
                     <button className="adm-cal-nav-btn" onClick={prevMonth} aria-label="Previous month">
@@ -529,7 +533,7 @@ export default function AdminPage() {
                   Apple   → App-Specific Password prompt (CalDAV)
                   On success, store provider token in Supabase user_integrations table.
                   connectedCal state drives the UI — swap setConnectedCal(p) for the real token check. */}
-              <div className="cd-card cd-cal-sync" style={{ marginTop: 20 }}>
+              <div className="cd-card" style={{ marginTop: 20 }}>
                 <div className="cd-cal-sync-top">
                   <div>
                     <div className="cd-cal-sync-title">Sync to your calendar</div>
