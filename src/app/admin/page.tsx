@@ -157,6 +157,10 @@ const PROSPECT_MEETINGS: ProspectMeeting[] = [
   { id: 5, prospect: 'Diana Solis',    firm: 'Solis Wealth Management',date: 'Apr 10, 2026', day: 10, time: '9:00 AM',  zoomUrl: 'https://zoom.us/j/placeholder', status: 'no-show'   },
 ];
 
+// Milestone ladder — defined outside component so it isn't re-created on every render
+// $2k → $6k → $10k → then $10k increments to $100k
+const MRR_MILESTONES = [2000, 6000, 10000, 20000, 30000, 40000, 50000, 60000, 70000, 80000, 90000, 100000];
+
 const DOW_LABELS = ['S','M','T','W','T','F','S'];
 const MONTH_NAMES_FULL = ['January','February','March','April','May','June','July','August','September','October','November','December'];
 
@@ -225,7 +229,6 @@ export default function AdminPage() {
 
   // Milestone ladder: $2k → $6k → $10k → $20k → $30k → ... → $100k
   // Milestones track MRR only — setup fees never move this bar
-  const MRR_MILESTONES = [2000, 6000, 10000, 20000, 30000, 40000, 50000, 60000, 70000, 80000, 90000, 100000];
   const nextMilestone  = MRR_MILESTONES.find(m => m > totalMRR) ?? 100000;
   const prevMilestone  = MRR_MILESTONES[MRR_MILESTONES.indexOf(nextMilestone) - 1] ?? 0;
   // Progress is relative between the previous and next milestone (not from zero)
@@ -234,6 +237,16 @@ export default function AdminPage() {
 
   // "X Total" pill: live + paused only (cancelled excluded — they're not current clients)
   const activeClientCount = ALL_CLIENTS.filter(c => c.status !== 'cancelled').length;
+
+  // Reply Rate = (total_replies / emails_sent) × 100, shown as a percentage
+  // TODO (Supabase + Smartlead): derived from periodStats once wired — shows '—' until then
+  const replyRate: string = (
+    periodStats?.emails_sent != null &&
+    periodStats.emails_sent > 0 &&
+    periodStats?.total_replies != null
+  )
+    ? `${((periodStats.total_replies / periodStats.emails_sent) * 100).toFixed(1)}%`
+    : '—';
 
   const flaggedCount = replyLog.filter(r => r.flagged).length;
 
@@ -595,7 +608,7 @@ export default function AdminPage() {
           <div>
             {/* Heading + period toggle — uses same cd-period-* classes as client dashboard */}
             <div className="adm-biz-toprow">
-              <h2 className="portal-heading" style={{ margin: 0 }}>Business Overview</h2>
+              <h2 className="portal-heading" style={{ margin: 0 }}>Overview</h2>
               <div className="cd-period-dropdown" ref={periodRef}>
                 <button className="cd-period-btn" onClick={() => setPeriodOpen(o => !o)}>
                   {PERIOD_LABEL[metricPeriod]}
@@ -638,8 +651,8 @@ export default function AdminPage() {
                 <div className="adm-metric-period">{PERIOD_LABEL[metricPeriod]}</div>
               </div>
               <div className="portal-metric-card">
-                <div className="portal-metric-label">Meetings Booked</div>
-                <div className="portal-metric-value">{periodStats?.meetings_booked ?? '—'}</div>
+                <div className="portal-metric-label">Reply Rate</div>
+                <div className="portal-metric-value">{replyRate}</div>
                 <div className="adm-metric-period">{PERIOD_LABEL[metricPeriod]}</div>
               </div>
             </div>
@@ -667,6 +680,10 @@ export default function AdminPage() {
                           <div className="adm-client-info">
                             <span className="adm-client-name">{c.name}</span>
                             <span className="adm-client-firm">{c.firm} · since {c.since}</span>
+                            {/* Shown while client is within first billing cycle — clears when firstMonthPaid flips true via Stripe webhook */}
+                            {!c.firstMonthPaid && c.status === 'live' && (
+                              <span className="adm-billing-pending">Billing pending</span>
+                            )}
                           </div>
                           <div className="adm-client-right">
                             <span className={`adm-client-pill adm-client-pill--${c.status}`}>
@@ -705,6 +722,13 @@ export default function AdminPage() {
                     <div className="adm-revenue-row">
                       <span className="adm-revenue-label">Setup Fees (all-time)</span>
                       <span className="adm-revenue-val">${setupFees.toLocaleString()}</span>
+                    </div>
+                    <div className="adm-divider" />
+                    {/* TODO (Supabase + Stripe): totalMRR sums only firstMonthPaid clients; setupFees sums all setupFeePaid clients × $1k.
+                        Total Collected = all cleared payments to date. */}
+                    <div className="adm-revenue-row adm-revenue-row--total">
+                      <span className="adm-revenue-label adm-revenue-label--total">Total Collected</span>
+                      <span className="adm-revenue-val adm-revenue-val--total">${(totalMRR + setupFees).toLocaleString()}</span>
                     </div>
                   </div>
 

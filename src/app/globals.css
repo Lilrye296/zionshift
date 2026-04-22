@@ -925,6 +925,7 @@ footer.zs-footer { padding: 40px 0; border-top: 1px solid var(--zs-border); }
 .adm-client-info { flex: 1; min-width: 0; }
 .adm-client-name { font: 600 14px var(--zs-sans); color: var(--zs-ink); letter-spacing: -0.01em; display: block; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
 .adm-client-firm { font: 400 12px var(--zs-sans); color: var(--zs-ink-4); display: block; margin-top: 2px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.adm-billing-pending { font: 500 11px var(--zs-sans); color: #92600A; background: #FEF3C7; border: 1px solid #F6D860; border-radius: 999px; padding: 2px 8px; display: inline-block; margin-top: 4px; letter-spacing: 0.01em; }
 .adm-client-right { display: flex; align-items: center; gap: 8px; flex-shrink: 0; }
 .adm-view-btn { font: 500 12px var(--zs-sans); color: var(--zs-ink-3); background: none; border: 1px solid var(--zs-border); border-radius: 999px; padding: 5px 13px; cursor: pointer; transition: all 160ms; }
 .adm-view-btn:hover { border-color: var(--zs-ink); color: var(--zs-ink); }
@@ -943,6 +944,9 @@ footer.zs-footer { padding: 40px 0; border-top: 1px solid var(--zs-border); }
 .adm-revenue-row { display: flex; align-items: center; justify-content: space-between; padding: 12px 0; flex-shrink: 0; }
 .adm-revenue-label { font: 400 13px var(--zs-sans); color: var(--zs-ink-4); }
 .adm-revenue-val   { font: 600 14px var(--zs-sans); color: var(--zs-ink); letter-spacing: -0.02em; }
+.adm-revenue-row--total { margin-top: 2px; }
+.adm-revenue-label--total { font: 600 13px var(--zs-sans); color: var(--zs-ink-2); }
+.adm-revenue-val--total   { font: 700 15px var(--zs-sans); color: var(--zs-ink); letter-spacing: -0.03em; }
 
 /* Milestone progress */
 .adm-milestone { margin-top: 20px; padding-top: 16px; border-top: 1px solid var(--zs-border-soft); }
