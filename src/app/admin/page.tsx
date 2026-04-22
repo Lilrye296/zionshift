@@ -539,7 +539,8 @@ export default function AdminPage() {
                             <span className="adm-meet-row-firm">{m.firm}</span>
                           </div>
                           <div className="adm-meet-row-right">
-                            <span className="adm-meet-row-date">{m.date} · {m.time}</span>
+                            <span className="adm-meet-row-date">{m.date}</span>
+                            <span className="adm-meet-row-time">{m.time}</span>
                             <span className={`adm-meet-pill adm-meet-pill--${m.status}`}>
                               {m.status === 'upcoming'  ? 'Upcoming'  :
                                m.status === 'completed' ? 'Completed' : 'No-show'}

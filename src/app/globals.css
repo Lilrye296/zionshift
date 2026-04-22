@@ -1034,6 +1034,7 @@ footer.zs-footer { padding: 40px 0; border-top: 1px solid var(--zs-border); }
 .adm-meet-row-firm { font: 400 11px var(--zs-sans); color: var(--zs-ink-4); display: block; margin-top: 2px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
 .adm-meet-row-right { display: flex; flex-direction: column; align-items: flex-end; gap: 4px; flex-shrink: 0; max-width: 110px; }
 .adm-meet-row-date { font: 400 10px var(--zs-mono); color: var(--zs-ink-5); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; width: 100%; text-align: right; }
+.adm-meet-row-time { font: 500 11px var(--zs-sans); color: var(--zs-ink-3); white-space: nowrap; text-align: right; }
 
 /* Calendar sync tiles */
 .adm-cal-sync-row { display: grid; grid-template-columns: repeat(3,1fr); gap: 12px; }
