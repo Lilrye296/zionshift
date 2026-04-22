@@ -988,7 +988,7 @@ footer.zs-footer { padding: 40px 0; border-top: 1px solid var(--zs-border); }
 .adm-meet-stat-divider { width: 1px; height: 32px; background: var(--zs-border); }
 
 /* Two-column grid */
-.adm-meet-grid { display: grid; grid-template-columns: 360px 1fr; gap: 20px; align-items: start; }
+.adm-meet-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; align-items: start; }
 
 /* Mini calendar */
 .adm-cal-dow { display: grid; grid-template-columns: repeat(7,1fr); gap: 4px; margin-bottom: 6px; }
