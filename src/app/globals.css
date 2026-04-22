@@ -984,4 +984,14 @@ footer.zs-footer { padding: 40px 0; border-top: 1px solid var(--zs-border); }
   .adm-client-scroll,
   .adm-revenue-rows,
   .adm-activity-list { overflow-x: hidden; }
+
+  /* Client billing tab mobile fixes */
+  /* Collapse 4-column invoice row to 2-column so it fits within card width on narrow screens */
+  .bl-invoice-row { grid-template-columns: 1fr auto; row-gap: 2px; }
+  .bl-inv-date   { grid-column: 1; grid-row: 1; }
+  .bl-inv-desc   { grid-column: 1; grid-row: 2; }
+  .bl-inv-amount { grid-column: 2; grid-row: 1; text-align: right; }
+  .bl-inv-status { grid-column: 2; grid-row: 2; justify-self: end; }
+  /* Prevent any remaining overflow from creating a horizontal scroll on the page */
+  .portal-page { overflow-x: hidden; }
 }
