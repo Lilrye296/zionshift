@@ -990,8 +990,8 @@ footer.zs-footer { padding: 40px 0; border-top: 1px solid var(--zs-border); }
   .client-logo-slot { position: static; transform: none; flex: 1; justify-content: center; overflow: hidden; }
   .client-logo-img  { max-width: 100px; height: 22px; }
   .client-logo-text { font-size: 13px; }
-  /* Hide the dashed upload placeholder on mobile — too cluttered; upload via desktop */
-  .client-logo-placeholder { display: none; }
+  /* Shrink placeholder to fit between nav items on mobile — still tappable to upload */
+  .client-logo-placeholder { font-size: 10px; padding: 4px 8px; white-space: nowrap; }
 
   /* Client billing tab mobile fixes */
   /* Collapse 4-column invoice row to 2-column so it fits within card width on narrow screens */
