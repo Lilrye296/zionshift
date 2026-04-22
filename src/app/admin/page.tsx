@@ -127,7 +127,7 @@ function AdminCalModal({
 /* ── Types ─────────────────────────────────────────────────────── */
 
 interface ActiveClient {
-  id: number;
+  id: string;         // uuid from Supabase (seed data uses string ids to match)
   name: string;
   firm: string;
   status: 'live' | 'paused' | 'cancelled';
@@ -161,11 +161,11 @@ interface AdminPeriodStats {
 // Setup fees count clients where setupFeePaid === true.
 const ALL_CLIENTS: ActiveClient[] = [
   // firstMonthPaid: false — both clients are within their first 30 days, no monthly charge yet
-  { id: 1, name: 'Sarah Mitchell', firm: 'Mitchell Wealth Advisors', status: 'live', mrr: 2000, since: 'Apr 11, 2026', firstMonthPaid: false, setupFeePaid: true  },
-  { id: 2, name: 'James Okafor',   firm: 'OFC Group',                status: 'live', mrr: 2000, since: 'Apr 20, 2026', firstMonthPaid: false, setupFeePaid: true  },
+  { id: '1', name: 'Sarah Mitchell', firm: 'Mitchell Wealth Advisors', status: 'live', mrr: 2000, since: 'Apr 11, 2026', firstMonthPaid: false, setupFeePaid: true  },
+  { id: '2', name: 'James Okafor',   firm: 'OFC Group',                status: 'live', mrr: 2000, since: 'Apr 20, 2026', firstMonthPaid: false, setupFeePaid: true  },
   // Example paused/cancelled (uncomment to test UI):
-  // { id: 3, name: 'Beth Navarro',  firm: 'Navarro WM',         status: 'paused',    mrr: 2000, since: 'Mar 1, 2026',  firstMonthPaid: true,  setupFeePaid: true  },
-  // { id: 4, name: 'Carter Flynn',  firm: 'Flynn Financial',    status: 'cancelled', mrr: 0,    since: 'Feb 1, 2026',  firstMonthPaid: false, setupFeePaid: true  },
+  // { id: '3', name: 'Beth Navarro',  firm: 'Navarro WM',         status: 'paused',    mrr: 2000, since: 'Mar 1, 2026',  firstMonthPaid: true,  setupFeePaid: true  },
+  // { id: '4', name: 'Carter Flynn',  firm: 'Flynn Financial',    status: 'cancelled', mrr: 0,    since: 'Feb 1, 2026',  firstMonthPaid: false, setupFeePaid: true  },
 ];
 
 // TODO (Supabase): replace ACTIVITY_FEED with a live fetch from the business_events table.
@@ -436,6 +436,8 @@ export default function AdminPage() {
                           key={i}
                           disabled={!hasMeet}
                           onClick={() => {
+                            // TODO: if two meetings land on the same day, find() surfaces only the first.
+                            // When real Calendly data arrives, consider a multi-meeting day modal.
                             const m = meetings.find(x => x.day === d && x.month === calMonth && x.year === calYear);
                             setSelectedMeeting(prev => prev?.id === m?.id ? null : (m ?? null));
                           }}
