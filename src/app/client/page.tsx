@@ -109,8 +109,8 @@ function MeetingDetailModal({ meetings, onClose }: { meetings: CalMeeting[]; onC
                 <div className="mdm-row">
                   <span className="mdm-icon">📹</span>
                   {meeting.zoomUrl ? (
-                    <a href={meeting.zoomUrl} target="_blank" rel="noopener noreferrer" className="mdm-zoom-link">
-                      Join Zoom Call →
+                    <a href={meeting.zoomUrl} target="_blank" rel="noopener noreferrer" className="mdm-zoom-btn">
+                      Join Zoom →
                     </a>
                   ) : (
                     <span className="mdm-zoom-pending">Zoom link will appear here</span>

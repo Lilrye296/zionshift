@@ -602,6 +602,8 @@ body { font-family: var(--zs-sans); color: var(--zs-ink-2); overflow-x: hidden; 
 .mdm-icon { font-size: 16px; width: 20px; text-align: center; flex-shrink: 0; }
 .mdm-zoom-link { font: 500 14px var(--zs-sans); color: #2563eb; text-decoration: none; border-bottom: 1px solid #bfdbfe; transition: color 160ms, border-color 160ms; }
 .mdm-zoom-link:hover { color: #1d4ed8; border-color: #1d4ed8; }
+.mdm-zoom-btn { display: inline-flex; align-items: center; font: 600 13px var(--zs-sans); color: #fff; background: #2D8CFF; border-radius: 999px; padding: 8px 18px; text-decoration: none; transition: background 160ms; }
+.mdm-zoom-btn:hover { background: #1a7aef; }
 .mdm-zoom-pending { font: 400 13px var(--zs-sans); color: var(--zs-ink-5); font-style: italic; }
 
 .cd-table-scroll { max-height: 260px; overflow-y: auto; padding-right: 4px; }
