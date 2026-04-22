@@ -647,7 +647,7 @@ export default function AdminPage() {
                 {ALL_CLIENTS.length === 0 ? (
                   <p className="adm-empty-text">No clients yet.</p>
                 ) : (
-                  <div className="adm-client-scroll">
+                  <div className="adm-client-scroll" style={ALL_CLIENTS.length <= 4 ? { maxHeight: 'none', overflowY: 'visible' } : {}}>
                     {ALL_CLIENTS.map((c, i) => (
                       <Fragment key={c.id}>
                         {i > 0 && <div className="adm-divider" />}
