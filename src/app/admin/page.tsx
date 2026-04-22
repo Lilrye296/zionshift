@@ -1,6 +1,6 @@
 'use client';
 
-import { Fragment, useState } from 'react';
+import { Fragment, useEffect, useRef, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { createClient } from '@/utils/supabase/client';
 
@@ -57,6 +57,15 @@ interface ActivityItem {
   text: string;
   time: string;
   type: 'onboard' | 'churn' | 'milestone' | 'meeting' | 'mrr';
+}
+
+// Period-scoped metrics — populated from Supabase when wired up.
+// TODO (Supabase): fetch from an aggregated view that sums across all active clients
+//   for the selected period. Shape mirrors Smartlead campaign stats.
+interface AdminPeriodStats {
+  emails_sent:     number | null;
+  total_replies:   number | null;
+  meetings_booked: number | null;
 }
 
 /* ── Static placeholder data ────────────────────────────────────── */
@@ -126,11 +135,35 @@ type MetricPeriod = 'week' | 'month' | 'alltime';
 const PERIOD_LABEL: Record<MetricPeriod, string> = { week: 'This Week', month: 'This Month', alltime: 'All Time' };
 
 export default function AdminPage() {
-  const [activeTab, setActiveTab]       = useState<Tab>('Business');
-  const [replyLog, setReplyLog]         = useState<ReplyLog[]>(REPLY_LOG);
-  const [metricPeriod, setMetricPeriod] = useState<MetricPeriod>('alltime');
-  const [periodOpen, setPeriodOpen]     = useState(false);
+  const [activeTab, setActiveTab]         = useState<Tab>('Business');
+  const [replyLog, setReplyLog]           = useState<ReplyLog[]>(REPLY_LOG);
+  const [metricPeriod, setMetricPeriod]   = useState<MetricPeriod>('alltime');
+  const [periodOpen, setPeriodOpen]       = useState(false);
+  // TODO (Supabase + Smartlead): replace null with real aggregated stats per period.
+  // Query Supabase view that sums Smartlead campaign stats across all active clients.
+  const [periodStats, setPeriodStats]     = useState<AdminPeriodStats | null>(null);
+  const periodRef                         = useRef<HTMLDivElement>(null);
   const router = useRouter();
+
+  // Close period dropdown on outside click
+  useEffect(() => {
+    function handleClick(e: MouseEvent) {
+      if (periodRef.current && !periodRef.current.contains(e.target as Node)) {
+        setPeriodOpen(false);
+      }
+    }
+    document.addEventListener('mousedown', handleClick);
+    return () => document.removeEventListener('mousedown', handleClick);
+  }, []);
+
+  // TODO (Supabase): when wired, fire a period-filtered query here.
+  // For now mirrors null (shows —) until Supabase is connected.
+  useEffect(() => {
+    setPeriodStats(null);
+    // Example future query:
+    // const { data } = await supabase.from('admin_period_stats').select('*').eq('period', metricPeriod).single();
+    // setPeriodStats(data);
+  }, [metricPeriod]);
 
   async function handleSignOut() {
     if (process.env.NEXT_PUBLIC_SUPABASE_URL && process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY) {
@@ -144,12 +177,14 @@ export default function AdminPage() {
     setReplyLog(log => log.map(r => r.id === id ? { ...r, flagged: !r.flagged } : r));
   }
 
-  const flaggedCount  = replyLog.filter(r => r.flagged).length;
+  // TODO (Supabase): replace ALL_CLIENTS with a live fetch from the clients table.
+  // ALL_CLIENTS is placeholder data — swap for: supabase.from('clients').select('*')
   const liveClients   = ALL_CLIENTS.filter(c => c.status === 'live');
   const totalMRR      = liveClients.reduce((s, c) => s + c.mrr, 0);
-  const setupFees     = ALL_CLIENTS.length * 1000; // $1k setup per client
+  const setupFees     = ALL_CLIENTS.filter(c => c.status !== 'cancelled').length * 1000;
   const nextMilestone = totalMRR < 5000 ? 5000 : totalMRR < 10000 ? 10000 : 20000;
   const mrrProgress   = Math.min(Math.round((totalMRR / nextMilestone) * 100), 100);
+  const flaggedCount  = replyLog.filter(r => r.flagged).length;
 
   return (
     <div className="portal-page">
@@ -335,19 +370,22 @@ export default function AdminPage() {
         {/* ══ BUSINESS ════════════════════════════════════════════ */}
         {activeTab === 'Business' && (
           <div>
-            {/* Heading + period toggle */}
+            {/* Heading + period toggle — uses same cd-period-* classes as client dashboard */}
             <div className="adm-biz-toprow">
               <h2 className="portal-heading" style={{ margin: 0 }}>Business Overview</h2>
-              <div className="adm-period-wrap">
-                <button className="adm-period-btn" onClick={() => setPeriodOpen(o => !o)}>
-                  {PERIOD_LABEL[metricPeriod]} <span className="adm-period-caret">▾</span>
+              <div className="cd-period-dropdown" ref={periodRef}>
+                <button className="cd-period-btn" onClick={() => setPeriodOpen(o => !o)}>
+                  {PERIOD_LABEL[metricPeriod]}
+                  <svg width="10" height="10" viewBox="0 0 10 10" fill="none" aria-hidden>
+                    <path d="M2 3.5L5 6.5L8 3.5" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
+                  </svg>
                 </button>
                 {periodOpen && (
-                  <div className="adm-period-dropdown">
+                  <div className="cd-period-menu">
                     {(['week', 'month', 'alltime'] as MetricPeriod[]).map(p => (
                       <button
                         key={p}
-                        className={`adm-period-option${metricPeriod === p ? ' active' : ''}`}
+                        className={`cd-period-option${metricPeriod === p ? ' active' : ''}`}
                         onClick={() => { setMetricPeriod(p); setPeriodOpen(false); }}
                       >
                         {PERIOD_LABEL[p]}
@@ -358,37 +396,39 @@ export default function AdminPage() {
               </div>
             </div>
 
-            {/* Metric cards */}
+            {/* Metric cards — MRR is always current; others are period-scoped */}
+            {/* TODO (Supabase): periodStats populated from admin_period_stats view */}
             <div className="portal-metrics" style={{ margin: '24px 0 28px' }}>
               <div className="portal-metric-card">
                 <div className="portal-metric-label">MRR</div>
                 <div className="portal-metric-value">${totalMRR.toLocaleString()}</div>
+                <div className="adm-metric-period">Current</div>
               </div>
-              {[
-                { label: 'Emails Sent',     value: '—' },
-                { label: 'Total Replies',   value: '—' },
-                { label: 'Meetings Booked', value: '—' },
-              ].map((m, i) => (
-                <div key={i} className="portal-metric-card">
-                  <div className="portal-metric-label">{m.label}</div>
-                  <div className="portal-metric-value">{m.value}</div>
-                  <div className="adm-metric-period">{PERIOD_LABEL[metricPeriod]}</div>
-                </div>
-              ))}
+              <div className="portal-metric-card">
+                <div className="portal-metric-label">Emails Sent</div>
+                <div className="portal-metric-value">{periodStats?.emails_sent ?? '—'}</div>
+                <div className="adm-metric-period">{PERIOD_LABEL[metricPeriod]}</div>
+              </div>
+              <div className="portal-metric-card">
+                <div className="portal-metric-label">Total Replies</div>
+                <div className="portal-metric-value">{periodStats?.total_replies ?? '—'}</div>
+                <div className="adm-metric-period">{PERIOD_LABEL[metricPeriod]}</div>
+              </div>
+              <div className="portal-metric-card">
+                <div className="portal-metric-label">Meetings Booked</div>
+                <div className="portal-metric-value">{periodStats?.meetings_booked ?? '—'}</div>
+                <div className="adm-metric-period">{PERIOD_LABEL[metricPeriod]}</div>
+              </div>
             </div>
 
             <div className="adm-biz-grid">
 
               {/* Clients — all statuses, scrollable */}
+              {/* TODO (Supabase): replace ALL_CLIENTS with live fetch from clients table */}
               <div className="adm-biz-card">
                 <div className="adm-biz-card-head">
                   <span className="adm-biz-card-title">Clients</span>
-                  <div style={{ display: 'flex', gap: 6 }}>
-                    <span className="adm-count-chip">{liveClients.length} live</span>
-                    {ALL_CLIENTS.filter(c => c.status !== 'live').length > 0 && (
-                      <span className="adm-count-chip">{ALL_CLIENTS.filter(c => c.status !== 'live').length} inactive</span>
-                    )}
-                  </div>
+                  <span className="adm-count-chip">{ALL_CLIENTS.length} total</span>
                 </div>
                 {ALL_CLIENTS.length === 0 ? (
                   <p className="adm-empty-text">No clients yet.</p>
@@ -409,7 +449,15 @@ export default function AdminPage() {
                             <span className={`adm-client-pill adm-client-pill--${c.status}`}>
                               ●&nbsp;{c.status.charAt(0).toUpperCase() + c.status.slice(1)}
                             </span>
-                            <button className="adm-view-btn">View →</button>
+                            {/* TODO (Supabase): pass real client UUID as query param.
+                                Client page will check for ?view=<id> + admin role,
+                                then load that client's data instead of the logged-in user's. */}
+                            <button
+                              className="adm-view-btn"
+                              onClick={() => router.push(`/client?view=${c.id}`)}
+                            >
+                              View →
+                            </button>
                           </div>
                         </div>
                       </Fragment>

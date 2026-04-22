@@ -566,6 +566,7 @@ body { font-family: var(--zs-sans); color: var(--zs-ink-2); overflow-x: hidden; 
 .cd-metric-label { font: 500 11px var(--zs-mono); letter-spacing: 0.08em; text-transform: uppercase; color: var(--zs-ink-5); margin-bottom: 10px; }
 .cd-metric-value { font: 700 clamp(30px,3.5vw,44px) var(--zs-sans); letter-spacing: -0.04em; color: var(--zs-ink); line-height: 1; margin-bottom: 6px; }
 .cd-metric-sub { font: 400 12px var(--zs-sans); color: var(--zs-ink-5); }
+.cd-metric-period { font: 400 11px var(--zs-mono); color: var(--zs-ink-5); margin-top: 6px; }
 
 .cd-mid-row { display: grid; grid-template-columns: 3fr 2fr; gap: 16px; margin-bottom: 16px; }
 .cd-card { background: #fff; border: 1px solid var(--zs-border); border-radius: 18px; padding: 28px; }
@@ -895,17 +896,7 @@ footer.zs-footer { padding: 40px 0; border-top: 1px solid var(--zs-border); }
 /* Business top row */
 .adm-biz-toprow { display: flex; align-items: center; justify-content: space-between; gap: 16px; }
 
-/* Period toggle */
-.adm-period-wrap { position: relative; }
-.adm-period-btn { font: 500 13px var(--zs-sans); color: var(--zs-ink-3); background: #fff; border: 1px solid var(--zs-border); border-radius: 999px; padding: 7px 14px; cursor: pointer; transition: all 160ms; display: flex; align-items: center; gap: 6px; }
-.adm-period-btn:hover { border-color: var(--zs-ink-3); }
-.adm-period-caret { font-size: 10px; opacity: 0.6; }
-.adm-period-dropdown { position: absolute; right: 0; top: calc(100% + 6px); background: #fff; border: 1px solid var(--zs-border); border-radius: 12px; padding: 4px; box-shadow: var(--zs-shadow-2); z-index: 40; min-width: 140px; }
-.adm-period-option { display: block; width: 100%; text-align: left; font: 400 13px var(--zs-sans); color: var(--zs-ink-3); background: none; border: none; padding: 8px 12px; border-radius: 8px; cursor: pointer; transition: background 140ms; }
-.adm-period-option:hover { background: var(--zs-mist); }
-.adm-period-option.active { font-weight: 600; color: var(--zs-ink); background: var(--zs-mist); }
-
-/* Period label on metric cards */
+/* Period label on admin metric cards (shared style with cd-metric-period) */
 .adm-metric-period { font: 400 11px var(--zs-mono); color: var(--zs-ink-5); margin-top: 6px; }
 
 /* Business tab */

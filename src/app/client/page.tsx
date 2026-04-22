@@ -664,20 +664,24 @@ export default function ClientPage() {
               <div className="cd-metric-card">
                 <div className="cd-metric-label">Emails Sent</div>
                 <div className="cd-metric-value">{periodStats?.emails_sent ?? '—'}</div>
+                <div className="cd-metric-period">{PERIOD_LABEL[period]}</div>
               </div>
               <div className="cd-metric-card">
                 <div className="cd-metric-label">Replies</div>
                 <div className="cd-metric-value">{periodStats?.replies ?? '—'}</div>
+                <div className="cd-metric-period">{PERIOD_LABEL[period]}</div>
               </div>
               <div className="cd-metric-card">
                 <div className="cd-metric-label">Reply Rate</div>
                 <div className="cd-metric-value">
                   {periodStats?.reply_rate != null ? `${periodStats.reply_rate}%` : '—'}
                 </div>
+                <div className="cd-metric-period">{PERIOD_LABEL[period]}</div>
               </div>
               <div className="cd-metric-card">
                 <div className="cd-metric-label">Meetings Booked</div>
                 <div className="cd-metric-value">{periodStats?.meetings_booked ?? '—'}</div>
+                <div className="cd-metric-period">{PERIOD_LABEL[period]}</div>
               </div>
             </div>
 
