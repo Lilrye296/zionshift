@@ -376,7 +376,7 @@ export default function AdminPage() {
         <div className="portal-nav-inner">
           {/* eslint-disable-next-line @next/next/no-img-element */}
           <a href="/"><img src="/logo.png" alt="ZionShift" className="portal-logo" /></a>
-          <span className="adm-center-label">Admin Portal</span>
+          <span className="adm-center-label">Admin</span>
           <button className="btn btn-ghost" onClick={handleSignOut} style={{ fontSize: 13, padding: '8px 16px' }}>
             Sign out
           </button>
