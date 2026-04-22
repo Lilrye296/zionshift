@@ -312,7 +312,7 @@ export default function AdminPage() {
   const replyRate: string = (
     periodStats?.emails_sent != null &&
     periodStats.emails_sent > 0 &&
-    periodStats?.total_replies != null
+    periodStats.total_replies != null
   )
     ? `${((periodStats.total_replies / periodStats.emails_sent) * 100).toFixed(1)}%`
     : '—';
