@@ -47,14 +47,16 @@ interface ActiveClient {
   id: number;
   name: string;
   firm: string;
-  status: 'live' | 'paused';
+  status: 'live' | 'paused' | 'cancelled';
   mrr: number;
+  since: string;
 }
 
 interface ActivityItem {
   id: number;
   text: string;
   time: string;
+  type: 'onboard' | 'churn' | 'milestone' | 'meeting' | 'mrr';
 }
 
 /* ── Static placeholder data ────────────────────────────────────── */
@@ -100,17 +102,19 @@ const INBOUND_LEADS: InboundLead[] = [
   { id: 3, date: 'Apr 11, 2026', name: 'Carter Flynn',  email: 'carter@flynnfinancial.com', message: 'Interested in a proposal. We manage about $400M AUM and want to expand to UHNW prospects.',                                        status: 'new'    },
 ];
 
-const ACTIVE_CLIENTS: ActiveClient[] = [
-  { id: 1, name: 'Sarah Mitchell', firm: 'Mitchell Wealth Advisors', status: 'live', mrr: 2000 },
-  { id: 2, name: 'James Okafor',   firm: 'OFC Group',                status: 'live', mrr: 2000 },
+const ALL_CLIENTS: ActiveClient[] = [
+  { id: 1, name: 'Sarah Mitchell', firm: 'Mitchell Wealth Advisors', status: 'live',      mrr: 2000, since: 'Apr 11, 2026' },
+  { id: 2, name: 'James Okafor',   firm: 'OFC Group',                status: 'live',      mrr: 2000, since: 'Apr 20, 2026' },
+  // Placeholder examples for paused/cancelled states:
+  // { id: 3, name: 'Beth Navarro', firm: 'Navarro WM', status: 'paused',    mrr: 2000, since: 'Mar 1, 2026' },
+  // { id: 4, name: 'Carter Flynn', firm: 'Flynn Financial', status: 'cancelled', mrr: 0, since: 'Feb 1, 2026' },
 ];
 
 const ACTIVITY_FEED: ActivityItem[] = [
-  { id: 1, text: 'AI replied to Marcus Webb (Webb Capital)',       time: '2h ago'  },
-  { id: 2, text: 'AI replied to Diana Solis (Solis Wealth)',       time: '4h ago'  },
-  { id: 3, text: 'Kevin Marsh opted out — suppressed',             time: '3d ago'  },
-  { id: 4, text: 'James Okafor submitted a website form',          time: '5d ago'  },
-  { id: 5, text: 'Sarah Mitchell onboarded — campaign live',       time: '10d ago' },
+  { id: 1, text: 'James Okafor onboarded — campaign going live',   time: 'Apr 20',  type: 'onboard'   },
+  { id: 2, text: 'MRR reached $4,000 — 2 active clients',          time: 'Apr 20',  type: 'mrr'       },
+  { id: 3, text: 'Meeting booked via Calendly — prospect TBD',      time: 'Apr 18',  type: 'meeting'   },
+  { id: 4, text: 'Sarah Mitchell onboarded — campaign going live',  time: 'Apr 11',  type: 'onboard'   },
 ];
 
 const TABS = ['Business', 'Replies', 'Inbound', 'Pipeline', 'Opt-Outs'] as const;
@@ -118,9 +122,14 @@ type Tab = typeof TABS[number];
 
 /* ── Component ──────────────────────────────────────────────────── */
 
+type MetricPeriod = 'week' | 'month' | 'alltime';
+const PERIOD_LABEL: Record<MetricPeriod, string> = { week: 'This Week', month: 'This Month', alltime: 'All Time' };
+
 export default function AdminPage() {
-  const [activeTab, setActiveTab]   = useState<Tab>('Business');
-  const [replyLog, setReplyLog]     = useState<ReplyLog[]>(REPLY_LOG);
+  const [activeTab, setActiveTab]       = useState<Tab>('Business');
+  const [replyLog, setReplyLog]         = useState<ReplyLog[]>(REPLY_LOG);
+  const [metricPeriod, setMetricPeriod] = useState<MetricPeriod>('alltime');
+  const [periodOpen, setPeriodOpen]     = useState(false);
   const router = useRouter();
 
   async function handleSignOut() {
@@ -135,11 +144,12 @@ export default function AdminPage() {
     setReplyLog(log => log.map(r => r.id === id ? { ...r, flagged: !r.flagged } : r));
   }
 
-  const flaggedCount = replyLog.filter(r => r.flagged).length;
-
-  const totalMRR      = ACTIVE_CLIENTS.reduce((s, c) => s + c.mrr, 0);
-  const setupFees     = 1000;
-  const nextMilestone = 10000;
+  const flaggedCount  = replyLog.filter(r => r.flagged).length;
+  const liveClients   = ALL_CLIENTS.filter(c => c.status === 'live');
+  const totalMRR      = liveClients.reduce((s, c) => s + c.mrr, 0);
+  const setupFees     = ALL_CLIENTS.length * 1000; // $1k setup per client
+  const nextMilestone = totalMRR < 5000 ? 5000 : totalMRR < 10000 ? 10000 : 20000;
+  const mrrProgress   = Math.min(Math.round((totalMRR / nextMilestone) * 100), 100);
 
   return (
     <div className="portal-page">
@@ -325,11 +335,36 @@ export default function AdminPage() {
         {/* ══ BUSINESS ════════════════════════════════════════════ */}
         {activeTab === 'Business' && (
           <div>
-            <h2 className="portal-heading" style={{ marginBottom: 28 }}>Business Overview</h2>
+            {/* Heading + period toggle */}
+            <div className="adm-biz-toprow">
+              <h2 className="portal-heading" style={{ margin: 0 }}>Business Overview</h2>
+              <div className="adm-period-wrap">
+                <button className="adm-period-btn" onClick={() => setPeriodOpen(o => !o)}>
+                  {PERIOD_LABEL[metricPeriod]} <span className="adm-period-caret">▾</span>
+                </button>
+                {periodOpen && (
+                  <div className="adm-period-dropdown">
+                    {(['week', 'month', 'alltime'] as MetricPeriod[]).map(p => (
+                      <button
+                        key={p}
+                        className={`adm-period-option${metricPeriod === p ? ' active' : ''}`}
+                        onClick={() => { setMetricPeriod(p); setPeriodOpen(false); }}
+                      >
+                        {PERIOD_LABEL[p]}
+                      </button>
+                    ))}
+                  </div>
+                )}
+              </div>
+            </div>
 
-            <div className="portal-metrics" style={{ marginBottom: 28 }}>
+            {/* Metric cards */}
+            <div className="portal-metrics" style={{ margin: '24px 0 28px' }}>
+              <div className="portal-metric-card">
+                <div className="portal-metric-label">MRR</div>
+                <div className="portal-metric-value">${totalMRR.toLocaleString()}</div>
+              </div>
               {[
-                { label: 'MRR',             value: `$${totalMRR.toLocaleString()}` },
                 { label: 'Emails Sent',     value: '—' },
                 { label: 'Total Replies',   value: '—' },
                 { label: 'Meetings Booked', value: '—' },
@@ -337,34 +372,42 @@ export default function AdminPage() {
                 <div key={i} className="portal-metric-card">
                   <div className="portal-metric-label">{m.label}</div>
                   <div className="portal-metric-value">{m.value}</div>
+                  <div className="adm-metric-period">{PERIOD_LABEL[metricPeriod]}</div>
                 </div>
               ))}
             </div>
 
             <div className="adm-biz-grid">
+
+              {/* Clients — all statuses, scrollable */}
               <div className="adm-biz-card">
                 <div className="adm-biz-card-head">
-                  <span className="adm-biz-card-title">Active Clients</span>
-                  <span className="adm-count-chip">{ACTIVE_CLIENTS.length}</span>
+                  <span className="adm-biz-card-title">Clients</span>
+                  <div style={{ display: 'flex', gap: 6 }}>
+                    <span className="adm-count-chip">{liveClients.length} live</span>
+                    {ALL_CLIENTS.filter(c => c.status !== 'live').length > 0 && (
+                      <span className="adm-count-chip">{ALL_CLIENTS.filter(c => c.status !== 'live').length} inactive</span>
+                    )}
+                  </div>
                 </div>
-                {ACTIVE_CLIENTS.length === 0 ? (
-                  <p className="adm-empty-text">No active clients yet.</p>
+                {ALL_CLIENTS.length === 0 ? (
+                  <p className="adm-empty-text">No clients yet.</p>
                 ) : (
-                  <div className="adm-client-list">
-                    {ACTIVE_CLIENTS.map((c, i) => (
+                  <div className="adm-client-scroll">
+                    {ALL_CLIENTS.map((c, i) => (
                       <Fragment key={c.id}>
                         {i > 0 && <div className="adm-divider" />}
                         <div className="adm-client-row">
-                          <div className="adm-client-avatar">
+                          <div className={`adm-client-avatar${c.status !== 'live' ? ' inactive' : ''}`}>
                             {c.name.split(' ').map(w => w[0]).join('')}
                           </div>
                           <div className="adm-client-info">
                             <span className="adm-client-name">{c.name}</span>
-                            <span className="adm-client-firm">{c.firm}</span>
+                            <span className="adm-client-firm">{c.firm} · since {c.since}</span>
                           </div>
                           <div className="adm-client-right">
-                            <span className={`adm-pill-live${c.status === 'paused' ? ' paused' : ''}`}>
-                              {c.status === 'live' ? '● Live' : '● Paused'}
+                            <span className={`adm-client-pill adm-client-pill--${c.status}`}>
+                              ●&nbsp;{c.status.charAt(0).toUpperCase() + c.status.slice(1)}
                             </span>
                             <button className="adm-view-btn">View →</button>
                           </div>
@@ -376,6 +419,8 @@ export default function AdminPage() {
               </div>
 
               <div className="adm-biz-right-col">
+
+                {/* Revenue + milestone progress */}
                 <div className="adm-biz-card">
                   <div className="adm-biz-card-head">
                     <span className="adm-biz-card-title">Revenue</span>
@@ -390,14 +435,24 @@ export default function AdminPage() {
                       <span className="adm-revenue-label">Setup Fees (all-time)</span>
                       <span className="adm-revenue-val">${setupFees.toLocaleString()}</span>
                     </div>
-                    <div className="adm-divider" />
-                    <div className="adm-revenue-row">
-                      <span className="adm-revenue-label" style={{ color: 'var(--zs-ink-5)', fontStyle: 'italic' }}>Next milestone</span>
-                      <span className="adm-revenue-val" style={{ color: 'var(--zs-ink-5)' }}>${nextMilestone.toLocaleString()} MRR</span>
+                  </div>
+
+                  {/* Milestone progress bar */}
+                  <div className="adm-milestone">
+                    <div className="adm-milestone-labels">
+                      <span className="adm-milestone-tag">Next milestone</span>
+                      <span className="adm-milestone-target">${nextMilestone.toLocaleString()} MRR</span>
+                    </div>
+                    <div className="adm-progress-track">
+                      <div className="adm-progress-fill" style={{ width: `${mrrProgress}%` }} />
+                    </div>
+                    <div className="adm-milestone-sub">
+                      ${totalMRR.toLocaleString()} of ${nextMilestone.toLocaleString()} — {mrrProgress}% there
                     </div>
                   </div>
                 </div>
 
+                {/* Recent activity — business events only */}
                 <div className="adm-biz-card">
                   <div className="adm-biz-card-head">
                     <span className="adm-biz-card-title">Recent Activity</span>
@@ -407,7 +462,12 @@ export default function AdminPage() {
                       <Fragment key={item.id}>
                         {i > 0 && <div className="adm-divider" />}
                         <div className="adm-activity-row">
-                          <span className="adm-activity-dot" />
+                          <span className={`adm-activity-icon adm-activity-icon--${item.type}`}>
+                            {item.type === 'onboard'   ? '↑' :
+                             item.type === 'churn'     ? '↓' :
+                             item.type === 'milestone' ? '★' :
+                             item.type === 'meeting'   ? '◎' : '$'}
+                          </span>
                           <span className="adm-activity-text">{item.text}</span>
                           <span className="adm-activity-time">{item.time}</span>
                         </div>
@@ -415,6 +475,7 @@ export default function AdminPage() {
                     ))}
                   </div>
                 </div>
+
               </div>
             </div>
           </div>
