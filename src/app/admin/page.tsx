@@ -223,6 +223,7 @@ type MetricPeriod = 'week' | 'month' | 'alltime';
 const PERIOD_LABEL: Record<MetricPeriod, string> = { week: 'This Week', month: 'This Month', alltime: 'All Time' };
 
 export default function AdminPage() {
+  const [loading, setLoading]             = useState(true);
   const [activeTab, setActiveTab]         = useState<Tab>('Overview');
   const [metricPeriod, setMetricPeriod]   = useState<MetricPeriod>('alltime');
   const [periodOpen, setPeriodOpen]       = useState(false);
@@ -240,6 +241,28 @@ export default function AdminPage() {
   const [periodStats, setPeriodStats]     = useState<AdminPeriodStats | null>(null);
   const periodRef                         = useRef<HTMLDivElement>(null);
   const router = useRouter();
+
+  // Auth guard — verify the user is logged in and has admin role before rendering
+  useEffect(() => {
+    async function load() {
+      if (!process.env.NEXT_PUBLIC_SUPABASE_URL || !process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY) {
+        setLoading(false);
+        return;
+      }
+      try {
+        const supabase = createClient();
+        const { data: { user } } = await supabase.auth.getUser();
+        if (!user) { router.push('/login'); return; }
+        const { data: profile } = await supabase
+          .from('profiles').select('role').eq('id', user.id).single();
+        if (profile?.role !== 'admin') { router.push('/client'); return; }
+      } catch {
+        // Network or Supabase error — allow page to render with seed data in dev.
+      }
+      setLoading(false);
+    }
+    load();
+  }, [router]);
 
   // Close period dropdown on outside click
   useEffect(() => {
@@ -342,6 +365,8 @@ export default function AdminPage() {
     if (calMonth === 11) { setCalMonth(0); setCalYear(y => y + 1); }
     else setCalMonth(m => m + 1);
   }
+
+  if (loading) return null;
 
   return (
     <div className="portal-page">
