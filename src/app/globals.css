@@ -864,7 +864,7 @@ footer.zs-footer { padding: 40px 0; border-top: 1px solid var(--zs-border); }
 .adm-reply-meta { font: 400 12px var(--zs-mono); color: var(--zs-ink-4); display: block; margin-top: 2px; }
 .adm-their-block { background: var(--zs-mist); border-radius: 12px; padding: 16px; margin-bottom: 16px; }
 .adm-block-label { font: 500 10px var(--zs-mono); text-transform: uppercase; letter-spacing: 0.12em; color: var(--zs-ink-5); display: block; margin-bottom: 8px; }
-.adm-their-text { font: 400 14px var(--zs-sans); color: var(--zs-ink-3); line-height: 1.55; margin: 0; font-style: italic; }
+.adm-their-text { font: 400 14px var(--zs-sans); color: var(--zs-ink-3); line-height: 1.55; margin: 0; font-style: italic; max-height: 120px; overflow-y: auto; scrollbar-width: thin; scrollbar-color: var(--zs-line) transparent; }
 .adm-draft-block { border: 1px solid var(--zs-border); border-radius: 12px; padding: 16px; margin-bottom: 16px; }
 .adm-block-label-row { display: flex; align-items: center; gap: 8px; margin-bottom: 8px; }
 .adm-ai-chip { font: 600 10px var(--zs-mono); letter-spacing: 0.08em; text-transform: uppercase; background: var(--zs-ink); color: #fff; border-radius: 4px; padding: 2px 6px; }
@@ -901,15 +901,21 @@ footer.zs-footer { padding: 40px 0; border-top: 1px solid var(--zs-border); }
 
 /* Business tab */
 .adm-biz-grid { display: grid; grid-template-columns: 1fr 400px; gap: 20px; }
-.adm-biz-card { background: #fff; border: 1px solid var(--zs-border); border-radius: 20px; padding: 24px; }
+.adm-biz-card { background: #fff; border: 1px solid var(--zs-border); border-radius: 20px; padding: 24px; display: flex; flex-direction: column; }
 .adm-biz-right-col { display: flex; flex-direction: column; gap: 20px; }
-.adm-biz-card-head { display: flex; align-items: center; justify-content: space-between; margin-bottom: 20px; }
+.adm-biz-card-head { display: flex; align-items: center; justify-content: space-between; margin-bottom: 20px; flex-shrink: 0; }
 .adm-biz-card-title { font: 600 14px var(--zs-sans); color: var(--zs-ink); letter-spacing: -0.01em; }
 .adm-count-chip { font: 600 12px var(--zs-sans); background: var(--zs-mist); color: var(--zs-ink-3); border-radius: 999px; padding: 3px 10px; }
 .adm-empty-text { font: 400 13px var(--zs-mono); color: var(--zs-ink-5); margin: 0; padding: 20px 0; text-align: center; }
 
 /* Clients list — scrollable */
-.adm-client-scroll { max-height: 260px; overflow-y: auto; scrollbar-width: thin; scrollbar-color: var(--zs-line) transparent; }
+/* Shared scroll styling for all card content areas */
+.adm-scroll { overflow-y: auto; scrollbar-width: thin; scrollbar-color: var(--zs-line) transparent; }
+.adm-scroll::-webkit-scrollbar { width: 4px; }
+.adm-scroll::-webkit-scrollbar-track { background: transparent; }
+.adm-scroll::-webkit-scrollbar-thumb { background: var(--zs-line); border-radius: 999px; }
+
+.adm-client-scroll { max-height: 300px; overflow-y: auto; scrollbar-width: thin; scrollbar-color: var(--zs-line) transparent; }
 .adm-client-scroll::-webkit-scrollbar { width: 4px; }
 .adm-client-scroll::-webkit-scrollbar-track { background: transparent; }
 .adm-client-scroll::-webkit-scrollbar-thumb { background: var(--zs-line); border-radius: 999px; }
@@ -930,8 +936,11 @@ footer.zs-footer { padding: 40px 0; border-top: 1px solid var(--zs-border); }
 .adm-client-pill--cancelled { background: #fff1f2; color: #dc2626; border: 1px solid #fecaca; }
 
 /* Revenue */
-.adm-revenue-rows { display: flex; flex-direction: column; }
-.adm-revenue-row { display: flex; align-items: center; justify-content: space-between; padding: 12px 0; }
+.adm-revenue-rows { display: flex; flex-direction: column; max-height: 160px; overflow-y: auto; scrollbar-width: thin; scrollbar-color: var(--zs-line) transparent; }
+.adm-revenue-rows::-webkit-scrollbar { width: 4px; }
+.adm-revenue-rows::-webkit-scrollbar-track { background: transparent; }
+.adm-revenue-rows::-webkit-scrollbar-thumb { background: var(--zs-line); border-radius: 999px; }
+.adm-revenue-row { display: flex; align-items: center; justify-content: space-between; padding: 12px 0; flex-shrink: 0; }
 .adm-revenue-label { font: 400 13px var(--zs-sans); color: var(--zs-ink-4); }
 .adm-revenue-val   { font: 600 14px var(--zs-sans); color: var(--zs-ink); letter-spacing: -0.02em; }
 
@@ -945,8 +954,11 @@ footer.zs-footer { padding: 40px 0; border-top: 1px solid var(--zs-border); }
 .adm-milestone-sub { font: 400 11px var(--zs-mono); color: var(--zs-ink-5); margin-top: 8px; }
 
 /* Activity */
-.adm-activity-list { display: flex; flex-direction: column; }
-.adm-activity-row { display: flex; align-items: center; gap: 10px; padding: 11px 0; }
+.adm-activity-list { display: flex; flex-direction: column; max-height: 240px; overflow-y: auto; scrollbar-width: thin; scrollbar-color: var(--zs-line) transparent; }
+.adm-activity-list::-webkit-scrollbar { width: 4px; }
+.adm-activity-list::-webkit-scrollbar-track { background: transparent; }
+.adm-activity-list::-webkit-scrollbar-thumb { background: var(--zs-line); border-radius: 999px; }
+.adm-activity-row { display: flex; align-items: center; gap: 10px; padding: 11px 0; flex-shrink: 0; }
 .adm-activity-icon { width: 22px; height: 22px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 11px; flex-shrink: 0; font-weight: 600; }
 .adm-activity-icon--onboard   { background: #f0fdf4; color: #16a34a; border: 1px solid #bbf7d0; }
 .adm-activity-icon--churn     { background: #fff1f2; color: #dc2626; border: 1px solid #fecaca; }
