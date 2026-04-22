@@ -554,7 +554,6 @@ body { font-family: var(--zs-sans); color: var(--zs-ink-2); overflow-x: hidden; 
 .cd-metric-card { background: #fff; border: 1px solid var(--zs-border); border-radius: 18px; padding: 24px 22px; }
 .cd-metric-label { font: 500 11px var(--zs-mono); letter-spacing: 0.08em; text-transform: uppercase; color: var(--zs-ink-5); margin-bottom: 10px; }
 .cd-metric-value { font: 700 clamp(30px,3.5vw,44px) var(--zs-sans); letter-spacing: -0.04em; color: var(--zs-ink); line-height: 1; margin-bottom: 6px; }
-.cd-metric-sub { font: 400 12px var(--zs-sans); color: var(--zs-ink-5); }
 .cd-metric-period { font: 400 11px var(--zs-mono); color: var(--zs-ink-5); margin-top: 6px; }
 
 .cd-meet-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; align-items: stretch; margin: 24px 0 20px; }
@@ -702,7 +701,6 @@ body { font-family: var(--zs-sans); color: var(--zs-ink-2); overflow-x: hidden; 
 .bl-inv-failed  { color: #dc2626; background: #fff1f2; border: 1px solid #fecaca; }
 .bl-inv-empty   { font: 400 13px var(--zs-sans); color: var(--zs-ink-5); margin: 12px 0 4px; }
 
-.bl-changes-card { }
 .bl-changes-title { font: 700 16px var(--zs-sans); letter-spacing: -0.02em; color: var(--zs-ink); margin-bottom: 10px; }
 .bl-changes-body { font: 400 14px var(--zs-sans); color: var(--zs-ink-3); line-height: 1.6; margin: 0 0 16px; }
 .bl-changes-link { color: var(--zs-ink); font-weight: 600; text-decoration: none; border-bottom: 1px solid var(--zs-ink); transition: opacity 160ms; }

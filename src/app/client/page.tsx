@@ -141,6 +141,14 @@ const ACTIVITY = [
 
 const MONTH_SHORT = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
 
+// Converts a time string like "2:00 PM EST" to total minutes (timezone suffix ignored)
+function parseTime(t: string): number {
+  const [timePart, pd] = t.split(' ');
+  const [h, m] = timePart.split(':').map(Number);
+  const hour = pd === 'PM' && h !== 12 ? h + 12 : pd === 'AM' && h === 12 ? 0 : h;
+  return hour * 60 + m;
+}
+
 // Returns true if the meeting month/day/time has already passed
 function isMeetingPast(day: number, time: string, month?: number): boolean {
   const now = new Date();
@@ -724,12 +732,6 @@ export default function ClientPage() {
                 if (period === 'week') return a.day >= today - 7;
                 return true;
               });
-              const parseTime = (t: string) => {
-                const [time, pd] = t.split(' ');
-                const [h, m] = time.split(':').map(Number);
-                const hour = pd === 'PM' && h !== 12 ? h + 12 : pd === 'AM' && h === 12 ? 0 : h;
-                return hour * 60 + m;
-              };
               const sortedMeetings = [...CAL_MEETINGS].sort((a, b) => b.month - a.month || b.day - a.day || parseTime(b.time) - parseTime(a.time));
               return (
                 <>
