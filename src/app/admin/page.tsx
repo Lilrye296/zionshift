@@ -113,13 +113,13 @@ const ACTIVITY_FEED: ActivityItem[] = [
   { id: 5, text: 'Sarah Mitchell onboarded — campaign live',       time: '10d ago' },
 ];
 
-const TABS = ['Replies', 'Inbound', 'Pipeline', 'Business', 'Opt-Outs'] as const;
+const TABS = ['Business', 'Replies', 'Inbound', 'Pipeline', 'Opt-Outs'] as const;
 type Tab = typeof TABS[number];
 
 /* ── Component ──────────────────────────────────────────────────── */
 
 export default function AdminPage() {
-  const [activeTab, setActiveTab]   = useState<Tab>('Replies');
+  const [activeTab, setActiveTab]   = useState<Tab>('Business');
   const [replyLog, setReplyLog]     = useState<ReplyLog[]>(REPLY_LOG);
   const router = useRouter();
 
