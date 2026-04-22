@@ -32,11 +32,13 @@ const DOW = ['S','M','T','W','T','F','S'];
 function MiniCalendar({
   meetings = [],
   onDayClick,
+  onMonthChange,
   selectedDay = null,
   selectedMonth = null,
 }: {
   meetings?: CalMeeting[];
   onDayClick?: (day: number, month: number) => void;
+  onMonthChange?: () => void;
   selectedDay?: number | null;
   selectedMonth?: number | null;
 }) {
@@ -61,10 +63,12 @@ function MiniCalendar({
   const meetingDays = meetings.filter(m => m.month === displayMonth).map(m => m.day);
 
   function prevMonth() {
+    onMonthChange?.(); // clear detail panel — it belongs to the month being left
     if (displayMonth === 0) { setDisplayMonth(11); setDisplayYear(y => y - 1); }
     else setDisplayMonth(m => m - 1);
   }
   function nextMonth() {
+    onMonthChange?.(); // clear detail panel — it belongs to the month being left
     if (displayMonth === 11) { setDisplayMonth(0); setDisplayYear(y => y + 1); }
     else setDisplayMonth(m => m + 1);
   }
@@ -746,6 +750,7 @@ export default function ClientPage() {
                   meetings={CAL_MEETINGS}
                   selectedDay={selectedMeeting?.day ?? null}
                   selectedMonth={selectedMeeting?.month ?? null}
+                  onMonthChange={() => setSelectedMeeting(null)}
                   onDayClick={(day, month) => {
                     const hit = [...CAL_MEETINGS]
                       .filter(m => m.month === month)
