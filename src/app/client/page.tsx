@@ -740,107 +740,107 @@ export default function ClientPage() {
             {/* ── Calendar + All Meetings + Recent Activity ── */}
             <div className="cd-meet-grid">
 
-                    {/* Calendar */}
-                    <div className="cd-card">
-                      <MiniCalendar
-                        meetings={CAL_MEETINGS}
-                        selectedDay={selectedMeeting?.day ?? null}
-                        selectedMonth={selectedMeeting?.month ?? null}
-                        onDayClick={(day, month) => {
-                          const hit = [...CAL_MEETINGS]
-                            .filter(m => m.month === month)
-                            .sort((a, b) => parseTime(a.time) - parseTime(b.time))
-                            .find(m => m.day === day);
-                          setSelectedMeeting(prev =>
-                            prev?.day === day && prev?.month === month ? null : (hit ?? null)
-                          );
-                        }}
-                      />
+              {/* Calendar */}
+              <div className="cd-card">
+                <MiniCalendar
+                  meetings={CAL_MEETINGS}
+                  selectedDay={selectedMeeting?.day ?? null}
+                  selectedMonth={selectedMeeting?.month ?? null}
+                  onDayClick={(day, month) => {
+                    const hit = [...CAL_MEETINGS]
+                      .filter(m => m.month === month)
+                      .sort((a, b) => parseTime(a.time) - parseTime(b.time))
+                      .find(m => m.day === day);
+                    setSelectedMeeting(prev =>
+                      prev?.day === day && prev?.month === month ? null : (hit ?? null)
+                    );
+                  }}
+                />
 
-                      {/* Inline detail — appears below calendar on selection */}
-                      {selectedMeeting ? (() => {
-                        const isPast = isMeetingPast(selectedMeeting.day, selectedMeeting.time, selectedMeeting.month);
-                        return (
-                          <div className="adm-meet-detail">
-                            <div className="adm-meet-detail-head">
-                              <div>
-                                <div className="adm-meet-detail-name">{selectedMeeting.prospect}</div>
-                                <div className="adm-meet-detail-firm">{selectedMeeting.firm}</div>
-                              </div>
-                              <span className={`adm-meet-pill adm-meet-pill--${isPast ? 'completed' : 'upcoming'}`}>
-                                {isPast ? 'Completed' : 'Upcoming'}
-                              </span>
-                            </div>
-                            <div className="adm-meet-detail-row">
-                              <span className="adm-meet-detail-label">Date &amp; Time</span>
-                              <span className="adm-meet-detail-val">{MONTH_SHORT[selectedMeeting.month]} {selectedMeeting.day} · {selectedMeeting.time}</span>
-                            </div>
-                            {!isPast && selectedMeeting.zoomUrl && (
-                              <a href={selectedMeeting.zoomUrl} target="_blank" rel="noopener noreferrer" className="adm-zoom-btn">
-                                Join Zoom →
-                              </a>
-                            )}
-                          </div>
-                        );
-                      })() : (
-                        <p className="adm-cal-hint">Tap a highlighted date to see meeting details.</p>
+                {/* Inline detail — appears below calendar on selection */}
+                {selectedMeeting ? (() => {
+                  const isPast = isMeetingPast(selectedMeeting.day, selectedMeeting.time, selectedMeeting.month);
+                  return (
+                    <div className="adm-meet-detail">
+                      <div className="adm-meet-detail-head">
+                        <div>
+                          <div className="adm-meet-detail-name">{selectedMeeting.prospect}</div>
+                          <div className="adm-meet-detail-firm">{selectedMeeting.firm}</div>
+                        </div>
+                        <span className={`adm-meet-pill adm-meet-pill--${isPast ? 'completed' : 'upcoming'}`}>
+                          {isPast ? 'Completed' : 'Upcoming'}
+                        </span>
+                      </div>
+                      <div className="adm-meet-detail-row">
+                        <span className="adm-meet-detail-label">Date &amp; Time</span>
+                        <span className="adm-meet-detail-val">{MONTH_SHORT[selectedMeeting.month]} {selectedMeeting.day} · {selectedMeeting.time}</span>
+                      </div>
+                      {!isPast && selectedMeeting.zoomUrl && (
+                        <a href={selectedMeeting.zoomUrl} target="_blank" rel="noopener noreferrer" className="adm-zoom-btn">
+                          Join Zoom →
+                        </a>
                       )}
                     </div>
+                  );
+                })() : (
+                  <p className="adm-cal-hint">Tap a highlighted date to see meeting details.</p>
+                )}
+              </div>
 
-                    {/* All Meetings log */}
-                    <div className="cd-card" style={{ padding: 0, overflow: 'hidden', display: 'flex', flexDirection: 'column' }}>
-                      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '24px 20px 0', marginBottom: 16, flexShrink: 0 }}>
-                        <span className="adm-biz-card-title">All Meetings</span>
-                        <span className="adm-count-chip">{CAL_MEETINGS.length} Total</span>
-                      </div>
-                      <div className="cd-meet-log">
-                        {SORTED_MEETINGS.map((m, i) => {
-                          const isPast = isMeetingPast(m.day, m.time, m.month);
-                          return (
-                            <Fragment key={i}>
-                              {i > 0 && <div className="adm-divider" style={{ margin: '0 20px' }} />}
-                              <div
-                                className={`adm-meet-row${selectedMeeting?.prospect === m.prospect && selectedMeeting?.day === m.day && selectedMeeting?.month === m.month ? ' selected' : ''}`}
-                                onClick={() => setSelectedMeeting(prev => prev?.prospect === m.prospect && prev?.day === m.day && prev?.month === m.month ? null : m)}
-                              >
-                                <div className="adm-meet-row-avatar">
-                                  {m.prospect.split(' ').map(w => w[0]).join('')}
-                                </div>
-                                <div className="adm-meet-row-info">
-                                  <span className="adm-meet-row-name">{m.prospect}</span>
-                                  <span className="adm-meet-row-firm">{m.firm}</span>
-                                </div>
-                                <div className="adm-meet-row-right">
-                                  <span className="adm-meet-row-date">{MONTH_SHORT[m.month]} {m.day}</span>
-                                  <span className="adm-meet-row-time">{m.time}</span>
-                                  <span className={`adm-meet-pill adm-meet-pill--${isPast ? 'completed' : 'upcoming'}`}>
-                                    {isPast ? 'Completed' : 'Upcoming'}
-                                  </span>
-                                </div>
-                              </div>
-                            </Fragment>
-                          );
-                        })}
-                      </div>
-                    </div>
+              {/* All Meetings log */}
+              <div className="cd-card" style={{ padding: 0, overflow: 'hidden', display: 'flex', flexDirection: 'column' }}>
+                <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '24px 20px 0', marginBottom: 16, flexShrink: 0 }}>
+                  <span className="adm-biz-card-title">All Meetings</span>
+                  <span className="adm-count-chip">{CAL_MEETINGS.length} Total</span>
+                </div>
+                <div className="cd-meet-log">
+                  {SORTED_MEETINGS.map((m, i) => {
+                    const isPast = isMeetingPast(m.day, m.time, m.month);
+                    return (
+                      <Fragment key={i}>
+                        {i > 0 && <div className="adm-divider" style={{ margin: '0 20px' }} />}
+                        <div
+                          className={`adm-meet-row${selectedMeeting?.prospect === m.prospect && selectedMeeting?.day === m.day && selectedMeeting?.month === m.month ? ' selected' : ''}`}
+                          onClick={() => setSelectedMeeting(prev => prev?.prospect === m.prospect && prev?.day === m.day && prev?.month === m.month ? null : m)}
+                        >
+                          <div className="adm-meet-row-avatar">
+                            {m.prospect.split(' ').map(w => w[0]).join('')}
+                          </div>
+                          <div className="adm-meet-row-info">
+                            <span className="adm-meet-row-name">{m.prospect}</span>
+                            <span className="adm-meet-row-firm">{m.firm}</span>
+                          </div>
+                          <div className="adm-meet-row-right">
+                            <span className="adm-meet-row-date">{MONTH_SHORT[m.month]} {m.day}</span>
+                            <span className="adm-meet-row-time">{m.time}</span>
+                            <span className={`adm-meet-pill adm-meet-pill--${isPast ? 'completed' : 'upcoming'}`}>
+                              {isPast ? 'Completed' : 'Upcoming'}
+                            </span>
+                          </div>
+                        </div>
+                      </Fragment>
+                    );
+                  })}
+                </div>
+              </div>
 
             </div>
 
             {/* Recent Activity — full width below the grid */}
             <div className="cd-card" style={{ marginBottom: 20 }}>
-                    <div className="cd-card-label">Recent Activity</div>
-                    <div className="cd-activity-scroll">
-                      <ul className="cd-activity-list">
-                        {filteredActivity.length === 0 ? (
-                          <li className="cd-empty-state">No activity this period.</li>
-                        ) : filteredActivity.map((a, i) => (
-                          <li key={i} className="cd-activity-item">
-                            <span className="cd-activity-text">{a.label}</span>
-                            <span className="cd-activity-sub">{a.sub}</span>
-                          </li>
-                        ))}
-                      </ul>
-                    </div>
+              <div className="cd-card-label">Recent Activity</div>
+              <div className="cd-activity-scroll">
+                <ul className="cd-activity-list">
+                  {filteredActivity.length === 0 ? (
+                    <li className="cd-empty-state">No activity this period.</li>
+                  ) : filteredActivity.map((a, i) => (
+                    <li key={i} className="cd-activity-item">
+                      <span className="cd-activity-text">{a.label}</span>
+                      <span className="cd-activity-sub">{a.sub}</span>
+                    </li>
+                  ))}
+                </ul>
+              </div>
             </div>
 
             {/* ── Calendar Sync ── */}
