@@ -428,7 +428,7 @@ export default function AdminPage() {
               <div className="adm-biz-card">
                 <div className="adm-biz-card-head">
                   <span className="adm-biz-card-title">Clients</span>
-                  <span className="adm-count-chip">{ALL_CLIENTS.length} total</span>
+                  <span className="adm-count-chip">{ALL_CLIENTS.filter(c => c.status !== 'cancelled').length} Total</span>
                 </div>
                 {ALL_CLIENTS.length === 0 ? (
                   <p className="adm-empty-text">No clients yet.</p>
