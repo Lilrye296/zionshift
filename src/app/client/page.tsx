@@ -685,13 +685,13 @@ export default function ClientPage() {
               </div>
             </div>
 
-            {/* ── Activity + Calendar ── */}
+            {/* ── Calendar + All Meetings + Recent Activity ── */}
             {(() => {
               const today = new Date().getDate();
               const filteredActivity = ACTIVITY.filter(a => {
                 if (period === 'alltime') return true;
-                if (period === 'week')  return a.day >= today - 7;
-                return true; // month — all in same month
+                if (period === 'week') return a.day >= today - 7;
+                return true;
               });
               const parseTime = (t: string) => {
                 const [time, pd] = t.split(' ');
@@ -700,30 +700,12 @@ export default function ClientPage() {
                 return hour * 60 + m;
               };
               const sortedMeetings = [...CAL_MEETINGS].sort((a, b) => b.day - a.day || parseTime(b.time) - parseTime(a.time));
-              const filteredMeetings = sortedMeetings.filter(m => {
-                if (period === 'alltime') return true;
-                if (period === 'week')  return m.day >= today - 7;
-                return true;
-              });
               return (
                 <>
-                  <div className="cd-mid-row">
-                    <div className="cd-card">
-                      <div className="cd-card-label">Recent Activity</div>
-                      <div className="cd-activity-scroll">
-                        <ul className="cd-activity-list">
-                          {filteredActivity.length === 0 ? (
-                            <li className="cd-empty-state">No activity this period.</li>
-                          ) : filteredActivity.map((a, i) => (
-                            <li key={i} className="cd-activity-item">
-                              <span className="cd-activity-text">{a.label}</span>
-                              <span className="cd-activity-sub">{a.sub}</span>
-                            </li>
-                          ))}
-                        </ul>
-                      </div>
-                    </div>
+                  {/* Calendar (left) + All Meetings (right) */}
+                  <div className="cd-meet-grid">
 
+                    {/* Calendar */}
                     <div className="cd-card">
                       <MiniCalendar
                         meetings={CAL_MEETINGS}
@@ -735,42 +717,57 @@ export default function ClientPage() {
                         }}
                       />
                     </div>
-                  </div>
 
-                  {/* ── Meeting Log ── */}
-                  <div className="cd-card" style={{ marginBottom: 20 }}>
-                    <div className="cd-card-label" style={{ marginBottom: 18 }}>Meeting Log</div>
-                    <div className="cd-table-scroll">
-                      <table className="cd-table">
-                        <thead>
-                          <tr>
-                            <th>Date</th>
-                            <th>Prospect</th>
-                            <th>Firm</th>
-                            <th>Status</th>
-                          </tr>
-                        </thead>
-                        <tbody>
-                          {filteredMeetings.length === 0 ? (
-                            <tr><td colSpan={4} className="cd-empty-state" style={{ textAlign: 'center', padding: '24px 0' }}>No meetings this period.</td></tr>
-                          ) : filteredMeetings.map((m, i) => (
-                            <tr
-                              key={i}
-                              className="cd-table-row-clickable"
+                    {/* All Meetings log */}
+                    <div className="cd-card" style={{ padding: 0, overflow: 'hidden', display: 'flex', flexDirection: 'column' }}>
+                      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '24px 20px 0', marginBottom: 16, flexShrink: 0 }}>
+                        <span className="adm-biz-card-title">All Meetings</span>
+                        <span className="adm-count-chip">{CAL_MEETINGS.length} Total</span>
+                      </div>
+                      <div className="cd-meet-log">
+                        {sortedMeetings.map((m, i) => (
+                          <Fragment key={i}>
+                            {i > 0 && <div className="adm-divider" style={{ margin: '0 20px' }} />}
+                            <div
+                              className="adm-meet-row"
                               onClick={() => setSelectedDayMeetings([m])}
                             >
-                              <td className="cd-td-date">{MONTH_SHORT[m.month]} {m.day}</td>
-                              <td className="cd-td-name">{m.prospect}</td>
-                              <td className="cd-td-firm">{m.firm}</td>
-                              <td>
-                                <span className={`cd-pill ${isMeetingPast(m.day, m.time, m.month) ? 'completed' : 'scheduled'}`}>
+                              <div className="adm-meet-row-avatar">
+                                {m.prospect.split(' ').map(w => w[0]).join('')}
+                              </div>
+                              <div className="adm-meet-row-info">
+                                <span className="adm-meet-row-name">{m.prospect}</span>
+                                <span className="adm-meet-row-firm">{m.firm}</span>
+                              </div>
+                              <div className="adm-meet-row-right">
+                                <span className="adm-meet-row-date">{MONTH_SHORT[m.month]} {m.day}</span>
+                                <span className="adm-meet-row-time">{m.time}</span>
+                                <span className={`adm-meet-pill adm-meet-pill--${isMeetingPast(m.day, m.time, m.month) ? 'completed' : 'upcoming'}`}>
                                   {isMeetingPast(m.day, m.time, m.month) ? 'Completed' : 'Scheduled'}
                                 </span>
-                              </td>
-                            </tr>
-                          ))}
-                        </tbody>
-                      </table>
+                              </div>
+                            </div>
+                          </Fragment>
+                        ))}
+                      </div>
+                    </div>
+
+                  </div>
+
+                  {/* Recent Activity — full width below the grid */}
+                  <div className="cd-card" style={{ marginBottom: 20 }}>
+                    <div className="cd-card-label">Recent Activity</div>
+                    <div className="cd-activity-scroll">
+                      <ul className="cd-activity-list">
+                        {filteredActivity.length === 0 ? (
+                          <li className="cd-empty-state">No activity this period.</li>
+                        ) : filteredActivity.map((a, i) => (
+                          <li key={i} className="cd-activity-item">
+                            <span className="cd-activity-text">{a.label}</span>
+                            <span className="cd-activity-sub">{a.sub}</span>
+                          </li>
+                        ))}
+                      </ul>
                     </div>
                   </div>
                 </>

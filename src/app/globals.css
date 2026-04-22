@@ -569,6 +569,11 @@ body { font-family: var(--zs-sans); color: var(--zs-ink-2); overflow-x: hidden; 
 .cd-metric-period { font: 400 11px var(--zs-mono); color: var(--zs-ink-5); margin-top: 6px; }
 
 .cd-mid-row { display: grid; grid-template-columns: 3fr 2fr; gap: 16px; margin-bottom: 16px; }
+.cd-meet-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; align-items: stretch; margin: 24px 0 20px; }
+.cd-meet-log { overflow-y: auto; overflow-x: hidden; flex: 1; scrollbar-width: thin; scrollbar-color: var(--zs-line) transparent; }
+.cd-meet-log::-webkit-scrollbar { width: 4px; }
+.cd-meet-log::-webkit-scrollbar-track { background: transparent; }
+.cd-meet-log::-webkit-scrollbar-thumb { background: var(--zs-line); border-radius: 999px; }
 .cd-card { background: #fff; border: 1px solid var(--zs-border); border-radius: 18px; padding: 28px; }
 .cd-card-label { font: 500 11px var(--zs-mono); letter-spacing: 0.08em; text-transform: uppercase; color: var(--zs-ink-5); margin-bottom: 20px; }
 
