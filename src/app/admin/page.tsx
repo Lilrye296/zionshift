@@ -223,7 +223,7 @@ export default function AdminPage() {
   // Setup fees = all clients who paid the $1k setup (regardless of monthly status)
   const setupFees = ALL_CLIENTS
     .filter(c => c.setupFeePaid)
-    .reduce((s, c) => s + 1000, 0);
+    .reduce((s, _c) => s + 1000, 0);
 
   // Milestone ladder: $2k → $6k → $10k → $20k → $30k → ... → $100k
   // Milestones track MRR only — setup fees never move this bar
