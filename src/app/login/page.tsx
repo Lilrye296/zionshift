@@ -18,23 +18,27 @@ export default function LoginPage() {
     if (!configured) return;
     setLoading(true);
     setError('');
+    try {
+      const supabase = createClient();
+      const { data, error: authError } = await supabase.auth.signInWithPassword({ email, password });
 
-    const supabase = createClient();
-    const { data, error: authError } = await supabase.auth.signInWithPassword({ email, password });
+      if (authError || !data.user) {
+        setError('Invalid email or password. Please try again.');
+        return;
+      }
 
-    if (authError || !data.user) {
-      setError('Invalid email or password. Please try again.');
+      const { data: profile } = await supabase
+        .from('profiles')
+        .select('role')
+        .eq('id', data.user.id)
+        .single();
+
+      router.push(profile?.role === 'admin' ? '/admin' : '/client');
+    } catch {
+      setError('Something went wrong. Please try again.');
+    } finally {
       setLoading(false);
-      return;
     }
-
-    const { data: profile } = await supabase
-      .from('profiles')
-      .select('role')
-      .eq('id', data.user.id)
-      .single();
-
-    router.push(profile?.role === 'admin' ? '/admin' : '/client');
   }
 
   return (
@@ -47,8 +51,9 @@ export default function LoginPage() {
 
         <form onSubmit={handleSubmit}>
           <div className="field">
-            <label>Email</label>
+            <label htmlFor="email">Email</label>
             <input
+              id="email"
               type="email"
               required
               value={email}
@@ -58,8 +63,9 @@ export default function LoginPage() {
             />
           </div>
           <div className="field">
-            <label>Password</label>
+            <label htmlFor="password">Password</label>
             <input
+              id="password"
               type="password"
               required
               value={password}

@@ -496,7 +496,6 @@ body { font-family: var(--zs-sans); color: var(--zs-ink-2); overflow-x: hidden; 
 .login-heading { font: 700 36px var(--zs-sans); letter-spacing: -0.04em; color: var(--zs-ink); margin: 0 0 8px; line-height: 1; }
 .login-sub { font: 400 14px var(--zs-mono); color: var(--zs-ink-4); margin: 0 0 32px; letter-spacing: 0.01em; }
 .login-error { font: 400 13px var(--zs-mono); color: #c0392b; margin: 10px 0 0; }
-.login-note { font: 400 11px var(--zs-mono); color: var(--zs-ink-6); text-align: center; margin: 28px 0 0; letter-spacing: 0.06em; text-transform: uppercase; }
 .login-logo { transition: opacity 200ms, transform 200ms; }
 .login-logo:hover { opacity: 0.6; transform: scale(0.96); }
 .login-forgot { font: 400 13px var(--zs-mono); color: var(--zs-ink-4); text-decoration: none; transition: color 160ms; }
