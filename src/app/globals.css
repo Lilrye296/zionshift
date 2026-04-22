@@ -998,7 +998,7 @@ footer.zs-footer { padding: 40px 0; border-top: 1px solid var(--zs-border); }
   /* Cap scroll container on mobile and always scroll — overrides the ≤4 client inline style
      that removes the cap on desktop. Rows are taller on mobile due to wrapping so we need
      a reliable cap to keep the tile a sensible height. */
-  .adm-client-scroll { max-height: 380px !important; overflow-y: auto !important; }
+  .adm-client-scroll { max-height: 440px !important; overflow-y: auto !important; }
   /* Clip any remaining horizontal bleed within scrollable list containers */
   .adm-client-scroll,
   .adm-revenue-rows,
