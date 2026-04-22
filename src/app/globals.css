@@ -198,6 +198,11 @@ body { font-family: var(--zs-sans); color: var(--zs-ink-2); overflow-x: hidden; 
 
 .reveal-blur { opacity: 0; filter: blur(12px); transform: translateY(16px); transition: opacity 1200ms var(--zs-ease-out), filter 1200ms var(--zs-ease-out), transform 1200ms var(--zs-ease-out); }
 .reveal-blur.in { opacity: 1; filter: blur(0); transform: translateY(0); }
+.reveal-blur.d1 { transition-delay: 100ms; }
+.reveal-blur.d2 { transition-delay: 220ms; }
+.reveal-blur.d3 { transition-delay: 340ms; }
+.reveal-blur.d4 { transition-delay: 460ms; }
+.reveal-blur.d5 { transition-delay: 580ms; }
 
 /* Word-by-word headline reveal */
 .headline-words .w { display: inline-block; overflow: hidden; vertical-align: top; padding: 0 0.04em 0.08em; margin: 0 -0.04em; }
