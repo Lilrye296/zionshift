@@ -15,42 +15,22 @@ function ResetPasswordForm() {
   const searchParams = useSearchParams();
 
   useEffect(() => {
-    const supabase = createClient();
     const tokenHash = searchParams.get('token_hash');
     const type      = searchParams.get('type');
-    const code      = searchParams.get('code'); // legacy fallback
 
-    if (tokenHash && type === 'recovery') {
-      // Direct token — no PKCE verifier needed, works regardless of how many
-      // reset emails were sent or which browser tab initiated the request
-      supabase.auth.verifyOtp({ token_hash: tokenHash, type: 'recovery' }).then(({ error: err }) => {
-        if (!err) {
-          setReady(true);
-        } else {
-          setError('This reset link is invalid or has already been used. Please request a new one.');
-        }
-      });
-      return;
-    }
-
-    if (code) {
-      // PKCE fallback for any old links still in circulation
-      supabase.auth.exchangeCodeForSession(code).then(({ error: err }) => {
-        if (!err) {
-          setReady(true);
-        } else {
-          setError('This reset link is invalid or has already been used. Please request a new one.');
-        }
-      });
-      return;
-    }
-
-    // No token at all — show a clear error after a brief pause
-    const timeout = setTimeout(() => {
+    if (!tokenHash || type !== 'recovery') {
       setError('No valid reset link found. Please request a new one from the login page.');
-    }, 3000);
+      return;
+    }
 
-    return () => clearTimeout(timeout);
+    const supabase = createClient();
+    supabase.auth.verifyOtp({ token_hash: tokenHash, type: 'recovery' }).then(({ error: err }) => {
+      if (!err) {
+        setReady(true);
+      } else {
+        setError('This reset link is invalid or has already been used. Please request a new one.');
+      }
+    });
   }, [searchParams]);
 
   async function handleSubmit(e: React.FormEvent) {
@@ -91,7 +71,7 @@ function ResetPasswordForm() {
               <svg width="26" height="26" viewBox="0 0 24 24" fill="none"
                 stroke="#1F6B3A" strokeWidth="2.5" strokeLinecap="round"
                 strokeLinejoin="round" aria-hidden>
-                <polyline points="20 6 9 17 4 12"/>
+                <polyline points="20 6 9 17 4 12" />
               </svg>
             </div>
             <p style={{ fontWeight: 600, color: '#1F6B3A', fontSize: 16, marginBottom: 8 }}>
