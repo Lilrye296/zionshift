@@ -18,8 +18,7 @@ function ForgotPasswordModal({ onClose }: { onClose: () => void }) {
     try {
       const supabase = createClient();
       const { error: resetError } = await supabase.auth.resetPasswordForEmail(email, {
-        // Routes through /auth/callback which exchanges the code, then lands on /reset-password
-        redirectTo: `${window.location.origin}/auth/callback?next=/reset-password`,
+        redirectTo: `${window.location.origin}/reset-password`,
       });
       if (resetError) throw resetError;
       setSent(true);

@@ -1,10 +1,10 @@
 'use client';
 
 import { useState, useEffect, Suspense } from 'react';
-import { useRouter } from 'next/navigation';
+import { useRouter, useSearchParams } from 'next/navigation';
 import { createClient } from '@/utils/supabase/client';
 
-/* ── Inner form — wrapped in Suspense by default export ── */
+/* ── Inner form — Suspense required because of useSearchParams ── */
 function ResetPasswordForm() {
   const [password, setPassword] = useState('');
   const [confirm, setConfirm]   = useState('');
@@ -13,12 +13,25 @@ function ResetPasswordForm() {
   const [done, setDone]         = useState(false);
   const [ready, setReady]       = useState(false);
   const router = useRouter();
+  const searchParams = useSearchParams();
 
-  // Works for both auth flows:
-  //  • PKCE  — session already established by /auth/callback; getSession() fires immediately
-  //  • Legacy — Supabase fires PASSWORD_RECOVERY via onAuthStateChange
   useEffect(() => {
     const supabase = createClient();
+    const code = searchParams.get('code');
+
+    if (code) {
+      // Exchange the PKCE code client-side — the browser holds the verifier
+      supabase.auth.exchangeCodeForSession(code).then(({ error: exchangeError }) => {
+        if (!exchangeError) {
+          setReady(true);
+        } else {
+          setError('This reset link is invalid or has already been used. Please request a new one.');
+        }
+      });
+      return;
+    }
+
+    // Fallback: listen for PASSWORD_RECOVERY event (legacy implicit flow)
     const { data: { subscription } } = supabase.auth.onAuthStateChange((event) => {
       if (event === 'PASSWORD_RECOVERY') setReady(true);
     });
@@ -26,7 +39,7 @@ function ResetPasswordForm() {
       if (session) setReady(true);
     });
     return () => subscription.unsubscribe();
-  }, []);
+  }, [searchParams]);
 
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
@@ -75,6 +88,14 @@ function ResetPasswordForm() {
             <p style={{ color: '#6B7280', fontSize: 14 }}>
               Taking you to sign in…
             </p>
+          </div>
+        ) : error && !ready ? (
+          <div style={{ textAlign: 'center', marginTop: 16 }}>
+            <p className="login-error">{error}</p>
+            <a href="/login" className="btn btn-primary"
+              style={{ display: 'inline-block', marginTop: 16, padding: '12px 24px', textDecoration: 'none' }}>
+              Back to login
+            </a>
           </div>
         ) : !ready ? (
           <div style={{ textAlign: 'center', padding: '16px 0' }}>
