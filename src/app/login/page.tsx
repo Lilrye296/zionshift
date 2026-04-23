@@ -16,14 +16,12 @@ function ForgotPasswordModal({ onClose }: { onClose: () => void }) {
     setLoading(true);
     setError('');
     try {
-      // TODO (Supabase): uncomment when Supabase is live.
-      // Also build /reset-password page — Supabase redirects there with a token
-      // so the user can set a new password via supabase.auth.updateUser({ password }).
-      // const supabase = createClient();
-      // const { error: resetError } = await supabase.auth.resetPasswordForEmail(email, {
-      //   redirectTo: `${window.location.origin}/reset-password`,
-      // });
-      // if (resetError) throw resetError;
+      const supabase = createClient();
+      const { error: resetError } = await supabase.auth.resetPasswordForEmail(email, {
+        // Routes through /auth/callback which exchanges the code, then lands on /reset-password
+        redirectTo: `${window.location.origin}/auth/callback?next=/reset-password`,
+      });
+      if (resetError) throw resetError;
       setSent(true);
     } catch {
       setError('Something went wrong. Please try again.');
