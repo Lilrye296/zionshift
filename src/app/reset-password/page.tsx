@@ -16,11 +16,25 @@ function ResetPasswordForm() {
 
   useEffect(() => {
     const supabase = createClient();
-    const code = searchParams.get('code');
+    const tokenHash = searchParams.get('token_hash');
+    const type      = searchParams.get('type');
+    const code      = searchParams.get('code'); // legacy fallback
+
+    if (tokenHash && type === 'recovery') {
+      // Direct token — no PKCE verifier needed, works regardless of how many
+      // reset emails were sent or which browser tab initiated the request
+      supabase.auth.verifyOtp({ token_hash: tokenHash, type: 'recovery' }).then(({ error: err }) => {
+        if (!err) {
+          setReady(true);
+        } else {
+          setError('This reset link is invalid or has already been used. Please request a new one.');
+        }
+      });
+      return;
+    }
 
     if (code) {
-      // Supabase sends a PKCE code — exchange it client-side so the browser
-      // can use the code verifier it stored in localStorage during the request
+      // PKCE fallback for any old links still in circulation
       supabase.auth.exchangeCodeForSession(code).then(({ error: err }) => {
         if (!err) {
           setReady(true);
@@ -31,23 +45,12 @@ function ResetPasswordForm() {
       return;
     }
 
-    // No code in URL — listen briefly for PASSWORD_RECOVERY (implicit flow fallback)
-    const { data: { subscription } } = supabase.auth.onAuthStateChange((event) => {
-      if (event === 'PASSWORD_RECOVERY') setReady(true);
-    });
-    supabase.auth.getSession().then(({ data: { session } }) => {
-      if (session) setReady(true);
-    });
-
-    // After 3 seconds with no token, show a clear error instead of spinning
+    // No token at all — show a clear error after a brief pause
     const timeout = setTimeout(() => {
       setError('No valid reset link found. Please request a new one from the login page.');
     }, 3000);
 
-    return () => {
-      subscription.unsubscribe();
-      clearTimeout(timeout);
-    };
+    return () => clearTimeout(timeout);
   }, [searchParams]);
 
   async function handleSubmit(e: React.FormEvent) {
