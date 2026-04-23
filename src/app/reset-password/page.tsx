@@ -1,10 +1,9 @@
 'use client';
 
 import { useState, useEffect, Suspense } from 'react';
-import { useRouter } from 'next/navigation';
+import { useRouter, useSearchParams } from 'next/navigation';
 import { createClient } from '@/utils/supabase/client';
 
-/* ── Inner form — wrapped in Suspense by default export ── */
 function ResetPasswordForm() {
   const [password, setPassword] = useState('');
   const [confirm, setConfirm]   = useState('');
@@ -13,22 +12,43 @@ function ResetPasswordForm() {
   const [done, setDone]         = useState(false);
   const [ready, setReady]       = useState(false);
   const router = useRouter();
+  const searchParams = useSearchParams();
 
   useEffect(() => {
     const supabase = createClient();
+    const code = searchParams.get('code');
 
-    // Implicit flow: Supabase puts tokens in the URL hash and fires PASSWORD_RECOVERY
+    if (code) {
+      // Supabase sends a PKCE code — exchange it client-side so the browser
+      // can use the code verifier it stored in localStorage during the request
+      supabase.auth.exchangeCodeForSession(code).then(({ error: err }) => {
+        if (!err) {
+          setReady(true);
+        } else {
+          setError('This reset link is invalid or has already been used. Please request a new one.');
+        }
+      });
+      return;
+    }
+
+    // No code in URL — listen briefly for PASSWORD_RECOVERY (implicit flow fallback)
     const { data: { subscription } } = supabase.auth.onAuthStateChange((event) => {
       if (event === 'PASSWORD_RECOVERY') setReady(true);
     });
-
-    // Fallback: session already set (e.g. user navigated back to this page)
     supabase.auth.getSession().then(({ data: { session } }) => {
       if (session) setReady(true);
     });
 
-    return () => subscription.unsubscribe();
-  }, []);
+    // After 3 seconds with no token, show a clear error instead of spinning
+    const timeout = setTimeout(() => {
+      setError('No valid reset link found. Please request a new one from the login page.');
+    }, 3000);
+
+    return () => {
+      subscription.unsubscribe();
+      clearTimeout(timeout);
+    };
+  }, [searchParams]);
 
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
@@ -77,6 +97,15 @@ function ResetPasswordForm() {
             <p style={{ color: '#6B7280', fontSize: 14 }}>
               Taking you to sign in…
             </p>
+          </div>
+        ) : error ? (
+          <div style={{ textAlign: 'center', marginTop: 16 }}>
+            <p className="login-error" style={{ marginBottom: 20 }}>{error}</p>
+            <a href="/login"
+              className="btn btn-primary"
+              style={{ display: 'inline-block', padding: '12px 28px', textDecoration: 'none' }}>
+              Back to login
+            </a>
           </div>
         ) : !ready ? (
           <div style={{ textAlign: 'center', padding: '16px 0' }}>
