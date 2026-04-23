@@ -1,27 +1,37 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect, Suspense } from 'react';
 import { useRouter } from 'next/navigation';
 import { createClient } from '@/utils/supabase/client';
 
-export default function ResetPasswordPage() {
-  const [password, setPassword]   = useState('');
-  const [confirm, setConfirm]     = useState('');
-  const [loading, setLoading]     = useState(false);
-  const [error, setError]         = useState('');
-  const [done, setDone]           = useState(false);
+/* ── Inner form — wrapped in Suspense by default export ── */
+function ResetPasswordForm() {
+  const [password, setPassword] = useState('');
+  const [confirm, setConfirm]   = useState('');
+  const [loading, setLoading]   = useState(false);
+  const [error, setError]       = useState('');
+  const [done, setDone]         = useState(false);
+  const [ready, setReady]       = useState(false);
   const router = useRouter();
+
+  // Works for both auth flows:
+  //  • PKCE  — session already established by /auth/callback; getSession() fires immediately
+  //  • Legacy — Supabase fires PASSWORD_RECOVERY via onAuthStateChange
+  useEffect(() => {
+    const supabase = createClient();
+    const { data: { subscription } } = supabase.auth.onAuthStateChange((event) => {
+      if (event === 'PASSWORD_RECOVERY') setReady(true);
+    });
+    supabase.auth.getSession().then(({ data: { session } }) => {
+      if (session) setReady(true);
+    });
+    return () => subscription.unsubscribe();
+  }, []);
 
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
-    if (password !== confirm) {
-      setError('Passwords do not match.');
-      return;
-    }
-    if (password.length < 8) {
-      setError('Password must be at least 8 characters.');
-      return;
-    }
+    if (password !== confirm) { setError('Passwords do not match.'); return; }
+    if (password.length < 8)  { setError('Password must be at least 8 characters.'); return; }
     setLoading(true);
     setError('');
     try {
@@ -31,8 +41,7 @@ export default function ResetPasswordPage() {
       setDone(true);
       setTimeout(() => router.push('/login'), 2500);
     } catch (err: unknown) {
-      const msg = err instanceof Error ? err.message : 'Something went wrong. Please try again.';
-      setError(msg);
+      setError(err instanceof Error ? err.message : 'Something went wrong. Please try again.');
     } finally {
       setLoading(false);
     }
@@ -67,6 +76,10 @@ export default function ResetPasswordPage() {
               Taking you to sign in…
             </p>
           </div>
+        ) : !ready ? (
+          <div style={{ textAlign: 'center', padding: '16px 0' }}>
+            <p className="login-sub">Verifying reset link…</p>
+          </div>
         ) : (
           <form onSubmit={handleSubmit}>
             <div className="field">
@@ -94,9 +107,7 @@ export default function ResetPasswordPage() {
                 autoComplete="new-password"
               />
             </div>
-
             {error && <p className="login-error">{error}</p>}
-
             <button
               type="submit"
               disabled={loading}
@@ -109,5 +120,19 @@ export default function ResetPasswordPage() {
         )}
       </div>
     </div>
+  );
+}
+
+export default function ResetPasswordPage() {
+  return (
+    <Suspense fallback={
+      <div className="login-page">
+        <div className="login-card">
+          <p className="login-sub">Loading…</p>
+        </div>
+      </div>
+    }>
+      <ResetPasswordForm />
+    </Suspense>
   );
 }
