@@ -329,7 +329,6 @@ function CalendarSlide() {
   const startDay = new Date(year, month, 1).getDay(); // 0=Sun
   const monthName = now.toLocaleString('default', { month: 'long' });
 
-  // Scatter ~6 "booked" days across the month, avoiding today and day 1
   const bookedDays = new Set<number>();
   const seeds = [5, 11, 17, 24].map(d => Math.min(d, daysInMonth));
   seeds.forEach(d => bookedDays.add(d));
@@ -358,6 +357,13 @@ function CalendarSlide() {
 }
 
 /* ─── PROCESS ────────────────────────────────────── */
+const PROSPECTS = [
+  { name: 'David Okafor',  co: 'Okafor Plumbing Co.',    signal: 'Hiring · 4 roles' },
+  { name: 'Lisa Tran',     co: 'Tran Family Dental',      signal: 'Just expanded'    },
+  { name: 'Carlos Mendez', co: 'Mendez Construction LLC', signal: 'Revenue growth'   },
+  { name: 'Rachel Kim',    co: 'Kim & Park Law Group',    signal: 'New entity'       },
+];
+
 function Process() {
   const [step, setStep] = useState(0);
   const wrapRef = useRef<HTMLElement>(null);
@@ -419,12 +425,7 @@ function Process() {
               <div className={`process-slide ${step === 1 ? 'active' : ''}`}>
                 {step === 1 && (
                   <div className="prospect-feed">
-                    {[
-                      { name: 'David Okafor',    co: 'Okafor Plumbing Co.',       signal: 'Hiring · 4 roles' },
-                      { name: 'Lisa Tran',        co: 'Tran Family Dental',         signal: 'Just expanded' },
-                      { name: 'Carlos Mendez',   co: 'Mendez Construction LLC',    signal: 'Revenue growth' },
-                      { name: 'Rachel Kim',       co: 'Kim & Park Law Group',       signal: 'New entity' },
-                    ].map((p, i) => (
+                    {PROSPECTS.map((p, i) => (
                       <div key={i} className="prospect-card">
                         <div className="pc-info">
                           <div className="pc-name">{p.name}</div>
@@ -472,12 +473,7 @@ function Process() {
             <p>{steps[1].p}</p>
             <div className="process-card-stage">
               <div className="prospect-feed">
-                {[
-                  { name: 'David Okafor',    co: 'Okafor Plumbing Co.',       signal: 'Hiring · 4 roles' },
-                  { name: 'Lisa Tran',        co: 'Tran Family Dental',         signal: 'Just expanded' },
-                  { name: 'Carlos Mendez',   co: 'Mendez Construction LLC',    signal: 'Revenue growth' },
-                  { name: 'Rachel Kim',       co: 'Kim & Park Law Group',       signal: 'New entity' },
-                ].map((p, i) => (
+                {PROSPECTS.map((p, i) => (
                   <div key={i} className="prospect-card">
                     <div className="pc-info">
                       <div className="pc-name">{p.name}</div>
