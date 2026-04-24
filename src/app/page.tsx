@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useRef, useState, useCallback, ReactNode, RefObject, Fragment } from 'react';
+import { useEffect, useRef, useState, useCallback, ReactNode, RefObject } from 'react';
 
 /* ─── HOOKS ─────────────────────────────────────────────────── */
 function useReveal() {
@@ -291,27 +291,6 @@ function Hero({ onBook }: { onBook: () => void }) {
   );
 }
 
-/* ─── MARQUEE ────────────────────────────────────── */
-function Marquee() {
-  return (
-    <div className="marquee">
-      <div className="marquee-track">
-        {Array.from({ length: 2 }).map((_, k) => (
-          <Fragment key={k}>
-            <span>HVAC &amp; plumbing shops</span>
-            <span>Dental practices</span>
-            <span>Law firms</span>
-            <span>Design studios</span>
-            <span>E-commerce brands</span>
-            <span>Medical clinics</span>
-            <span>Real estate teams</span>
-            <span>Trades &amp; contractors</span>
-          </Fragment>
-        ))}
-      </div>
-    </div>
-  );
-}
 
 /* ─── STATS ──────────────────────────────────────── */
 function Stats() {
@@ -844,7 +823,6 @@ export default function Home() {
       <div className="scroll-progress" />
       <Nav onBook={openModal} />
       <Hero onBook={openModal} />
-      <Marquee />
       <Stats />
       <Process />
       <Bento />
