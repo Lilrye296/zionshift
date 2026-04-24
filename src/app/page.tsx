@@ -261,7 +261,7 @@ function Hero({ onBook }: { onBook: () => void }) {
               <div className="h-panel-body" style={{ padding: '4px 22px 22px' }}>
                 {meetings.map((m, i) => (
                   <div key={i} className="cal-day">
-                    <span className="cal-time">{m.time}</span>
+                    <span className="cal-time" style={{ whiteSpace: 'nowrap' }}>{m.time}</span>
                     <div className="cal-who">
                       <div className="cal-name">{m.name}</div>
                       <div className="cal-co">{m.co}</div>
