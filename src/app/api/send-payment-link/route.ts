@@ -43,10 +43,6 @@ export async function POST(req: NextRequest) {
         <h1 style="margin:0 0 16px;font-size:30px;font-weight:800;color:#1A1715;letter-spacing:-0.03em;line-height:1.15;">
           Welcome,<br>${name}.
         </h1>
-        <p style="margin:0 0 32px;font-size:15px;color:#6B7280;line-height:1.7;">
-          ZionShift gets qualified bookkeeping clients onto your calendar on autopilot — so you can focus on the work, not the chase.
-        </p>
-
         <a href="${STRIPE_PAYMENT_LINK}"
            target="_blank"
            style="display:inline-block;background:#1A1715;color:#ffffff;text-decoration:none;font-size:15px;font-weight:700;padding:16px 32px;border-radius:8px;letter-spacing:-0.01em;">
@@ -60,10 +56,6 @@ export async function POST(req: NextRequest) {
 
       <!-- Footer -->
       <div style="padding:20px 36px 28px;border-top:1px solid #F0EDE8;">
-        <p style="margin:0 0 6px;font-size:13px;color:#B5B0A8;">
-          ZionShift &nbsp;·&nbsp;
-          <a href="https://www.zionshift.com" style="color:#B5B0A8;text-decoration:none;">www.zionshift.com</a>
-        </p>
         <p style="margin:0;font-size:12px;color:#C8C4BC;">
           Questions? Reply to this email or reach us at <a href="mailto:ryan@zionshift.com" style="color:#C8C4BC;">ryan@zionshift.com</a>
         </p>
