@@ -218,7 +218,7 @@ function Hero({ onBook }: { onBook: () => void }) {
           <WordReveal>that <em>never sleeps.</em></WordReveal>
         </h1>
         <p className="lead reveal-blur d3">
-          ZionShift is a fully autonomous AI that finds small business owners who need what you offer, reaches out personally, and books them onto your calendar — while you focus on the work.
+          ZionShift is a fully autonomous AI built for bookkeeping firms. It finds small business owners who need your services, reaches out personally, and books them directly onto your calendar — so you can stop depending on referrals and start growing on demand.
         </p>
         <div className="reveal d4" style={{ marginTop: 40, display: 'flex', gap: 12, flexWrap: 'wrap' }}>
           <button className="btn btn-primary btn-lg" onClick={onBook}>
@@ -430,7 +430,7 @@ function Process() {
               </div>
               <div className={`process-slide ${step === 0 ? 'active' : ''}`}>
                 <div className="slide-form">
-                  <div className="row"><span className="k">Ideal client</span><span className="v">Small business owners, owner-operated{step === 0 && <span className="cursor" />}</span></div>
+                  <div className="row"><span className="k">Ideal client</span><span className="v">Business owners who need bookkeeping{step === 0 && <span className="cursor" />}</span></div>
                   <div className="row"><span className="k">Target geography</span><span className="v">United States · $500K–$5M revenue</span></div>
                   <div className="row"><span className="k">Offer</span><span className="v">Your service, positioned to your ICP</span></div>
                 </div>
@@ -478,7 +478,7 @@ function Process() {
             <p>{steps[0].p}</p>
             <div className="process-card-stage">
               <div className="slide-form">
-                <div className="row"><span className="k">Ideal client</span><span className="v">Small business owners, owner-operated<span className="cursor" /></span></div>
+                <div className="row"><span className="k">Ideal client</span><span className="v">Business owners who need bookkeeping<span className="cursor" /></span></div>
                 <div className="row"><span className="k">Target geography</span><span className="v">United States · $500K–$5M revenue</span></div>
                 <div className="row"><span className="k">Offer</span><span className="v">Your service, positioned to your ICP</span></div>
               </div>
@@ -644,8 +644,9 @@ function Pricing({ onBook }: { onBook: () => void }) {
               <span className="pricing-amount">$2,000</span>
             </div>
           </div>
-          <p className="pricing-note">No contract. No hidden fees. Cancel anytime.</p>
-          <p className="pricing-note" style={{ marginTop: 10 }}>Monthly retainer starts only after your first meeting is booked.</p>
+          <p className="pricing-note" style={{ fontWeight: 600, fontSize: 15, color: 'var(--zs-ink)' }}>
+            You don&apos;t pay a single dollar of the monthly retainer until a qualified prospect is on your calendar. No contracts. Cancel anytime.
+          </p>
           <button className="btn btn-primary" onClick={onBook} style={{ marginTop: 32 }}>
             Book a free call<span className="chev">→</span>
           </button>
@@ -659,11 +660,11 @@ function Pricing({ onBook }: { onBook: () => void }) {
 function FAQ() {
   const [open, setOpen] = useState(0);
   const faqs = [
-    { q: 'How does the AI find qualified leads?', a: 'Our AI scans thousands of signals to identify decision makers at companies showing active buying intent — recent hiring, revenue growth, new entity formations, funding, tech changes, engagement activity. It writes and sends personalized outreach on your behalf, 24/7.' },
+    { q: 'How does the AI find qualified leads?', a: 'Our AI scans thousands of signals to identify small business owners who are growing and likely need bookkeeping support — recent hiring, revenue growth, new entity formations, funding, and more. It writes and sends personalized outreach on your behalf, 24/7, positioning your firm as the right solution at the right time.' },
     { q: 'Is this really hands-free?', a: "Yes. After a quick onboarding call where you tell us your ideal client, the AI handles everything — prospect research, personalized outreach, follow-ups, and conversation management." },
     { q: 'How long until I see booked calls?', a: 'After a quick onboarding and setup period, most clients begin seeing qualified meetings within the first few weeks. The AI continuously learns what messaging resonates best with your specific audience, so results typically improve month over month.' },
     { q: 'What does it cost?', a: 'Simple and transparent: a one-time $1,000 setup fee and a $2,000 monthly retainer — a fraction of what a human SDR or traditional agency would cost. No contract. Book a call and we\'ll walk through everything.' },
-    { q: 'What kinds of businesses do you work with?', a: 'Any B2B or owner-operated service business selling into small-to-mid-sized companies: trades, professional services, agencies, consultancies, e-commerce brands, medical and dental practices, law firms, real estate teams, and more.' },
+    { q: 'What kinds of businesses do you work with?', a: 'We work exclusively with bookkeeping firms that serve small to mid-sized businesses. Our AI targets the types of owner-operated businesses that make ideal bookkeeping clients — trades, contractors, dental and medical practices, law firms, real estate teams, e-commerce brands, and more.' },
     { q: 'Can I cancel anytime?', a: 'Yes. Month-to-month. No contract. No cancellation fees.' },
   ];
   return (
@@ -697,9 +698,9 @@ function CTA({ onBook }: { onBook: () => void }) {
     <section className="zs-section">
       <div className="zs-container">
         <div className="cta-wrap reveal">
-          <h2>Your next client is already out there.</h2>
+          <h2>Your next client isn&apos;t coming from a referral.</h2>
           <p style={{ margin: '32px auto 0', maxWidth: 560, fontSize: 19, lineHeight: 1.5 }}>
-            One call. We&apos;ll show you exactly what this looks like for your business.
+            One call. We&apos;ll show you exactly what a consistent, referral-free pipeline looks like for your firm.
           </p>
           <div style={{ marginTop: 40, position: 'relative', zIndex: 1 }}>
             <button className="btn btn-primary btn-lg" onClick={onBook} style={{ background: '#fff', color: 'var(--zs-ink)' }}>
@@ -816,7 +817,7 @@ function Modal({ open, onClose }: { open: boolean; onClose: () => void }) {
                 <div className="field"><label>Email</label><input type="email" required value={form.email} onChange={(e) => setForm({ ...form, email: e.target.value })} placeholder="jane@firm.com" /></div>
                 <div className="field"><label>Phone</label><input type="tel" required value={form.phone} onChange={(e) => setForm({ ...form, phone: e.target.value })} placeholder="(555) 000-0000" /></div>
                 <div className="field"><label>Business</label><input value={form.business} onChange={(e) => setForm({ ...form, business: e.target.value })} placeholder="Rivera Consulting LLC" /></div>
-                <div className="field"><label>Biggest challenge</label><textarea value={form.challenge} onChange={(e) => setForm({ ...form, challenge: e.target.value })} placeholder="Tell us what's holding you back…" /></div>
+                <div className="field"><label>Biggest challenge</label><textarea value={form.challenge} onChange={(e) => setForm({ ...form, challenge: e.target.value })} placeholder="e.g. Too reliant on referrals, need a consistent pipeline…" /></div>
                 <button type="submit" disabled={loading} className="btn btn-primary" style={{ marginTop: 20, width: '100%', padding: '14px' }}>
                   {loading ? 'Sending…' : <>Book your free strategy call<span className="chev">→</span></>}
                 </button>
