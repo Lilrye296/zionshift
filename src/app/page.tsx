@@ -2,6 +2,8 @@
 
 import { useEffect, useRef, useState, useCallback, ReactNode, RefObject } from 'react';
 
+const CALENDLY_URL = '#'; // TODO: replace with your Calendly link
+
 /* ─── HOOKS ─────────────────────────────────────────────────── */
 function useReveal() {
   useEffect(() => {
@@ -708,130 +710,26 @@ function Footer() {
   );
 }
 
-/* ─── MODAL ──────────────────────────────────────── */
-interface FormState { name: string; email: string; phone: string; business: string; challenge: string; }
-
-function Modal({ open, onClose }: { open: boolean; onClose: () => void }) {
-  const [submitted, setSubmitted] = useState(false);
-  const [loading, setLoading] = useState(false);
-  const [formError, setFormError] = useState('');
-  const [form, setForm] = useState<FormState>({ name: '', email: '', phone: '', business: '', challenge: '' });
-  const overlayRef = useRef<HTMLDivElement>(null);
-
-  useEffect(() => { document.body.style.overflow = open ? 'hidden' : ''; }, [open]);
-
-  const close = useCallback(() => {
-    setSubmitted(false);
-    setFormError('');
-    setForm({ name: '', email: '', phone: '', business: '', challenge: '' });
-    onClose();
-  }, [onClose]);
-
-  async function handleSubmit(e: React.FormEvent) {
-    e.preventDefault();
-    setLoading(true);
-    setFormError('');
-    try {
-      const res = await fetch('/api/contact', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(form),
-      });
-      const data = await res.json();
-      if (!res.ok) throw new Error(data.error || 'Something went wrong.');
-      setSubmitted(true);
-    } catch (err) {
-      setFormError(err instanceof Error ? err.message : 'Something went wrong. Please try again.');
-    } finally {
-      setLoading(false);
-    }
-  }
-
-  if (!open) return null;
-
-  return (
-    <div
-      className="modal-overlay"
-      ref={overlayRef}
-      onClick={(e) => { if (e.target === overlayRef.current) close(); }}
-    >
-      <div className="modal">
-        <button className="modal-close" onClick={close} aria-label="Close">✕</button>
-        <div className="modal-scroll">
-          {submitted ? (
-            <div style={{ textAlign: 'center', padding: '8px 0' }}>
-              <div style={{ width: 56, height: 56, borderRadius: 999, background: '#E8F1EA', display: 'flex', alignItems: 'center', justifyContent: 'center', margin: '0 auto 20px' }}>
-                <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="#1F6B3A" strokeWidth="2.5">
-                  <path d="M5 13l4 4L19 7" />
-                </svg>
-              </div>
-              <h3 style={{ fontSize: 24, fontWeight: 700, letterSpacing: '-0.025em', margin: 0 }}>You&apos;re in.</h3>
-              <p style={{ color: 'var(--zs-ink-4)', marginTop: 10 }}>We&apos;ll reach out within 24 hours to schedule your call.</p>
-              <button className="btn btn-primary" style={{ marginTop: 28, width: '100%' }} onClick={close}>Close</button>
-            </div>
-          ) : (
-            <>
-              <h3 style={{ fontSize: 22, fontWeight: 700, letterSpacing: '-0.025em', margin: 0 }}>Book a free strategy call</h3>
-              <p style={{ fontSize: 14, color: 'var(--zs-ink-4)', marginTop: 6, marginBottom: 20 }}>No commitment · No sales pitch · Just a real conversation.</p>
-
-              {/* ── Calendly quick-book ── */}
-              <div className="modal-cal-block">
-                <div>
-                  <div className="modal-cal-label">Ready to jump on now?</div>
-                  <div className="modal-cal-sub">Skip the form — pick a time and we&apos;ll meet on Zoom.</div>
-                </div>
-                {/* TODO (Calendly): replace href="#" with your Calendly link */}
-                <a href="#" target="_blank" rel="noopener noreferrer" className="btn btn-primary modal-cal-btn">
-                  See availability <span className="chev">→</span>
-                </a>
-              </div>
-
-              {/* ── Divider ── */}
-              <div className="modal-divider">
-                <span>or tell us about your business first</span>
-              </div>
-
-              <form onSubmit={handleSubmit}>
-                <div className="field"><label>Your name</label><input required value={form.name} onChange={(e) => setForm({ ...form, name: e.target.value })} placeholder="Jane Rivera" /></div>
-                <div className="field"><label>Email</label><input type="email" required value={form.email} onChange={(e) => setForm({ ...form, email: e.target.value })} placeholder="jane@firm.com" /></div>
-                <div className="field"><label>Phone</label><input type="tel" required value={form.phone} onChange={(e) => setForm({ ...form, phone: e.target.value })} placeholder="(555) 000-0000" /></div>
-                <div className="field"><label>Business</label><input value={form.business} onChange={(e) => setForm({ ...form, business: e.target.value })} placeholder="Rivera Consulting LLC" /></div>
-                <div className="field"><label>Biggest challenge</label><textarea value={form.challenge} onChange={(e) => setForm({ ...form, challenge: e.target.value })} placeholder="e.g. Too reliant on referrals, need a consistent pipeline…" /></div>
-                <button type="submit" disabled={loading} className="btn btn-primary" style={{ marginTop: 20, width: '100%', padding: '14px' }}>
-                  {loading ? 'Sending…' : <>Book your free strategy call<span className="chev">→</span></>}
-                </button>
-                {formError && <p style={{ marginTop: 12, fontSize: 13, color: 'var(--zs-signal)', textAlign: 'center' }}>{formError}</p>}
-              </form>
-            </>
-          )}
-        </div>
-      </div>
-    </div>
-  );
-}
 
 /* ─── ROOT ───────────────────────────────────────── */
 export default function Home() {
   useReveal();
   useScrollProgress();
-  const [modal, setModal] = useState(false);
-  const openModal = useCallback(() => setModal(true), []);
-  const closeModal = useCallback(() => setModal(false), []);
+  const openCalendly = useCallback(() => window.open(CALENDLY_URL, '_blank'), []);
 
   return (
     <>
       <div className="scroll-progress" />
-      <Nav onBook={openModal} />
-      <Hero onBook={openModal} />
+      <Nav onBook={openCalendly} />
+      <Hero onBook={openCalendly} />
       <Stats />
       <Process />
       <Bento />
       <Video />
-      <Pricing onBook={openModal} />
+      <Pricing onBook={openCalendly} />
       <FAQ />
-      <CTA onBook={openModal} />
+      <CTA onBook={openCalendly} />
       <Footer />
-      <Modal open={modal} onClose={closeModal} />
     </>
   );
 }
