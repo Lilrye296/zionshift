@@ -15,6 +15,21 @@ interface ClientProfile {
   campaign_status: string;
 }
 
+interface CalMeeting {
+  day: number;
+  month: number; // 0-indexed (0 = Jan, 3 = Apr)
+  prospect: string;
+  firm: string;
+  time: string;
+  zoomUrl?: string;
+}
+
+interface ActivityRow {
+  label: string;
+  sub: string;
+  day: number;
+}
+
 /* ── Helpers ── */
 function getGreeting() {
   const h = new Date().getHours();
@@ -59,16 +74,15 @@ function MiniCalendar({
   for (let d = 1; d <= daysInMonth; d++) cells.push(d);
   while (cells.length % 7 !== 0) cells.push(null);
 
-  // Only show dots for meetings in the displayed month
   const meetingDays = meetings.filter(m => m.month === displayMonth).map(m => m.day);
 
   function prevMonth() {
-    onMonthChange?.(); // clear detail panel — it belongs to the month being left
+    onMonthChange?.();
     if (displayMonth === 0) { setDisplayMonth(11); setDisplayYear(y => y - 1); }
     else setDisplayMonth(m => m - 1);
   }
   function nextMonth() {
-    onMonthChange?.(); // clear detail panel — it belongs to the month being left
+    onMonthChange?.();
     if (displayMonth === 11) { setDisplayMonth(0); setDisplayYear(y => y + 1); }
     else setDisplayMonth(m => m + 1);
   }
@@ -91,7 +105,6 @@ function MiniCalendar({
       <div className="mini-cal-grid">
         {DOW.map((d, i) => <div key={i} className="mini-cal-dow">{d}</div>)}
         {cells.map((day, i) => {
-          // Empty cells — mini-cal-day + empty applies pointer-events:none from CSS
           if (day === null) return <div key={i} className="mini-cal-day empty" />;
           const hasMeeting  = meetingDays.includes(day);
           const isSelected  = day === selectedDay && displayMonth === selectedMonth;
@@ -116,36 +129,9 @@ function MiniCalendar({
   );
 }
 
-/* ── Placeholder data (replaced by Supabase per-client data later) ── */
-
-interface CalMeeting {
-  day: number;
-  month: number; // 0-indexed (0 = Jan, 3 = Apr) — used for accurate date display
-  prospect: string;
-  firm: string;
-  time: string;
-  zoomUrl?: string;
-}
-
-const CAL_MEETINGS: CalMeeting[] = [
-  { day: 11, month: 3, prospect: 'James Rivera',    firm: 'Apex Financial Services',   time: '10:00 AM EST' },
-  { day: 17, month: 3, prospect: 'Sarah Mitchell',  firm: 'Clarity Point Bookkeeping', time: '2:00 PM EST'  },
-  { day: 23, month: 3, prospect: 'Marcus Thompson', firm: 'Northstar CFO Group',        time: '9:00 AM EST',  zoomUrl: 'https://zoom.us/j/placeholder'  },
-  { day: 23, month: 3, prospect: 'Linda Park',      firm: 'Summit Tax Advisors',        time: '2:00 PM EST',  zoomUrl: 'https://zoom.us/j/placeholder2' },
-];
-
-// Activity items tagged with day number for period filtering
-const ACTIVITY = [
-  { label: 'Meeting booked — Marcus T., Northstar CFO', sub: 'Today, 9:14am', day: 21 },
-  { label: '6 new replies received this week',           sub: 'This week',     day: 18 },
-  { label: 'Email 2 delivered to 104 prospects',         sub: 'Apr 18',        day: 18 },
-  { label: 'Campaign entered Week 3',                    sub: 'Apr 15',        day: 15 },
-  { label: 'Initial outreach sent to 98 prospects',      sub: 'Apr 8',         day: 8  },
-];
-
 const MONTH_SHORT = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
 
-// Converts a time string like "2:00 PM EST" to total minutes (timezone suffix ignored)
+// Converts a time string like "2:00 PM EST" to total minutes
 function parseTime(t: string): number {
   const [timePart, pd] = t.split(' ');
   const [h, m] = timePart.split(':').map(Number);
@@ -302,10 +288,8 @@ function LogoUploadModal({
   const [preview, setPreview]   = useState<string | null>(null);
   const [error, setError]       = useState('');
   const inputRef  = useRef<HTMLInputElement>(null);
-  // Tracks whether onSave was called — prevents revoking a URL the parent is still using
   const savedRef  = useRef(false);
 
-  // Revoke object URLs to avoid memory leaks, but only if the URL wasn't saved to the parent
   useEffect(() => {
     return () => { if (preview && !savedRef.current) URL.revokeObjectURL(preview); };
   }, [preview]);
@@ -342,7 +326,6 @@ function LogoUploadModal({
           <h2 className="lu-heading">Upload your logo</h2>
           <p className="lu-sub">This appears in the top center of your dashboard.</p>
 
-          {/* Drop zone */}
           <div
             className={`lu-dropzone${dragging ? ' dragging' : ''}${preview ? ' has-preview' : ''}`}
             onClick={() => inputRef.current?.click()}
@@ -381,7 +364,6 @@ function LogoUploadModal({
 
           {error && <p className="lu-error">{error}</p>}
 
-          {/* Requirements */}
           <div className="lu-reqs">
             <div className="lu-req-row">
               <span className="lu-req-key">Formats</span>
@@ -415,7 +397,7 @@ function LogoUploadModal({
   );
 }
 
-// Period-scoped metric shape — populated from Supabase when wired up
+/* ── Period stats interface ── */
 interface PeriodStats {
   emails_sent: number | null;
   replies: number | null;
@@ -423,33 +405,25 @@ interface PeriodStats {
   meetings_booked: number | null;
 }
 
-// Billing data — populated from Stripe + Supabase when wired up
-// TODO (Stripe): fetch via Stripe Customer object + subscription + invoice list
-// TODO (Supabase): plan name and billing_started stored in client_stats table
 interface BillingData {
-  plan_name: string;          // e.g. "ZionShift", "ZionShift Growth"
+  plan_name: string;
   status: 'active' | 'paused' | 'cancelled';
-  monthly_amount: number;     // in dollars, e.g. 2000
-  billing_started: string;    // formatted date string, e.g. "Apr 11, 2026"
-  next_invoice: string;       // formatted date string, e.g. "May 11, 2026"
-  card_brand: string;         // e.g. "Visa"
-  card_last4: string;         // e.g. "4821"
-  card_expires: string;       // e.g. "09 / 28"
-  stripe_portal_url: string;  // Stripe Customer Portal link for card updates only
+  monthly_amount: number;
+  billing_started: string;
+  next_invoice: string;
+  card_brand: string;
+  card_last4: string;
+  card_expires: string;
+  stripe_portal_url: string;
   invoices: {
     date: string;
     description: string;
     amount: number;
-    status: 'paid' | 'open' | 'failed'; // maps directly to Stripe invoice status
+    status: 'paid' | 'open' | 'failed';
   }[];
 }
 
 const PERIOD_LABEL = { week: 'This Week', month: 'This Month', alltime: 'All Time' };
-
-// Pre-sorted once at module level — descending by month, day, then time
-const SORTED_MEETINGS = [...CAL_MEETINGS].sort(
-  (a, b) => b.month - a.month || b.day - a.day || parseTime(b.time) - parseTime(a.time),
-);
 
 function getStatusProps(status: string | null) {
   switch (status) {
@@ -463,29 +437,26 @@ function getStatusProps(status: string | null) {
 
 /* ── Page ── */
 export default function ClientPage() {
-  const [profile, setProfile] = useState<ClientProfile | null>(null);
-  const [loading, setLoading] = useState(true);
-  const [isAdminView, setIsAdminView] = useState(false);
+  const [profile, setProfile]           = useState<ClientProfile | null>(null);
+  const [loading, setLoading]           = useState(true);
+  const [isAdminView, setIsAdminView]   = useState(false);
+  const [calMeetings, setCalMeetings]   = useState<CalMeeting[]>([]);
+  const [activityItems, setActivityItems] = useState<ActivityRow[]>([]);
   const router = useRouter();
 
-  // ── All state declarations up front so effects can reference them ──────
   const [activeTab, setActiveTab]               = useState<'overview' | 'billing'>('overview');
   const [showLogoUpload, setShowLogoUpload]     = useState(false);
   const [localLogoUrl, setLocalLogoUrl]         = useState<string | null>(null);
-  const [selectedMeeting, setSelectedMeeting] = useState<CalMeeting | null>(null);
+  const [selectedMeeting, setSelectedMeeting]   = useState<CalMeeting | null>(null);
   const [period, setPeriod]                     = useState<'week' | 'month' | 'alltime'>('month');
   const [periodOpen, setPeriodOpen]             = useState(false);
-  // Holds metric totals filtered to the selected period.
-  // Defaults to null (shows —) until Supabase query returns data.
   const [periodStats, setPeriodStats]           = useState<PeriodStats | null>(null);
-  // Billing data — null until Stripe + Supabase are wired up (shows — placeholders).
-  // TODO (Stripe/Supabase): replace BILLING_PLACEHOLDER below with a real fetch.
   const [billingData, setBillingData]           = useState<BillingData | null>(null);
-  const periodRef                           = useRef<HTMLDivElement>(null);
-  const [connectedCal, setConnectedCal]     = useState<CalProvider | null>(null);
-  const [calModal, setCalModal]             = useState<CalProvider | null>(null);
+  const periodRef                               = useRef<HTMLDivElement>(null);
+  const [connectedCal, setConnectedCal]         = useState<CalProvider | null>(null);
+  const [calModal, setCalModal]                 = useState<CalProvider | null>(null);
 
-  // ── Load profile from Supabase on mount ───────────────────────────────
+  // Load profile + meetings + activity from Supabase
   useEffect(() => {
     async function load() {
       if (!process.env.NEXT_PUBLIC_SUPABASE_URL || !process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY) {
@@ -497,53 +468,86 @@ export default function ClientPage() {
         const { data: { user } } = await supabase.auth.getUser();
         if (!user) { router.push('/login'); return; }
 
-        // Admin view: if ?view=<clientId> is in the URL and the logged-in user is admin,
-        // load that client's data instead of the admin's own (non-existent) row.
-        // TODO (Supabase): fully wired — activates automatically once Supabase is live.
-        const viewId = new URLSearchParams(window.location.search).get('view');
-        let targetId = user.id;
-        if (viewId) {
-          const { data: roleData } = await supabase
-            .from('profiles')
-            .select('role')
-            .eq('id', user.id)
-            .single();
-          if (roleData?.role === 'admin') {
-            targetId = viewId;
-            setIsAdminView(true);
-          }
-          // Non-admin with ?view= param — silently ignored, falls through to their own data
-        }
-
-        const { data } = await supabase
-          .from('client_stats')
-          .select('firm_name, logo_url, client_name, emails_sent, replies, reply_rate, meetings_booked, campaign_status')
-          .eq('client_id', targetId)
+        // Get profile row — includes client_id link to the clients table
+        const { data: profileRow } = await supabase
+          .from('profiles')
+          .select('role, client_id')
+          .eq('id', user.id)
           .single();
 
-        setProfile(data);
+        const viewId = new URLSearchParams(window.location.search).get('view');
+        let targetClientId: string | null = null;
+
+        if (viewId && profileRow?.role === 'admin') {
+          targetClientId = viewId;
+          setIsAdminView(true);
+        } else {
+          targetClientId = profileRow?.client_id ?? null;
+        }
+
+        if (!targetClientId) {
+          // Client account exists but hasn't been linked to a clients record yet
+          setLoading(false);
+          return;
+        }
+
+        // Fetch campaign stats
+        const { data: statsData } = await supabase
+          .from('client_stats')
+          .select('firm_name, logo_url, client_name, emails_sent, replies, reply_rate, meetings_booked, campaign_status')
+          .eq('client_id', targetClientId)
+          .single();
+
+        setProfile(statsData);
+
+        // Fetch meetings for this client
+        const { data: meetingsData } = await supabase
+          .from('meetings')
+          .select('prospect, firm, day, month, meeting_time, zoom_url')
+          .eq('client_id', targetClientId)
+          .order('year',  { ascending: false })
+          .order('month', { ascending: false })
+          .order('day',   { ascending: false });
+
+        if (meetingsData) {
+          setCalMeetings(meetingsData.map(m => ({
+            day:     m.day,
+            month:   m.month,
+            prospect: m.prospect ?? '',
+            firm:    m.firm ?? '',
+            time:    m.meeting_time ?? '',
+            zoomUrl: m.zoom_url ?? undefined,
+          })));
+        }
+
+        // Fetch activity for this client
+        const { data: activityData } = await supabase
+          .from('activity')
+          .select('label, sub, day')
+          .eq('client_id', targetClientId)
+          .order('created_at', { ascending: false })
+          .limit(20);
+
+        if (activityData) {
+          setActivityItems(activityData.map(a => ({
+            label: a.label ?? '',
+            sub:   a.sub   ?? '',
+            day:   a.day   ?? 0,
+          })));
+        }
+
       } catch {
-        // Network or Supabase error — profile stays null, dashboard renders gracefully.
+        // Network or Supabase error — render gracefully with empty states.
       }
       setLoading(false);
     }
     load();
   }, [router]);
 
-  // ── Period-scoped metrics ──────────────────────────────────────────────
-  // Fires whenever the user changes the period dropdown or profile loads.
-  // TODO (Supabase): replace setPeriodStats below with a period-filtered query, e.g.:
-  //   const { data } = await supabase
-  //     .from('client_stats_by_period')
-  //     .select('emails_sent, replies, reply_rate, meetings_booked')
-  //     .eq('client_id', user.id)
-  //     .eq('period', period)
-  //     .single();
-  //   setPeriodStats(data);
-  // The metric cards are already wired to periodStats — no further changes needed.
+  // Period-scoped metrics — update whenever period or profile changes
   useEffect(() => {
     if (!profile) return;
-    // Temporary: all periods show lifetime totals until Supabase is wired.
+    // All periods show lifetime totals until period-scoped view is wired to Smartlead
     setPeriodStats({
       emails_sent:     profile.emails_sent,
       replies:         profile.replies,
@@ -551,34 +555,11 @@ export default function ClientPage() {
       meetings_booked: profile.meetings_booked,
     });
   }, [period, profile]);
-  // ───────────────────────────────────────────────────────────────────────
 
-  // ── Billing data ──────────────────────────────────────────────────────
-  // TODO (Stripe + Supabase): replace this placeholder block with real fetches:
-  //   1. GET /api/billing?clientId=user.id  (server route that calls Stripe API)
-  //      → returns subscription, latest invoices, and card details
-  //   2. Supabase: pull plan_name and billing_started from client_stats
-  // All JSX fields below already read from billingData — swap in real data
-  // and the page updates automatically with no further changes needed.
+  // Billing placeholder — replaced when Stripe is wired
   useEffect(() => {
-    // Placeholder — remove this block and replace with real Stripe fetch
-    setBillingData({
-      plan_name:        'ZionShift',
-      status:           'active',
-      monthly_amount:   2000,
-      billing_started:  'Apr 11, 2026',
-      next_invoice:     'May 11, 2026',
-      card_brand:       'Visa',
-      card_last4:       '4821',
-      card_expires:     '09 / 28',
-      stripe_portal_url: 'https://billing.stripe.com',
-      invoices: [
-        { date: 'Apr 11, 2026', description: 'Monthly retainer', amount: 2000, status: 'paid' },
-        { date: 'Mar 29, 2026', description: 'Setup fee',         amount: 1000, status: 'paid' },
-      ],
-    });
+    setBillingData(null);
   }, []);
-  // ───────────────────────────────────────────────────────────────────────
 
   async function handleSignOut() {
     if (process.env.NEXT_PUBLIC_SUPABASE_URL && process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY) {
@@ -592,7 +573,7 @@ export default function ClientPage() {
     router.push('/login');
   }
 
-  // ── Close period dropdown on outside click ────────────────────────────
+  // Close period dropdown on outside click
   useEffect(() => {
     function handleClick(e: MouseEvent) {
       if (periodRef.current && !periodRef.current.contains(e.target as Node)) {
@@ -606,15 +587,19 @@ export default function ClientPage() {
   const p = profile;
   const greeting  = getGreeting();
   const firstName = p?.client_name?.split(' ')[0] ?? null;
-
   const statusProps = getStatusProps(p?.campaign_status ?? null);
 
-  // Computed here so filteredActivity can reference `period` state
-  const today           = new Date().getDate();
-  const filteredActivity = ACTIVITY.filter(a => {
+  // Sorted meetings — descending by month, day, then time
+  const sortedMeetings = [...calMeetings].sort(
+    (a, b) => b.month - a.month || b.day - a.day || parseTime(b.time) - parseTime(a.time),
+  );
+
+  // Activity filtered by selected period
+  const today = new Date().getDate();
+  const filteredActivity = activityItems.filter(a => {
     if (period === 'alltime') return true;
     if (period === 'week')    return a.day >= today - 7;
-    return true; // 'month' — shows all; full filtering requires month field in seed data
+    return true;
   });
 
   return (
@@ -652,7 +637,7 @@ export default function ClientPage() {
         ) : (
           <>
 
-            {/* ── Admin view banner — visible only when accessing via View → in admin portal ── */}
+            {/* ── Admin view banner ── */}
             {isAdminView && (
               <div className="adm-view-banner">
                 <span className="adm-view-banner-text">
@@ -714,8 +699,6 @@ export default function ClientPage() {
             </div>
 
             {/* ── Metric cards ── */}
-            {/* Values come from periodStats, which updates with the period dropdown. */}
-            {/* When Supabase is wired, periodStats will reflect the selected time range. */}
             <div className="cd-metrics">
               <div className="cd-metric-card">
                 <div className="cd-metric-label">Emails Sent</div>
@@ -747,12 +730,12 @@ export default function ClientPage() {
               {/* Calendar */}
               <div className="cd-card">
                 <MiniCalendar
-                  meetings={CAL_MEETINGS}
+                  meetings={calMeetings}
                   selectedDay={selectedMeeting?.day ?? null}
                   selectedMonth={selectedMeeting?.month ?? null}
                   onMonthChange={() => setSelectedMeeting(null)}
                   onDayClick={(day, month) => {
-                    const hit = [...CAL_MEETINGS]
+                    const hit = [...calMeetings]
                       .filter(m => m.month === month)
                       .sort((a, b) => parseTime(a.time) - parseTime(b.time))
                       .find(m => m.day === day);
@@ -762,7 +745,7 @@ export default function ClientPage() {
                   }}
                 />
 
-                {/* Inline detail — appears below calendar on selection */}
+                {/* Inline detail */}
                 {selectedMeeting ? (() => {
                   const isPast = isMeetingPast(selectedMeeting.day, selectedMeeting.time, selectedMeeting.month);
                   return (
@@ -796,10 +779,12 @@ export default function ClientPage() {
               <div className="cd-card" style={{ padding: 0, overflow: 'hidden', display: 'flex', flexDirection: 'column' }}>
                 <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '24px 20px 0', marginBottom: 16, flexShrink: 0 }}>
                   <span className="adm-biz-card-title">All Meetings</span>
-                  <span className="adm-count-chip">{CAL_MEETINGS.length} Total</span>
+                  <span className="adm-count-chip">{calMeetings.length} Total</span>
                 </div>
                 <div className="cd-meet-log">
-                  {SORTED_MEETINGS.map((m, i) => {
+                  {sortedMeetings.length === 0 ? (
+                    <p className="adm-empty-text" style={{ padding: '0 20px 24px' }}>No meetings booked yet.</p>
+                  ) : sortedMeetings.map((m, i) => {
                     const isPast = isMeetingPast(m.day, m.time, m.month);
                     return (
                       <Fragment key={i}>
@@ -831,13 +816,13 @@ export default function ClientPage() {
 
             </div>
 
-            {/* Recent Activity — full width below the grid */}
+            {/* Recent Activity */}
             <div className="cd-card" style={{ marginBottom: 20 }}>
               <div className="cd-card-label">Recent Activity</div>
               <div className="cd-activity-scroll">
                 <ul className="cd-activity-list">
                   {filteredActivity.length === 0 ? (
-                    <li className="cd-empty-state">No activity this period.</li>
+                    <li className="cd-empty-state">No activity yet.</li>
                   ) : filteredActivity.map((a, i) => (
                     <li key={i} className="cd-activity-item">
                       <span className="cd-activity-text">{a.label}</span>

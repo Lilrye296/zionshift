@@ -4,7 +4,7 @@ import { Fragment, useEffect, useRef, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { createClient } from '@/utils/supabase/client';
 
-/* ── Calendar icons (shared with client dashboard) ─────────────── */
+/* ── Calendar icons ─────────────────────────────────────────────── */
 
 function GoogleIcon() {
   return (
@@ -127,87 +127,60 @@ function AdminCalModal({
 /* ── Types ─────────────────────────────────────────────────────── */
 
 interface ActiveClient {
-  id: string;         // uuid from Supabase (seed data uses string ids to match)
+  id: string;
   name: string;
   firm: string;
   status: 'live' | 'paused' | 'cancelled';
-  mrr: number;           // monthly retainer amount in dollars
-  since: string;         // onboarded date label
-  firstMonthPaid: boolean; // true only after first $2k monthly charge clears
-  setupFeePaid: boolean;   // true as soon as $1k setup payment is confirmed
+  mrr: number;
+  since: string;
+  firstMonthPaid: boolean;
+  setupFeePaid: boolean;
 }
 
 interface ActivityItem {
-  id: string;         // uuid from Supabase (seed data uses string ids to match)
+  id: string;
   text: string;
   time: string;
   type: 'onboard' | 'churn' | 'milestone' | 'meeting' | 'mrr';
 }
 
-// Period-scoped metrics — populated from Supabase when wired up.
-// TODO (Supabase): fetch from an aggregated view that sums across all active clients
-//   for the selected period. Shape mirrors Smartlead campaign stats.
 interface AdminPeriodStats {
   emails_sent:   number | null;
   total_replies: number | null;
 }
 
-/* ── Static placeholder data ────────────────────────────────────── */
-
-// TODO (Supabase): replace ALL_CLIENTS with a live fetch from the clients table.
-// Fields populated by: Stripe webhook (setupFeePaid, firstMonthPaid), onboarding form (since, status).
-// MRR card only counts clients where firstMonthPaid === true.
-// Setup fees count clients where setupFeePaid === true.
-const ALL_CLIENTS: ActiveClient[] = [
-  // firstMonthPaid: false — both clients are within their first 30 days, no monthly charge yet
-  { id: '1', name: 'Sarah Mitchell', firm: 'Mitchell Wealth Advisors', status: 'live', mrr: 2000, since: 'Apr 11, 2026', firstMonthPaid: false, setupFeePaid: true  },
-  { id: '2', name: 'James Okafor',   firm: 'OFC Group',                status: 'live', mrr: 2000, since: 'Apr 20, 2026', firstMonthPaid: false, setupFeePaid: true  },
-  // Example paused/cancelled (uncomment to test UI):
-  // { id: '3', name: 'Beth Navarro',  firm: 'Navarro WM',         status: 'paused',    mrr: 2000, since: 'Mar 1, 2026',  firstMonthPaid: true,  setupFeePaid: true  },
-  // { id: '4', name: 'Carter Flynn',  firm: 'Flynn Financial',    status: 'cancelled', mrr: 0,    since: 'Feb 1, 2026',  firstMonthPaid: false, setupFeePaid: true  },
-];
-
-// TODO (Supabase): replace ACTIVITY_FEED with a live fetch from the business_events table.
-// Events written by: onboarding webhook (onboard), Stripe webhook (mrr, churn), Calendly webhook (meeting).
-const ACTIVITY_FEED: ActivityItem[] = [
-  { id: '1', text: 'James Okafor onboarded — campaign going live',  time: 'Apr 20', type: 'onboard' },
-  { id: '2', text: 'Setup fee received — James Okafor ($1,000)',     time: 'Apr 20', type: 'mrr'     },
-  { id: '3', text: 'Meeting booked via Calendly — prospect TBD',     time: 'Apr 18', type: 'meeting' },
-  { id: '4', text: 'Sarah Mitchell onboarded — campaign going live', time: 'Apr 11', type: 'onboard' },
-  { id: '5', text: 'Setup fee received — Sarah Mitchell ($1,000)',   time: 'Apr 11', type: 'mrr'     },
-];
-
-// TODO (Calendly → Supabase): when wired, remove PROSPECT_MEETINGS_SEED and replace the
-// useState initializer below with an empty array []. Then uncomment the useEffect fetch.
-// Supabase table shape (meetings):
-//   id uuid PK, prospect text, firm text, date text, day int2, month int2, year int4,
-//   time text, zoom_url text, status text CHECK status IN ('upcoming','completed')
-// Interface fields map 1-to-1 with column names — no aliasing needed in the Supabase query.
-// Calendly webhook fires POST → Supabase Edge Function → INSERT into meetings.
-// Completed status flipped automatically by a cron job comparing meeting datetime to now().
 interface ProspectMeeting {
-  id: string;         // uuid from Supabase (seed data uses string ids to match)
+  id: string;
   prospect: string;
   firm: string;
-  date: string;       // e.g. "Apr 24, 2026"
-  day: number;        // day of month for calendar dot
-  month: number;      // 0-indexed (0=Jan, 3=Apr) — used for month navigation filtering
-  year: number;       // e.g. 2026
-  time: string;       // e.g. "10:00 AM"
-  zoom_url: string;   // snake_case matches Supabase column name directly
+  date: string;
+  day: number;
+  month: number;
+  year: number;
+  time: string;
+  zoom_url: string;
   status: 'upcoming' | 'completed';
 }
 
-// Seed data — swap for Supabase fetch when ready (see TODO above)
-const PROSPECT_MEETINGS_SEED: ProspectMeeting[] = [
-  { id: '1', prospect: 'Carter Flynn',   firm: 'Flynn Financial',         date: 'Apr 24, 2026', day: 24, month: 3, year: 2026, time: '10:00 AM', zoom_url: 'https://zoom.us/j/placeholder', status: 'upcoming'  },
-  { id: '2', prospect: 'James Okafor',   firm: 'OFC Group',               date: 'Apr 22, 2026', day: 22, month: 3, year: 2026, time: '2:00 PM',  zoom_url: 'https://zoom.us/j/placeholder', status: 'upcoming'  },
-  { id: '3', prospect: 'Beth Navarro',   firm: 'Navarro Wealth Mgmt',     date: 'Apr 17, 2026', day: 17, month: 3, year: 2026, time: '11:00 AM', zoom_url: 'https://zoom.us/j/placeholder', status: 'completed' },
-  { id: '4', prospect: 'Marcus Webb',    firm: 'Webb Capital Partners',   date: 'Apr 14, 2026', day: 14, month: 3, year: 2026, time: '3:00 PM',  zoom_url: 'https://zoom.us/j/placeholder', status: 'completed' },
-  { id: '5', prospect: 'Diana Solis',    firm: 'Solis Wealth Management', date: 'Apr 10, 2026', day: 10, month: 3, year: 2026, time: '9:00 AM',  zoom_url: 'https://zoom.us/j/placeholder', status: 'completed' },
-];
+/* ── Helpers ────────────────────────────────────────────────────── */
 
-// Milestone ladder — defined outside component so it isn't re-created on every render
+const SHORT_MONTHS = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
+
+function fmtDate(iso: string): string {
+  const d = new Date(iso + 'T12:00:00Z');
+  return d.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
+}
+
+function fmtEventTime(iso: string): string {
+  return new Date(iso).toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
+}
+
+function fmtMeetingDate(year: number, month: number, day: number): string {
+  return `${SHORT_MONTHS[month]} ${day}, ${year}`;
+}
+
+/* ── Constants ──────────────────────────────────────────────────── */
+
 // $2k → $6k → $10k → then $10k increments to $100k
 const MRR_MILESTONES = [2000, 6000, 10000, 20000, 30000, 40000, 50000, 60000, 70000, 80000, 90000, 100000];
 
@@ -232,17 +205,14 @@ export default function AdminPage() {
   const [calModal, setCalModal]               = useState<CalProvider | null>(null);
   const [calMonth, setCalMonth]               = useState(() => new Date().getMonth());
   const [calYear, setCalYear]                 = useState(() => new Date().getFullYear());
-  // Meetings — seeded from static data; swap for Supabase fetch when ready.
-  // TODO (Supabase): change initializer to [] and uncomment the useEffect below.
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars -- setMeetings used when Supabase fetch is uncommented
-  const [meetings, setMeetings]               = useState<ProspectMeeting[]>(PROSPECT_MEETINGS_SEED);
-  // TODO (Supabase + Smartlead): replace null with real aggregated stats per period.
-  // Query Supabase view that sums Smartlead campaign stats across all active clients.
+  const [clients, setClients]                 = useState<ActiveClient[]>([]);
+  const [activityFeed, setActivityFeed]       = useState<ActivityItem[]>([]);
+  const [meetings, setMeetings]               = useState<ProspectMeeting[]>([]);
   const [periodStats, setPeriodStats]     = useState<AdminPeriodStats | null>(null);
   const periodRef                         = useRef<HTMLDivElement>(null);
   const router = useRouter();
 
-  // Auth guard — verify the user is logged in and has admin role before rendering
+  // Auth guard + data fetch
   useEffect(() => {
     async function load() {
       if (!process.env.NEXT_PUBLIC_SUPABASE_URL || !process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY) {
@@ -256,8 +226,67 @@ export default function AdminPage() {
         const { data: profile } = await supabase
           .from('profiles').select('role').eq('id', user.id).single();
         if (profile?.role !== 'admin') { router.push('/client'); return; }
+
+        // Fetch all clients
+        const { data: clientsData } = await supabase
+          .from('clients')
+          .select('id, name, firm, status, mrr, since, first_month_paid, setup_fee_paid')
+          .order('created_at', { ascending: false });
+
+        if (clientsData) {
+          setClients(clientsData.map(c => ({
+            id: c.id,
+            name: c.name,
+            firm: c.firm,
+            status: (c.status === 'active' ? 'live' : c.status) as 'live' | 'paused' | 'cancelled',
+            mrr: Number(c.mrr),
+            since: c.since ? fmtDate(c.since) : '—',
+            firstMonthPaid: c.first_month_paid,
+            setupFeePaid: c.setup_fee_paid,
+          })));
+        }
+
+        // Fetch business events (admin activity feed)
+        const { data: eventsData } = await supabase
+          .from('business_events')
+          .select('id, label, event_type, created_at')
+          .order('created_at', { ascending: false })
+          .limit(20);
+
+        if (eventsData) {
+          setActivityFeed(eventsData.map(e => ({
+            id: e.id,
+            text: e.label ?? '',
+            time: fmtEventTime(e.created_at),
+            type: (e.event_type ?? 'milestone') as ActivityItem['type'],
+          })));
+        }
+
+        // Fetch all prospect meetings
+        const { data: meetingsData } = await supabase
+          .from('meetings')
+          .select('id, prospect, firm, day, month, year, meeting_time, zoom_url, status')
+          .order('year',  { ascending: false })
+          .order('month', { ascending: false })
+          .order('day',   { ascending: false });
+
+        if (meetingsData) {
+          setMeetings(meetingsData.map(m => ({
+            id: m.id,
+            prospect: m.prospect ?? '',
+            firm: m.firm ?? '',
+            date: fmtMeetingDate(m.year, m.month, m.day),
+            day: m.day,
+            month: m.month,
+            year: m.year,
+            time: m.meeting_time ?? '',
+            zoom_url: m.zoom_url ?? '',
+            status: (m.status === 'scheduled' ? 'upcoming' : (m.status ?? 'upcoming')) as 'upcoming' | 'completed',
+          })));
+        }
+
       } catch {
-        // Network or Supabase error — allow page to render with seed data in dev.
+        // Network or Supabase error — render with empty arrays.
       }
       setLoading(false);
     }
@@ -275,26 +304,10 @@ export default function AdminPage() {
     return () => document.removeEventListener('mousedown', handleClick);
   }, []);
 
-  // TODO (Supabase): when wired, fire a period-filtered query here.
-  // For now mirrors null (shows —) until Supabase is connected.
+  // Period stats — shows '—' until Smartlead API is wired
   useEffect(() => {
     setPeriodStats(null);
-    // Example future query:
-    // const { data } = await supabase.from('admin_period_stats').select('*').eq('period', metricPeriod).single();
-    // setPeriodStats(data);
   }, [metricPeriod]);
-
-  // TODO (Supabase): uncomment to load live meetings from Supabase.
-  // Remove PROSPECT_MEETINGS_SEED initializer above and use [] instead.
-  // Ordered descending so newest meetings appear at the top of the All Meetings list.
-  // useEffect(() => {
-  //   const supabase = createClient();
-  //   supabase.from('meetings').select('*')
-  //     .order('year',  { ascending: false })
-  //     .order('month', { ascending: false })
-  //     .order('day',   { ascending: false })
-  //     .then(({ data }) => { if (data) setMeetings(data as ProspectMeeting[]); });
-  // }, []);
 
   async function handleSignOut() {
     if (process.env.NEXT_PUBLIC_SUPABASE_URL && process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY) {
@@ -308,30 +321,24 @@ export default function AdminPage() {
     router.push('/login');
   }
 
-  // TODO (Supabase): replace ALL_CLIENTS with a live fetch from the clients table.
-  // ALL_CLIENTS is placeholder — swap for: supabase.from('clients').select('*')
-
-  // MRR = only clients whose first monthly payment has cleared (not setup fees)
-  const totalMRR  = ALL_CLIENTS
+  // MRR = only clients whose first monthly payment has cleared
+  const totalMRR = clients
     .filter(c => c.firstMonthPaid)
     .reduce((s, c) => s + c.mrr, 0);
 
-  // Setup fees = all clients who paid the $1k setup (regardless of monthly status)
-  const setupFees = ALL_CLIENTS.filter(c => c.setupFeePaid).length * 1000;
+  // Setup fees = all clients who paid the $1k setup
+  const setupFees = clients.filter(c => c.setupFeePaid).length * 1000;
 
-  // Milestone ladder: $2k → $6k → $10k → $20k → $30k → ... → $100k
-  // Milestones track MRR only — setup fees never move this bar
+  // Milestone ladder
   const nextMilestone  = MRR_MILESTONES.find(m => m > totalMRR) ?? 100000;
   const prevMilestone  = MRR_MILESTONES[MRR_MILESTONES.indexOf(nextMilestone) - 1] ?? 0;
-  // Progress is relative between the previous and next milestone (not from zero)
   const mrrProgress    = nextMilestone === prevMilestone ? 100
     : Math.min(Math.round(((totalMRR - prevMilestone) / (nextMilestone - prevMilestone)) * 100), 100);
 
-  // "X Total" pill: live + paused only (cancelled excluded — they're not current clients)
-  const activeClientCount = ALL_CLIENTS.filter(c => c.status !== 'cancelled').length;
+  // Live + paused only (cancelled excluded)
+  const activeClientCount = clients.filter(c => c.status !== 'cancelled').length;
 
-  // Reply Rate = (total_replies / emails_sent) × 100, shown as a percentage
-  // TODO (Supabase + Smartlead): derived from periodStats once wired — shows '—' until then
+  // Reply Rate
   const replyRate: string = (
     periodStats?.emails_sent != null &&
     periodStats.emails_sent > 0 &&
@@ -342,7 +349,7 @@ export default function AdminPage() {
 
   const upcomingCount = meetings.filter(m => m.status === 'upcoming').length;
 
-  // Calendar grid — recomputed when calMonth/calYear/meetings state changes
+  // Calendar grid
   const calNow      = new Date();
   const calToday    = (calMonth === calNow.getMonth() && calYear === calNow.getFullYear()) ? calNow.getDate() : -1;
   const calFirstDay = new Date(calYear, calMonth, 1).getDay();
@@ -356,17 +363,15 @@ export default function AdminPage() {
   while (calCells.length % 7 !== 0) calCells.push(null);
 
   function prevMonth() {
-    setSelectedMeeting(null); // clear detail panel — it belongs to the month being left
+    setSelectedMeeting(null);
     if (calMonth === 0) { setCalMonth(11); setCalYear(y => y - 1); }
     else setCalMonth(m => m - 1);
   }
   function nextMonth() {
-    setSelectedMeeting(null); // clear detail panel — it belongs to the month being left
+    setSelectedMeeting(null);
     if (calMonth === 11) { setCalMonth(0); setCalYear(y => y + 1); }
     else setCalMonth(m => m + 1);
   }
-
-  if (loading) return null;
 
   return (
     <div className="portal-page">
@@ -384,6 +389,11 @@ export default function AdminPage() {
       </header>
 
       <main className="portal-main">
+
+        {loading ? (
+          <div className="portal-empty"><p>Loading…</p></div>
+        ) : (
+          <>
 
         {/* ── Tab pills ── */}
         <div className="cd-tabs" style={{ marginBottom: 32 }}>
@@ -427,7 +437,6 @@ export default function AdminPage() {
 
               {/* Calendar */}
               <div className="adm-biz-card">
-                {/* Month nav */}
                 <div className="adm-cal-nav">
                   <button className="adm-cal-nav-btn" onClick={prevMonth} aria-label="Previous month">
                     <svg width="14" height="14" viewBox="0 0 14 14" fill="none" aria-hidden>
@@ -456,8 +465,6 @@ export default function AdminPage() {
                         key={i}
                         disabled={!hasMeet}
                         onClick={() => {
-                          // TODO: if two meetings land on the same day, find() surfaces only the first.
-                          // When real Calendly data arrives, consider a multi-meeting day modal.
                           const m = meetings.find(x => x.day === d && x.month === calMonth && x.year === calYear);
                           setSelectedMeeting(prev => prev?.id === m?.id ? null : (m ?? null));
                         }}
@@ -542,13 +549,7 @@ export default function AdminPage() {
 
             </div>
 
-            {/* Calendar sync — matches client dashboard */}
-            {/* TODO (OAuth): wire each provider button to its OAuth flow.
-                Google  → /api/auth/google-calendar   (scope: calendar.events.readonly)
-                Outlook → /api/auth/outlook-calendar  (scope: Calendars.Read)
-                Apple   → App-Specific Password prompt (CalDAV)
-                On success, store provider token in Supabase user_integrations table.
-                connectedCal state drives the UI — swap setConnectedCal(p) for the real token check. */}
+            {/* Calendar sync */}
             <div className="cd-card" style={{ marginTop: 20 }}>
               <div className="cd-cal-sync-top">
                 <div>
@@ -584,7 +585,6 @@ export default function AdminPage() {
         {/* ══ OVERVIEW ════════════════════════════════════════════ */}
         {activeTab === 'Overview' && (
           <div>
-            {/* Heading + period toggle — uses same cd-period-* classes as client dashboard */}
             <div className="adm-biz-toprow">
               <h2 className="portal-heading" style={{ margin: 0 }}>Overview</h2>
               <div className="cd-period-dropdown" ref={periodRef}>
@@ -610,8 +610,7 @@ export default function AdminPage() {
               </div>
             </div>
 
-            {/* Metric cards — MRR is always current; others are period-scoped */}
-            {/* TODO (Supabase): periodStats populated from admin_period_stats view */}
+            {/* Metric cards */}
             <div className="portal-metrics" style={{ margin: '24px 0 28px' }}>
               <div className="portal-metric-card">
                 <div className="portal-metric-label">MRR</div>
@@ -637,18 +636,17 @@ export default function AdminPage() {
 
             <div className="adm-biz-grid">
 
-              {/* Clients — all statuses, scrollable */}
-              {/* TODO (Supabase): replace ALL_CLIENTS with live fetch from clients table */}
+              {/* Clients */}
               <div className="adm-biz-card">
                 <div className="adm-biz-card-head">
                   <span className="adm-biz-card-title">Clients</span>
                   <span className="adm-count-chip">{activeClientCount} Total</span>
                 </div>
-                {ALL_CLIENTS.length === 0 ? (
+                {clients.length === 0 ? (
                   <p className="adm-empty-text">No clients yet.</p>
                 ) : (
-                  <div className="adm-client-scroll" style={ALL_CLIENTS.length <= 4 ? { maxHeight: 'none', overflowY: 'visible' } : {}}>
-                    {ALL_CLIENTS.map((c, i) => (
+                  <div className="adm-client-scroll" style={clients.length <= 4 ? { maxHeight: 'none', overflowY: 'visible' } : {}}>
+                    {clients.map((c, i) => (
                       <Fragment key={c.id}>
                         {i > 0 && <div className="adm-divider" />}
                         <div className="adm-client-row">
@@ -658,7 +656,6 @@ export default function AdminPage() {
                           <div className="adm-client-info">
                             <span className="adm-client-name">{c.name}</span>
                             <span className="adm-client-firm">{c.firm} · since {c.since}</span>
-                            {/* Shown while client is within first billing cycle — clears when firstMonthPaid flips true via Stripe webhook */}
                             {!c.firstMonthPaid && c.status === 'live' && (
                               <span className="adm-billing-pending">Billing pending</span>
                             )}
@@ -667,9 +664,6 @@ export default function AdminPage() {
                             <span className={`adm-client-pill adm-client-pill--${c.status}`}>
                               ●&nbsp;{c.status === 'live' ? 'Active' : c.status.charAt(0).toUpperCase() + c.status.slice(1)}
                             </span>
-                            {/* TODO (Supabase): pass real client UUID as query param.
-                                Client page will check for ?view=<id> + admin role,
-                                then load that client's data instead of the logged-in user's. */}
                             <button
                               className="adm-view-btn"
                               onClick={() => router.push(`/client?view=${c.id}`)}
@@ -702,8 +696,6 @@ export default function AdminPage() {
                       <span className="adm-revenue-val">${setupFees.toLocaleString()}</span>
                     </div>
                     <div className="adm-divider" />
-                    {/* TODO (Supabase + Stripe): totalMRR sums only firstMonthPaid clients; setupFees sums all setupFeePaid clients × $1k.
-                        Total Collected = all cleared payments to date. */}
                     <div className="adm-revenue-row adm-revenue-row--total">
                       <span className="adm-revenue-label adm-revenue-label--total">Total Collected</span>
                       <span className="adm-revenue-val adm-revenue-val--total">${(totalMRR + setupFees).toLocaleString()}</span>
@@ -725,13 +717,15 @@ export default function AdminPage() {
                   </div>
                 </div>
 
-                {/* Recent activity — business events only */}
+                {/* Recent activity */}
                 <div className="adm-biz-card">
                   <div className="adm-biz-card-head">
                     <span className="adm-biz-card-title">Recent Activity</span>
                   </div>
                   <div className="adm-activity-list">
-                    {ACTIVITY_FEED.map((item, i) => (
+                    {activityFeed.length === 0 ? (
+                      <p className="adm-empty-text">No activity yet.</p>
+                    ) : activityFeed.map((item, i) => (
                       <Fragment key={item.id}>
                         {i > 0 && <div className="adm-divider" />}
                         <div className="adm-activity-row">
@@ -754,9 +748,12 @@ export default function AdminPage() {
           </div>
         )}
 
+          </>
+        )}
+
       </main>
 
-      {/* Calendar connect modal — shared with Meetings tab sync section */}
+      {/* Calendar connect modal */}
       {calModal && (
         <AdminCalModal
           provider={calModal}
