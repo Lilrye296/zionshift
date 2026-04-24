@@ -19,6 +19,7 @@ export async function POST(req: NextRequest) {
     const { error } = await resend.emails.send({
       from: 'ZionShift <hello@zionshift.com>',
       to: email,
+      replyTo: 'ryan@zionshift.com',
       subject: 'Your ZionShift Setup — Complete Your Payment',
       html: `
 <!DOCTYPE html>
