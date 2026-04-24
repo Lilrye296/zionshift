@@ -203,10 +203,10 @@ function Hero({ onBook }: { onBook: () => void }) {
   useCursorOrb();
 
   const meetings = [
-    { time: '09:00', name: 'Marcus Thompson',  co: 'Thompson HVAC & Plumbing' },
-    { time: '10:30', name: 'Sarah Mitchell',   co: 'Mitchell Dental Practice' },
-    { time: '13:00', name: 'James Rivera',     co: 'Rivera Law Offices' },
-    { time: '15:30', name: 'Amanda Chen',      co: 'Chen Design Studio' },
+    { time: '9:00 AM',  name: 'Marcus Thompson', co: 'Thompson HVAC & Plumbing' },
+    { time: '10:30 AM', name: 'Sarah Mitchell',  co: 'Mitchell Family Dental' },
+    { time: '1:00 PM',  name: 'James Rivera',    co: 'Rivera Family Restaurant' },
+    { time: '3:30 PM',  name: 'Amanda Chen',     co: 'Chen Real Estate Group' },
   ];
 
   return (
