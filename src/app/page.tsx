@@ -282,7 +282,7 @@ function Hero({ onBook }: { onBook: () => void }) {
           <div className="hero-badge hero-badge-2 ink">
             <div>
               <div className="lbl">Avg. retainer</div>
-              <div className="n" style={{ color: '#fff' }}>$<Counter to={1200} /></div>
+              <div className="n" style={{ color: '#fff', letterSpacing: '0.03em' }}>$<Counter to={1200} /></div>
             </div>
           </div>
         </div>
@@ -297,7 +297,7 @@ function Stats() {
   const stats = [
     { idx: 'Always on',         val: '24/7',                                                                              lbl: 'Autonomous AI operation' },
     { idx: 'No learning curve', val: 'Zero',                                                                              lbl: 'Software for you to learn' },
-    { idx: 'Time reclaimed',    val: <><Counter to={40} /><span className="unit">hrs</span></>,                           lbl: 'Saved per month, per client' },
+    { idx: 'Dry spells',        val: 'Gone',                                                                             lbl: 'Consistent new business, every single month' },
     { idx: 'Fully managed',     val: <><Counter to={100} /><span className="unit">%</span></>,                            lbl: 'Done for you, end to end' },
   ];
   return (
