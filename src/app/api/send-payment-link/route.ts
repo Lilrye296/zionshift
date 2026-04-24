@@ -29,75 +29,47 @@ export async function POST(req: NextRequest) {
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Your ZionShift Setup</title>
   </head>
-  <body style="margin:0;padding:0;background-color:#F0EDE8;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Helvetica,Arial,sans-serif;">
-    <table width="100%" cellpadding="0" cellspacing="0" style="background-color:#F0EDE8;padding:48px 16px;">
-      <tr>
-        <td align="center">
+  <body style="margin:0;padding:48px 0;background:#F0EDE8;font-family:'Helvetica Neue',Helvetica,Arial,sans-serif;">
+    <div style="max-width:540px;margin:0 auto;background:#ffffff;border-radius:16px;overflow:hidden;box-shadow:0 4px 24px rgba(0,0,0,0.07);">
 
-          <!-- Card -->
-          <table width="100%" cellpadding="0" cellspacing="0" style="max-width:560px;background-color:#ffffff;border-radius:12px;overflow:hidden;">
+      <!-- Logo bar -->
+      <div style="background:#ffffff;padding:24px 36px;border-bottom:1px solid #F0EDE8;">
+        <img src="https://zionshift.com/logo.png" alt="ZionShift" width="140" style="display:block;" />
+      </div>
 
-            <!-- Logo bar -->
-            <tr>
-              <td style="padding:32px 40px 0;text-align:left;">
-                <img
-                  src="https://zionshift.com/logo.png"
-                  alt="ZionShift"
-                  width="140"
-                  style="display:block;height:auto;border:0;"
-                />
-              </td>
-            </tr>
+      <!-- Body -->
+      <div style="padding:44px 36px 36px;">
+        <p style="margin:0 0 10px;font-size:11px;font-weight:700;letter-spacing:0.1em;text-transform:uppercase;color:#9CA3AF;">New Client Setup</p>
+        <h1 style="margin:0 0 16px;font-size:30px;font-weight:800;color:#1A1715;letter-spacing:-0.03em;line-height:1.15;">
+          Welcome,<br>${name}.
+        </h1>
+        <p style="margin:0 0 32px;font-size:15px;color:#6B7280;line-height:1.7;">
+          ZionShift gets qualified bookkeeping clients onto your calendar on autopilot — so you can focus on the work, not the chase.
+        </p>
 
-            <!-- Body -->
-            <tr>
-              <td style="padding:32px 40px 40px;">
+        <a href="${STRIPE_PAYMENT_LINK}"
+           target="_blank"
+           style="display:inline-block;background:#1A1715;color:#ffffff;text-decoration:none;font-size:15px;font-weight:700;padding:16px 32px;border-radius:8px;letter-spacing:-0.01em;">
+          Complete Setup — $1,000 →
+        </a>
 
-                <p style="margin:0 0 8px;font-size:22px;font-weight:700;color:#1A1715;line-height:1.3;">
-                  Welcome, ${name}.
-                </p>
+        <p style="margin:32px 0 0;font-size:13px;color:#9CA3AF;line-height:1.7;">
+          Once payment is complete, you'll receive a separate email with a link to set up your ZionShift account. The whole process takes less than 5 minutes.
+        </p>
+      </div>
 
-                <p style="margin:0 0 28px;font-size:15px;color:#555551;line-height:1.6;">
-                  ZionShift gets qualified bookkeeping clients onto your calendar on autopilot — so you can focus on the work, not the chase.
-                </p>
+      <!-- Footer -->
+      <div style="padding:20px 36px 28px;border-top:1px solid #F0EDE8;">
+        <p style="margin:0 0 6px;font-size:13px;color:#B5B0A8;">
+          ZionShift &nbsp;·&nbsp;
+          <a href="https://www.zionshift.com" style="color:#B5B0A8;text-decoration:none;">www.zionshift.com</a>
+        </p>
+        <p style="margin:0;font-size:12px;color:#C8C4BC;">
+          Questions? Reply to this email or reach us at <a href="mailto:ryan@zionshift.com" style="color:#C8C4BC;">ryan@zionshift.com</a>
+        </p>
+      </div>
 
-                <!-- CTA button -->
-                <table cellpadding="0" cellspacing="0" style="margin-bottom:24px;">
-                  <tr>
-                    <td style="background-color:#1A1715;border-radius:8px;">
-                      <a
-                        href="${STRIPE_PAYMENT_LINK}"
-                        target="_blank"
-                        style="display:inline-block;padding:14px 28px;font-size:15px;font-weight:600;color:#ffffff;text-decoration:none;letter-spacing:-0.2px;"
-                      >
-                        Complete Setup — $1,000 →
-                      </a>
-                    </td>
-                  </tr>
-                </table>
-
-                <p style="margin:0;font-size:13px;color:#888884;line-height:1.6;">
-                  Once payment is complete, you'll receive a separate email with a link to set up your ZionShift account. The whole process takes less than 5 minutes.
-                </p>
-
-              </td>
-            </tr>
-
-            <!-- Footer -->
-            <tr>
-              <td style="padding:20px 40px;border-top:1px solid #F0EDE8;">
-                <p style="margin:0;font-size:12px;color:#AAAAAA;">
-                  © ${new Date().getFullYear()} ZionShift. All rights reserved.
-                </p>
-              </td>
-            </tr>
-
-          </table>
-          <!-- /Card -->
-
-        </td>
-      </tr>
-    </table>
+    </div>
   </body>
 </html>
       `.trim(),
