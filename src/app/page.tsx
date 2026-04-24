@@ -245,7 +245,7 @@ function Hero({ onBook }: { onBook: () => void }) {
               <div className="h-panel-body">
                 <div className="ai-draft">
                   <span className="tag">To · Marcus Thompson, Owner · Thompson HVAC &amp; Plumbing</span>
-                  <Typewriter text={"Hi Marcus — noticed Thompson HVAC just added two service trucks and you're hiring a third tech. Most owners at your stage end up buried in receipts and QuickBooks reconciliations instead of running the business. I help owner-operators like you hand off the books entirely — month-end closes, A/R, A/P, clean P&Ls — so you get the reports without the bookkeeping."} />
+                  <Typewriter text={"Hi Marcus — noticed Thompson HVAC just brought on two new trucks and you're already hiring again. That kind of growth is exciting, but it usually means the financial side of the business starts slipping through the cracks — invoices piling up, tax time turning into a scramble, never quite sure what you actually made last month. I help trades owners like you keep that side of the business completely off your plate. You run the jobs. We handle the numbers. Worth a quick call?"} />
                 </div>
               </div>
             </div>
