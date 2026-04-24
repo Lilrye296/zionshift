@@ -283,7 +283,7 @@ function Hero({ onBook }: { onBook: () => void }) {
           </div>
           <div className="hero-badge hero-badge-2 ink">
             <div>
-              <div className="lbl">Avg. retainer</div>
+              <div className="lbl">Avg. client value</div>
               <div className="n" style={{ color: '#fff', letterSpacing: '0.03em' }}>$<Counter to={1200} /></div>
             </div>
           </div>
@@ -357,6 +357,25 @@ function CalendarSlide() {
 }
 
 /* ─── PROCESS ────────────────────────────────────── */
+function FormSlide({ showCursor }: { showCursor?: boolean }) {
+  return (
+    <div className="slide-form">
+      <div className="row">
+        <span className="k">Ideal client</span>
+        <span className="v">Business owners who need bookkeeping{showCursor && <span className="cursor" />}</span>
+      </div>
+      <div className="row">
+        <span className="k">Target geography</span>
+        <span className="v">United States · $500K–$5M revenue</span>
+      </div>
+      <div className="row">
+        <span className="k">Offer</span>
+        <span className="v">Your service, positioned to your ICP</span>
+      </div>
+    </div>
+  );
+}
+
 const PROSPECTS = [
   { name: 'David Okafor',  co: 'Okafor Plumbing Co.',    signal: 'Hiring · 4 roles' },
   { name: 'Lisa Tran',     co: 'Tran Family Dental',      signal: 'Just expanded'    },
@@ -368,6 +387,12 @@ function Process() {
   const [step, setStep] = useState(0);
   const wrapRef = useRef<HTMLElement>(null);
 
+  const steps = [
+    { num: '01 / 03', h: 'You tell us who you want.', p: 'One onboarding call. Share your ideal client, offer, and target market. We handle everything after that.' },
+    { num: '02 / 03', h: 'The AI builds your pipeline.', p: 'We find decision makers showing buying signals, write personalized outreach that reads human, and handle entire conversations 24/7 — even while you sleep.' },
+    { num: '03 / 03', h: 'Meetings land on your calendar.', p: 'Qualified prospects show up as booked calls. You open your calendar, see who\'s next, and close. That\'s the whole interaction.' },
+  ];
+
   useEffect(() => {
     const onScroll = () => {
       const el = wrapRef.current;
@@ -376,21 +401,15 @@ function Process() {
       const total = el.offsetHeight - window.innerHeight;
       const scrolled = Math.max(0, -r.top);
       const pct = Math.min(1, Math.max(0, scrolled / total));
-      setStep(Math.min(2, Math.floor(pct * 3)));
+      setStep(Math.min(steps.length - 1, Math.floor(pct * steps.length)));
     };
     window.addEventListener('scroll', onScroll, { passive: true });
     onScroll();
     return () => window.removeEventListener('scroll', onScroll);
-  }, []);
-
-  const steps = [
-    { num: '01 / 03', h: 'You tell us who you want.', p: 'One onboarding call. Share your ideal client, offer, and target market. We handle everything after that.' },
-    { num: '02 / 03', h: 'The AI builds your pipeline.', p: 'We find decision makers showing buying signals, write personalized outreach that reads human, and handle entire conversations 24/7 — even while you sleep.' },
-    { num: '03 / 03', h: 'Meetings land on your calendar.', p: 'Qualified prospects show up as booked calls. You open your calendar, see who\'s next, and close. That\'s the whole interaction.' },
-  ];
+  }, [steps.length]);
 
   return (
-    <section id="how" className="process" ref={wrapRef as React.RefObject<HTMLElement>}>
+    <section id="how" className="process" ref={wrapRef}>
 
       {/* Desktop: sticky scroll animation */}
       <div className="process-sticky process-desktop">
@@ -416,11 +435,7 @@ function Process() {
                 {[0, 1, 2].map((i) => <div key={i} className={`dot ${i === step ? 'active' : ''}`} />)}
               </div>
               <div className={`process-slide ${step === 0 ? 'active' : ''}`}>
-                <div className="slide-form">
-                  <div className="row"><span className="k">Ideal client</span><span className="v">Business owners who need bookkeeping{step === 0 && <span className="cursor" />}</span></div>
-                  <div className="row"><span className="k">Target geography</span><span className="v">United States · $500K–$5M revenue</span></div>
-                  <div className="row"><span className="k">Offer</span><span className="v">Your service, positioned to your ICP</span></div>
-                </div>
+                <FormSlide showCursor={step === 0} />
               </div>
               <div className={`process-slide ${step === 1 ? 'active' : ''}`}>
                 {step === 1 && (
@@ -459,11 +474,7 @@ function Process() {
             <h3>{steps[0].h}</h3>
             <p>{steps[0].p}</p>
             <div className="process-card-stage">
-              <div className="slide-form">
-                <div className="row"><span className="k">Ideal client</span><span className="v">Business owners who need bookkeeping<span className="cursor" /></span></div>
-                <div className="row"><span className="k">Target geography</span><span className="v">United States · $500K–$5M revenue</span></div>
-                <div className="row"><span className="k">Offer</span><span className="v">Your service, positioned to your ICP</span></div>
-              </div>
+              <FormSlide showCursor />
             </div>
           </div>
 
@@ -548,7 +559,7 @@ function Bento() {
             <h3>Learns. Adapts. Compounds.</h3>
             <p>The AI continuously learns what messaging resonates with your ideal client — so results compound month over month.</p>
             <div className="bt-graph">
-              <svg viewBox="0 0 400 100" preserveAspectRatio="none">
+              <svg viewBox="0 0 400 100" preserveAspectRatio="none" aria-hidden="true">
                 <defs>
                   <linearGradient id="graphGrad" x1="0" y1="0" x2="0" y2="1">
                     <stop offset="0%" stopColor="#0B0B0C" stopOpacity="1" />
@@ -566,7 +577,7 @@ function Bento() {
             <h3>Only qualified meetings.</h3>
             <p>The AI qualifies every prospect before a single meeting gets booked. You only talk to people worth your time.</p>
             <div className="bt-check">
-              <svg viewBox="0 0 110 110">
+              <svg viewBox="0 0 110 110" aria-hidden="true">
                 <path className="ck-path" d="M18 58 L42 82 L92 28" />
               </svg>
             </div>
@@ -656,7 +667,7 @@ function FAQ() {
         <div className="reveal d1">
           {faqs.map((f, i) => (
             <div key={i} className="faq-item" data-open={open === i ? true : undefined}>
-              <button className="faq-q" onClick={() => setOpen(open === i ? -1 : i)}>
+              <button className="faq-q" onClick={() => setOpen(open === i ? -1 : i)} aria-expanded={open === i}>
                 <span>{f.q}</span>
                 <span className="faq-plus">+</span>
               </button>
