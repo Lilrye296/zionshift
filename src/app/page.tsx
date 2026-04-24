@@ -112,7 +112,7 @@ function Counter({ to, suffix = '', duration = 1800 }: { to: number; suffix?: st
     if (ref.current) io.observe(ref.current);
     return () => io.disconnect();
   }, [to, duration]);
-  return <span ref={ref}>{val}{suffix}</span>;
+  return <span ref={ref}>{val.toLocaleString()}{suffix}</span>;
 }
 
 /* ─── TYPEWRITER ─────────────────────────────────── */
@@ -297,7 +297,7 @@ function Stats() {
   const stats = [
     { idx: 'Always on',         val: '24/7',                                                                              lbl: 'Autonomous AI operation' },
     { idx: 'No learning curve', val: 'Zero',                                                                              lbl: 'Software for you to learn' },
-    { idx: 'Dry spells',        val: 'Gone',                                                                             lbl: 'Consistent new business, every single month' },
+    { idx: 'Slow months',       val: 'Gone',                                                                             lbl: 'Consistent new business, every single month' },
     { idx: 'Fully managed',     val: <><Counter to={100} /><span className="unit">%</span></>,                            lbl: 'Done for you, end to end' },
   ];
   return (
