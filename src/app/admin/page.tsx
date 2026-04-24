@@ -618,13 +618,6 @@ export default function AdminPage() {
           <div>
             <div className="adm-biz-toprow">
               <h2 className="portal-heading" style={{ margin: 0 }}>Overview</h2>
-              <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
-              <button
-                className="adm-onboard-btn"
-                onClick={openOnboard}
-              >
-                Onboard New Client
-              </button>
               <div className="cd-period-dropdown" ref={periodRef}>
                 <button className="cd-period-btn" onClick={() => setPeriodOpen(o => !o)}>
                   {PERIOD_LABEL[metricPeriod]}
@@ -645,7 +638,6 @@ export default function AdminPage() {
                     ))}
                   </div>
                 )}
-              </div>
               </div>
             </div>
 
@@ -671,6 +663,17 @@ export default function AdminPage() {
                 <div className="portal-metric-value">{replyRate}</div>
                 <div className="adm-metric-period">{PERIOD_LABEL[metricPeriod]}</div>
               </div>
+            </div>
+
+            {/* Onboard strip */}
+            <div className="adm-onboard-strip">
+              <div className="adm-onboard-strip-text">
+                <span className="adm-onboard-strip-title">Onboard New Client</span>
+                <span className="adm-onboard-strip-sub">Send a payment link to start their setup.</span>
+              </div>
+              <button className="adm-onboard-btn" onClick={openOnboard}>
+                Send Payment Link
+              </button>
             </div>
 
             <div className="adm-biz-grid">
