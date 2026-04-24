@@ -245,7 +245,7 @@ function Hero({ onBook }: { onBook: () => void }) {
               <div className="h-panel-body">
                 <div className="ai-draft">
                   <span className="tag">To · Marcus Thompson, Owner · Thompson HVAC &amp; Plumbing</span>
-                  <Typewriter text={"Hi Marcus — noticed Thompson HVAC just brought on two new trucks and you're already hiring again. That kind of growth is exciting, but it usually means the financial side of the business starts slipping through the cracks — invoices piling up, tax time turning into a scramble, never quite sure what you actually made last month. I help trades owners like you keep that side of the business completely off your plate. You run the jobs. We handle the numbers. Worth a quick call?"} />
+                  <Typewriter text={"Hi Marcus — Thompson HVAC just added two trucks and you're already hiring. That kind of growth usually means the books get messy fast. I help trades owners like you hand that off completely. You run the jobs. We handle the numbers. Worth a quick call?"} />
                 </div>
               </div>
             </div>
