@@ -116,7 +116,7 @@ function Counter({ to, suffix = '', duration = 1800 }: { to: number; suffix?: st
 }
 
 /* ─── TYPEWRITER ─────────────────────────────────── */
-function Typewriter({ text, speed = 30, startDelay = 800 }: { text: string; speed?: number; startDelay?: number }) {
+function Typewriter({ text, speed = 48, startDelay = 800 }: { text: string; speed?: number; startDelay?: number }) {
   const [out, setOut] = useState('');
   useEffect(() => {
     let i = 0;
@@ -127,7 +127,7 @@ function Typewriter({ text, speed = 30, startDelay = 800 }: { text: string; spee
         i++;
         timeout = setTimeout(tick, speed);
       } else {
-        timeout = setTimeout(() => { i = 0; tick(); }, 4000);
+        timeout = setTimeout(() => { i = 0; tick(); }, 8000);
       }
     };
     timeout = setTimeout(tick, startDelay);
