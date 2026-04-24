@@ -852,6 +852,10 @@ footer.zs-footer { padding: 40px 0; border-top: 1px solid var(--zs-border); }
 /* Business top row */
 .adm-biz-toprow { display: flex; align-items: center; justify-content: space-between; gap: 16px; }
 
+/* Onboard New Client button */
+.adm-onboard-btn { padding: 9px 18px; border-radius: 8px; border: none; background: var(--zs-ink); color: #fff; font: 600 13px var(--zs-sans); letter-spacing: -0.1px; cursor: pointer; transition: opacity 160ms; white-space: nowrap; }
+.adm-onboard-btn:hover { opacity: 0.82; }
+
 /* Period label on admin metric cards (shared style with cd-metric-period) */
 .adm-metric-period { font: 400 11px var(--zs-mono); color: var(--zs-ink-5); margin-top: 6px; }
 

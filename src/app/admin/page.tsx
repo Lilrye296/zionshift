@@ -209,6 +209,10 @@ export default function AdminPage() {
   const [activityFeed, setActivityFeed]       = useState<ActivityItem[]>([]);
   const [meetings, setMeetings]               = useState<ProspectMeeting[]>([]);
   const [periodStats, setPeriodStats]     = useState<AdminPeriodStats | null>(null);
+  const [onboardOpen, setOnboardOpen]     = useState(false);
+  const [onboardName, setOnboardName]     = useState('');
+  const [onboardEmail, setOnboardEmail]   = useState('');
+  const [onboardStatus, setOnboardStatus] = useState<'idle' | 'sending' | 'success' | 'error'>('idle');
   const periodRef                         = useRef<HTMLDivElement>(null);
   const router = useRouter();
 
@@ -308,6 +312,33 @@ export default function AdminPage() {
   useEffect(() => {
     setPeriodStats(null);
   }, [metricPeriod]);
+
+  function openOnboard() {
+    setOnboardName('');
+    setOnboardEmail('');
+    setOnboardStatus('idle');
+    setOnboardOpen(true);
+  }
+
+  async function handleSendPaymentLink() {
+    if (!onboardName.trim() || !onboardEmail.trim()) return;
+    setOnboardStatus('sending');
+    try {
+      const res = await fetch('/api/send-payment-link', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ name: onboardName.trim(), email: onboardEmail.trim() }),
+      });
+      const json = await res.json();
+      if (!res.ok || json.error) {
+        setOnboardStatus('error');
+      } else {
+        setOnboardStatus('success');
+      }
+    } catch {
+      setOnboardStatus('error');
+    }
+  }
 
   async function handleSignOut() {
     if (process.env.NEXT_PUBLIC_SUPABASE_URL && process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY) {
@@ -587,6 +618,13 @@ export default function AdminPage() {
           <div>
             <div className="adm-biz-toprow">
               <h2 className="portal-heading" style={{ margin: 0 }}>Overview</h2>
+              <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
+              <button
+                className="adm-onboard-btn"
+                onClick={openOnboard}
+              >
+                Onboard New Client
+              </button>
               <div className="cd-period-dropdown" ref={periodRef}>
                 <button className="cd-period-btn" onClick={() => setPeriodOpen(o => !o)}>
                   {PERIOD_LABEL[metricPeriod]}
@@ -607,6 +645,7 @@ export default function AdminPage() {
                     ))}
                   </div>
                 )}
+              </div>
               </div>
             </div>
 
@@ -762,6 +801,103 @@ export default function AdminPage() {
           onDisconnect={() => setConnectedCal(null)}
           onClose={() => setCalModal(null)}
         />
+      )}
+
+      {/* Onboard New Client modal */}
+      {onboardOpen && (
+        <div className="modal-overlay" onClick={() => setOnboardOpen(false)}>
+          <div className="modal" style={{ maxWidth: 420 }} onClick={e => e.stopPropagation()}>
+            <button className="modal-close" onClick={() => setOnboardOpen(false)}>✕</button>
+            <div className="modal-scroll">
+              <div className="ccm-title" style={{ marginBottom: 6 }}>Onboard New Client</div>
+              <p style={{ margin: '0 0 24px', fontSize: 13, color: 'var(--muted, #888)' }}>
+                Enter the client&apos;s details and we&apos;ll send them a payment link to complete their setup.
+              </p>
+
+              {onboardStatus === 'success' ? (
+                <div style={{
+                  padding: '16px 20px',
+                  background: '#F0FDF4',
+                  border: '1px solid #BBF7D0',
+                  borderRadius: 8,
+                  fontSize: 14,
+                  color: '#15803D',
+                  fontWeight: 500,
+                }}>
+                  Payment link sent to {onboardEmail} ✓
+                </div>
+              ) : (
+                <>
+                  <div style={{ marginBottom: 16 }}>
+                    <label style={{ display: 'block', fontSize: 12, fontWeight: 600, color: 'var(--muted, #888)', marginBottom: 6, textTransform: 'uppercase', letterSpacing: '0.05em' }}>
+                      Client Name
+                    </label>
+                    <input
+                      type="text"
+                      value={onboardName}
+                      onChange={e => setOnboardName(e.target.value)}
+                      placeholder="Jane Smith"
+                      style={{
+                        width: '100%',
+                        padding: '10px 14px',
+                        fontSize: 14,
+                        border: '1px solid #E5E5E5',
+                        borderRadius: 8,
+                        outline: 'none',
+                        boxSizing: 'border-box',
+                        background: '#FAFAFA',
+                        color: '#1A1715',
+                      }}
+                    />
+                  </div>
+
+                  <div style={{ marginBottom: 24 }}>
+                    <label style={{ display: 'block', fontSize: 12, fontWeight: 600, color: 'var(--muted, #888)', marginBottom: 6, textTransform: 'uppercase', letterSpacing: '0.05em' }}>
+                      Client Email
+                    </label>
+                    <input
+                      type="email"
+                      value={onboardEmail}
+                      onChange={e => setOnboardEmail(e.target.value)}
+                      placeholder="jane@smithbookkeeping.com"
+                      style={{
+                        width: '100%',
+                        padding: '10px 14px',
+                        fontSize: 14,
+                        border: '1px solid #E5E5E5',
+                        borderRadius: 8,
+                        outline: 'none',
+                        boxSizing: 'border-box',
+                        background: '#FAFAFA',
+                        color: '#1A1715',
+                      }}
+                    />
+                  </div>
+
+                  {onboardStatus === 'error' && (
+                    <p style={{ margin: '0 0 16px', fontSize: 13, color: '#DC2626' }}>
+                      Something went wrong. Please try again.
+                    </p>
+                  )}
+
+                  <div className="ccm-actions">
+                    <button
+                      className="ccm-btn-connect"
+                      disabled={onboardStatus === 'sending' || !onboardName.trim() || !onboardEmail.trim()}
+                      onClick={handleSendPaymentLink}
+                      style={{ opacity: (!onboardName.trim() || !onboardEmail.trim()) ? 0.5 : 1 }}
+                    >
+                      {onboardStatus === 'sending' ? 'Sending…' : 'Send Payment Link'}
+                    </button>
+                    <button className="ccm-btn-cancel" onClick={() => setOnboardOpen(false)}>
+                      Cancel
+                    </button>
+                  </div>
+                </>
+              )}
+            </div>
+          </div>
+        </div>
       )}
 
     </div>
