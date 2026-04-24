@@ -679,7 +679,7 @@ function CTA({ onBook }: { onBook: () => void }) {
         <div className="cta-wrap reveal">
           <h2>Your next client isn&apos;t coming from a referral.</h2>
           <p style={{ margin: '32px auto 0', maxWidth: 560, fontSize: 19, lineHeight: 1.5 }}>
-            One call. We&apos;ll show you exactly what a consistent, referral-free pipeline looks like for your firm.
+            One call. We&apos;ll show you exactly what a consistent stream of new clients looks like for your firm.
           </p>
           <div style={{ marginTop: 40, position: 'relative', zIndex: 1 }}>
             <button className="btn btn-primary btn-lg" onClick={onBook} style={{ background: '#fff', color: 'var(--zs-ink)' }}>
