@@ -39,7 +39,12 @@ export async function POST(req: NextRequest) {
             <!-- Logo bar -->
             <tr>
               <td style="padding:32px 40px 0;text-align:left;">
-                <span style="font-size:18px;font-weight:700;letter-spacing:-0.5px;color:#1A1715;">ZionShift</span>
+                <img
+                  src="https://zionshift.com/logo.png"
+                  alt="ZionShift"
+                  width="140"
+                  style="display:block;height:auto;border:0;"
+                />
               </td>
             </tr>
 
