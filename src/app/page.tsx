@@ -329,7 +329,7 @@ function CalendarSlide() {
 
   // Scatter ~6 "booked" days across the month, avoiding today and day 1
   const bookedDays = new Set<number>();
-  const seeds = [3, 7, 11, 15, 19, 24].map(d => Math.min(d, daysInMonth));
+  const seeds = [5, 11, 17, 24].map(d => Math.min(d, daysInMonth));
   seeds.forEach(d => { if (d !== today) bookedDays.add(d); });
 
   const cells: (number | null)[] = [
