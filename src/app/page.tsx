@@ -254,7 +254,7 @@ function Hero({ onBook }: { onBook: () => void }) {
             <div className="h-panel">
               <div className="h-panel-head">
                 <span className="h-panel-title">
-                  <span className="live" />This week · booked by AI
+                  <span className="live" />This month · booked by AI
                 </span>
                 <span className="h-panel-count" style={{ font: '500 11px var(--zs-mono)', color: 'var(--zs-ink-5)', letterSpacing: '0.1em' }}>4 QUALIFIED</span>
               </div>
@@ -276,13 +276,13 @@ function Hero({ onBook }: { onBook: () => void }) {
           <div className="hero-badge hero-badge-1">
             <div>
               <div className="lbl">New clients this mo.</div>
-              <div className="n"><Counter to={3} /></div>
+              <div className="n"><Counter to={1} /></div>
             </div>
           </div>
           <div className="hero-badge hero-badge-2 ink">
             <div>
               <div className="lbl">Avg. retainer</div>
-              <div className="n" style={{ color: '#fff' }}>$<Counter to={850} /></div>
+              <div className="n" style={{ color: '#fff' }}>$<Counter to={1200} /></div>
             </div>
           </div>
         </div>
