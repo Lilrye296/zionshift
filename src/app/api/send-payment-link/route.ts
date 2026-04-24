@@ -46,7 +46,7 @@ export async function POST(req: NextRequest) {
         <a href="${STRIPE_PAYMENT_LINK}"
            target="_blank"
            style="display:inline-block;background:#1A1715;color:#ffffff;text-decoration:none;font-size:15px;font-weight:700;padding:16px 32px;border-radius:8px;letter-spacing:-0.01em;">
-          Complete Setup — $1,000 →
+          Complete Setup &rarr;
         </a>
 
         <p style="margin:32px 0 0;font-size:13px;color:#9CA3AF;line-height:1.7;">
