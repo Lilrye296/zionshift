@@ -384,6 +384,24 @@ export default function AdminPage() {
     }
   }
 
+  async function handleDownloadAssets(client: ActiveClient) {
+    try {
+      const res = await fetch(`/api/download-client-assets?email=${encodeURIComponent(client.email)}`);
+      if (!res.ok) return;
+      const blob = await res.blob();
+      const url  = URL.createObjectURL(blob);
+      const a    = document.createElement('a');
+      a.href     = url;
+      a.download = `${(client.firm || client.name).replace(/[^a-zA-Z0-9]/g, '_')}_assets.zip`;
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+      URL.revokeObjectURL(url);
+    } catch {
+      // Silently fail — user still sees the button
+    }
+  }
+
   async function handleViewIntake(client: ActiveClient) {
     setIntakeClient(client);
     setIntakeData(null);
@@ -799,11 +817,11 @@ export default function AdminPage() {
                                     </button>
                                     <div className="adm-actions-divider" />
                                     <button
-                                      className={`adm-actions-item${!c.logoUrl ? ' disabled' : ''}`}
-                                      disabled={!c.logoUrl}
-                                      onClick={() => { if (c.logoUrl) { window.open(c.logoUrl, '_blank'); } setOpenDropdownId(null); }}
+                                      className={`adm-actions-item${!c.logoUrl && !c.headshotUrl ? ' disabled' : ''}`}
+                                      disabled={!c.logoUrl && !c.headshotUrl}
+                                      onClick={() => { handleDownloadAssets(c); setOpenDropdownId(null); }}
                                     >
-                                      Download Logo
+                                      Download Assets
                                     </button>
                                     <div className="adm-actions-divider" />
                                     <button className="adm-actions-item" onClick={() => { handleViewIntake(c); setOpenDropdownId(null); }}>
