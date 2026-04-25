@@ -452,24 +452,42 @@ function AvailabilityGrid({ availability, onChange }: {
   availability: Record<string, string[]>;
   onChange: (v: Record<string, string[]>) => void;
 }) {
+  const totalSlots    = DAYS.length * SLOT_LABELS.length;
+  const selectedCount = Object.values(availability).reduce((n, s) => n + s.length, 0);
+  const allSelected   = selectedCount === totalSlots;
+
   function toggleSlot(day: string, slot: string) {
     const current = availability[day] ?? [];
-    const next = current.includes(slot)
+    const next    = current.includes(slot)
       ? current.filter(s => s !== slot)
       : [...current, slot];
     const updated = { ...availability };
-    if (next.length === 0) {
-      delete updated[day];
-    } else {
-      updated[day] = next;
-    }
+    if (next.length === 0) { delete updated[day]; } else { updated[day] = next; }
     onChange(updated);
+  }
+
+  function toggleDay(day: string) {
+    const current = availability[day] ?? [];
+    const updated = { ...availability };
+    if (current.length === SLOT_LABELS.length) { delete updated[day]; }
+    else { updated[day] = [...SLOT_LABELS]; }
+    onChange(updated);
+  }
+
+  function selectAll() {
+    const all: Record<string, string[]> = {};
+    DAYS.forEach(d => { all[d] = [...SLOT_LABELS]; });
+    onChange(all);
   }
 
   return (
     <div className="ob-avail-grid">
       <div className="ob-avail-header">
-        <span className="ob-avail-header-day" />
+        <span className="ob-avail-header-day">
+          <button type="button" className="ob-avail-selectall" onClick={allSelected ? () => onChange({}) : selectAll}>
+            {allSelected ? 'Clear all' : 'Select all'}
+          </button>
+        </span>
         {SLOT_LABELS.map(s => (
           <span key={s} className="ob-avail-header-slot">
             <span className="ob-avail-slot-name">{s}</span>
@@ -478,10 +496,18 @@ function AvailabilityGrid({ availability, onChange }: {
         ))}
       </div>
       {DAYS.map(day => {
-        const selected = availability[day] ?? [];
+        const selected      = availability[day] ?? [];
+        const dayAllOn      = selected.length === SLOT_LABELS.length;
         return (
           <div key={day} className="ob-avail-row">
-            <span className="ob-avail-day">{day}</span>
+            <button
+              type="button"
+              className={`ob-avail-day-btn${dayAllOn ? ' all-on' : selected.length > 0 ? ' partial' : ''}`}
+              onClick={() => toggleDay(day)}
+              title={dayAllOn ? `Deselect all for ${day}` : `Select all for ${day}`}
+            >
+              {day}
+            </button>
             {SLOT_LABELS.map(slot => {
               const on = selected.includes(slot);
               return (
