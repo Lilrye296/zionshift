@@ -131,7 +131,7 @@ export async function POST(req: NextRequest) {
         tone,
         exclusions: avoidances,
         available_days: Object.keys(availability || {}).join(', '),
-        time_slots: Object.entries(availability || {}).map(([d, s]) => `${d}: ${s.join(', ')}`).join('; '),
+        time_slots: Object.entries(availability as Record<string, string[]> || {}).map(([d, s]) => `${d}: ${s.join(', ')}`).join('; '),
         call_length: callLength,
         timezone,
         submitted_at: new Date().toISOString(),
@@ -159,7 +159,7 @@ export async function POST(req: NextRequest) {
     try {
       const industryList = Array.isArray(industries) ? industries.join(', ') : industries;
       const empList = Array.isArray(employeeCount) ? employeeCount.join(', ') : employeeCount;
-      const availabilityRows = Object.entries(availability || {})
+      const availabilityRows = Object.entries(availability as Record<string, string[]> || {})
         .map(([day, slots]: [string, string[]]) =>
           `<tr><td style="padding:4px 0;font-size:12px;font-weight:600;color:#6B7280;">${day}</td><td style="padding:4px 0;font-size:14px;color:#1A1715;">${slots.join(', ')}</td></tr>`
         ).join('');
