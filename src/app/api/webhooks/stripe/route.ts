@@ -153,7 +153,7 @@ export async function POST(req: NextRequest) {
             <span style="font-weight:700;color:#1A1715;">1 &nbsp;&mdash;</span>&nbsp; Complete your account setup using the button above.
           </p>
           <p style="margin:0 0 10px;font-size:14px;color:#4B5563;line-height:1.6;">
-            <span style="font-weight:700;color:#1A1715;">2 &nbsp;&mdash;</span>&nbsp; We&apos;ll reach out to kick off your onboarding call.
+            <span style="font-weight:700;color:#1A1715;">2 &nbsp;&mdash;</span>&nbsp; We review your info and get your campaign dialed in.
           </p>
           <p style="margin:0;font-size:14px;color:#4B5563;line-height:1.6;">
             <span style="font-weight:700;color:#1A1715;">3 &nbsp;&mdash;</span>&nbsp; We launch your campaign and the meetings start rolling in.
