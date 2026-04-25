@@ -633,7 +633,7 @@ function Pricing({ onBook }: { onBook: () => void }) {
             </div>
           </div>
           <p className="pricing-note" style={{ fontWeight: 600, fontSize: 15, color: 'var(--zs-ink)' }}>
-            You don&apos;t pay a single dollar of the monthly retainer until a qualified prospect is on your calendar. No contracts. Cancel anytime.
+            You don&apos;t pay the $2,000 retainer until your first qualified lead lands in your dashboard &mdash; and even then, billing doesn&apos;t start for another 30 days. No contracts. Cancel anytime.
           </p>
           <button className="btn btn-primary" onClick={onBook} style={{ marginTop: 32 }}>
             Book a free call<span className="chev">→</span>
@@ -649,9 +649,9 @@ function FAQ() {
   const [open, setOpen] = useState(0);
   const faqs = [
     { q: 'How does the AI find qualified leads?', a: 'Our AI scans thousands of signals to identify small business owners who are growing and likely need bookkeeping support — recent hiring, revenue growth, new entity formations, funding, and more. It writes and sends personalized outreach on your behalf, 24/7, positioning your firm as the right solution at the right time.' },
-    { q: 'Is this really hands-free?', a: "Completely. After a quick onboarding call where you tell us what your ideal bookkeeping client looks like, the AI handles everything — finding prospects, writing personalized outreach, managing follow-ups, and handling replies. You just show up to the calls we book." },
+    { q: 'Is this really hands-free?', a: "Completely. After a quick onboarding form where you tell us what your ideal bookkeeping client looks like, the AI handles everything — finding prospects, writing personalized outreach, managing follow-ups, and handling replies. You just show up to the calls we book." },
     { q: 'How long until I see booked calls?', a: 'Realistically, most bookkeeping firms start seeing qualified meetings within 4 to 8 weeks. The first month is building and launching. Month two the machine is warmed up and optimized. Results compound from there — the longer it runs, the better it gets.' },
-    { q: 'What does it cost?', a: 'Simple and transparent: a one-time $1,000 setup fee and a $2,000 monthly retainer — a fraction of what it would cost to hire a salesperson or work with a traditional marketing agency. And you don\'t pay the retainer until a qualified prospect is on your calendar. Book a call and we\'ll walk through everything.' },
+    { q: 'What does it cost?', a: 'Simple and transparent: a one-time $1,000 setup fee and a $2,000 monthly retainer — a fraction of what it would cost to hire a salesperson or work with a traditional marketing agency. You won\'t see a retainer charge until your first lead lands in your dashboard, and even then billing doesn\'t start for another 30 days. No results, no charge.' },
     { q: 'What kinds of businesses do you work with?', a: 'We work exclusively with bookkeeping firms that serve small to mid-sized businesses. Our AI targets the types of owner-operated businesses that make ideal bookkeeping clients — trades, contractors, dental and medical practices, law firms, real estate teams, e-commerce brands, and more.' },
     { q: 'Can I cancel anytime?', a: 'Yes. Month-to-month. No contract. No cancellation fees.' },
   ];
