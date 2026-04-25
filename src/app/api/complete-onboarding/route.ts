@@ -263,7 +263,7 @@ export async function POST(req: NextRequest) {
     // ── 11. Send password reset email ──────────────────────────────
     try {
       await supabase.auth.resetPasswordForEmail(email, {
-        redirectTo: 'https://www.zionshift.com/login',
+        redirectTo: 'https://www.zionshift.com/reset-password',
       });
     } catch (e) {
       console.error('[complete-onboarding] Reset email failed:', e);

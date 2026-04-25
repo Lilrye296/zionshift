@@ -17,7 +17,9 @@ function ForgotPasswordModal({ onClose }: { onClose: () => void }) {
     setError('');
     try {
       const supabase = createClient();
-      const { error: resetError } = await supabase.auth.resetPasswordForEmail(email);
+      const { error: resetError } = await supabase.auth.resetPasswordForEmail(email, {
+        redirectTo: 'https://www.zionshift.com/reset-password',
+      });
       if (resetError) throw resetError;
       setSent(true);
     } catch {
