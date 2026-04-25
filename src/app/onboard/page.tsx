@@ -615,7 +615,7 @@ function Screen6({ submitting, submitError, onSubmit }: {
   onSubmit: () => void;
 }) {
   return (
-    <div className="ob-screen">
+    <div className="ob-screen" style={{ paddingBottom: 28 }}>
       <h2 className="ob-screen-title">You&apos;re all set.</h2>
       <p className="ob-screen-sub" style={{ marginBottom: 24 }}>Here&apos;s what happens from here.</p>
 
