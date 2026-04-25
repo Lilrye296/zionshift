@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useEffect, Suspense } from 'react';
-import { useRouter } from 'next/navigation';
+import { useRouter, useSearchParams } from 'next/navigation';
 import { createClient } from '@/utils/supabase/client';
 
 function ResetPasswordForm() {
@@ -14,17 +14,48 @@ function ResetPasswordForm() {
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirm, setShowConfirm]   = useState(false);
   const router = useRouter();
+  const searchParams = useSearchParams();
 
   useEffect(() => {
-    // Session is established server-side by /auth/callback before we arrive here
     const supabase = createClient();
-    supabase.auth.getSession().then(({ data: { session } }) => {
-      if (session) {
-        setReady(true);
-      } else {
-        setError('This reset link is invalid or has expired. Please request a new one from the login page.');
+
+    async function establish() {
+      // 1. Session already established by /auth/callback (PKCE server-side exchange)
+      const { data: { session } } = await supabase.auth.getSession();
+      if (session) { setReady(true); return; }
+
+      // 2. PKCE code in URL — exchange it client-side
+      const code = searchParams.get('code');
+      if (code) {
+        const { error: codeErr } = await supabase.auth.exchangeCodeForSession(code);
+        if (!codeErr) { setReady(true); return; }
       }
-    });
+
+      // 3. Legacy token_hash in URL — verify OTP
+      const tokenHash = searchParams.get('token_hash');
+      const type      = searchParams.get('type');
+      if (tokenHash && type === 'recovery') {
+        const { error: otpErr } = await supabase.auth.verifyOtp({ token_hash: tokenHash, type: 'recovery' });
+        if (!otpErr) { setReady(true); return; }
+      }
+
+      // 4. Also listen for PASSWORD_RECOVERY event (handles implicit flow hash tokens)
+      const { data: { subscription } } = supabase.auth.onAuthStateChange((event) => {
+        if (event === 'PASSWORD_RECOVERY') { setReady(true); }
+      });
+      // Give implicit-flow hash tokens a moment to fire onAuthStateChange
+      await new Promise(res => setTimeout(res, 800));
+      subscription.unsubscribe();
+
+      // 5. Final check after waiting
+      const { data: { session: s2 } } = await supabase.auth.getSession();
+      if (s2) { setReady(true); return; }
+
+      setError('This reset link is invalid or has expired. Please request a new one from the login page.');
+    }
+
+    establish();
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   async function handleSubmit(e: React.FormEvent) {

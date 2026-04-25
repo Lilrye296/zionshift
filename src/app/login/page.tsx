@@ -1,29 +1,55 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { useRouter } from 'next/navigation';
 import { createClient } from '@/utils/supabase/client';
 
 /* ── Forgot Password Modal ────────────────────────── */
 function ForgotPasswordModal({ onClose }: { onClose: () => void }) {
-  const [email, setEmail]     = useState('');
-  const [loading, setLoading] = useState(false);
-  const [error, setError]     = useState('');
-  const [sent, setSent]       = useState(false);
+  const [email, setEmail]       = useState('');
+  const [loading, setLoading]   = useState(false);
+  const [error, setError]       = useState('');
+  const [sent, setSent]         = useState(false);
+  const [cooldown, setCooldown] = useState(0);
+  const timerRef = useRef<ReturnType<typeof setInterval> | null>(null);
+
+  useEffect(() => {
+    return () => { if (timerRef.current) clearInterval(timerRef.current); };
+  }, []);
+
+  function startCooldown(seconds: number) {
+    setCooldown(seconds);
+    timerRef.current = setInterval(() => {
+      setCooldown(prev => {
+        if (prev <= 1) { clearInterval(timerRef.current!); return 0; }
+        return prev - 1;
+      });
+    }, 1000);
+  }
 
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
+    if (cooldown > 0) return;
     setLoading(true);
     setError('');
     try {
       const supabase = createClient();
       const { error: resetError } = await supabase.auth.resetPasswordForEmail(email, {
-        redirectTo: 'https://www.zionshift.com/reset-password',
+        redirectTo: 'https://www.zionshift.com/auth/callback?next=/reset-password',
       });
-      if (resetError) throw resetError;
+      if (resetError) {
+        // Rate-limited (429) or similar — tell the user to wait
+        if (resetError.status === 429 || resetError.message?.toLowerCase().includes('rate')) {
+          setError('Too many requests. Please wait a minute before trying again.');
+          startCooldown(60);
+        } else {
+          setError(resetError.message || 'Something went wrong. Please try again.');
+        }
+        return;
+      }
       setSent(true);
-    } catch {
-      setError('Something went wrong. Please try again.');
+    } catch (err: unknown) {
+      setError(err instanceof Error ? err.message : 'Something went wrong. Please try again.');
     } finally {
       setLoading(false);
     }
@@ -46,6 +72,9 @@ function ForgotPasswordModal({ onClose }: { onClose: () => void }) {
               <p className="fp-sub">
                 We sent a reset link to <strong>{email}</strong>.<br />
                 It may take a minute to arrive.
+              </p>
+              <p className="fp-sub" style={{ marginTop: 12, fontSize: 13, color: '#9CA3AF' }}>
+                Only click the <em>most recent</em> link in your inbox — older ones won&apos;t work.
               </p>
               <button
                 className="btn btn-primary"
@@ -76,11 +105,11 @@ function ForgotPasswordModal({ onClose }: { onClose: () => void }) {
                 {error && <p className="login-error" style={{ marginTop: 12 }}>{error}</p>}
                 <button
                   type="submit"
-                  disabled={loading}
+                  disabled={loading || cooldown > 0}
                   className="btn btn-primary"
                   style={{ width: '100%', marginTop: 16, padding: '14px' }}
                 >
-                  {loading ? 'Sending…' : <>Send reset link <span className="chev">→</span></>}
+                  {loading ? 'Sending…' : cooldown > 0 ? `Resend in ${cooldown}s` : <>Send reset link <span className="chev">→</span></>}
                 </button>
               </form>
             </>
