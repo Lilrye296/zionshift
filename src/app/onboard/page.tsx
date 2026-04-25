@@ -494,41 +494,36 @@ function Screen4({ form, set }: { form: FormState; set: (f: FormState) => void }
 
       <div className="ob-field-group">
         <label className="ob-group-label">What days are you available for discovery calls? <span className="ob-req">*</span></label>
-        <ChipGroup
+        <CheckDropdown
           options={DAYS}
           selected={form.availableDays}
           onToggle={val => set({ ...form, availableDays: tog(form.availableDays, val) })}
+          placeholder="Select available days…"
+          multi
         />
       </div>
 
       <div className="ob-field-group">
         <label className="ob-group-label">What time slots work best? <span className="ob-req">*</span></label>
-        <ChipGroup
+        <CheckDropdown
           options={TIME_SLOTS}
           selected={form.timeSlots}
           onToggle={val => set({ ...form, timeSlots: tog(form.timeSlots, val) })}
+          placeholder="Select time slots…"
+          multi
         />
       </div>
 
-      <div className="ob-field-group">
-        <label className="ob-group-label">How long should each discovery call be? <span className="ob-req">*</span></label>
-        <ChipGroup
-          options={CALL_LENGTHS}
-          selected={form.callLength ? [form.callLength] : []}
-          onToggle={val => set({ ...form, callLength: single(form.callLength, val) })}
-        />
-      </div>
-
-      <div className="ob-field-group">
+      <div className="ob-field-group" style={{ marginBottom: 0 }}>
         <label className="ob-group-label">Your time zone <span className="ob-req">*</span></label>
-        <select
-          className="ob-select"
-          value={form.timezone}
-          onChange={e => set({ ...form, timezone: e.target.value })}
-        >
-          <option value="">Select a time zone…</option>
-          {TIMEZONES.map(tz => <option key={tz} value={tz}>{tz}</option>)}
-        </select>
+        <CheckDropdown
+          options={TIMEZONES}
+          selected={form.timezone ? [form.timezone] : []}
+          onToggle={val => set({ ...form, timezone: single(form.timezone, val) })}
+          placeholder="Select your time zone…"
+          radio
+          multi={false}
+        />
       </div>
     </div>
   );
@@ -634,7 +629,6 @@ function validate(step: number, form: FormState): string | null {
   if (step === 4) {
     if (form.availableDays.length === 0) return 'Select at least one available day.';
     if (form.timeSlots.length === 0)     return 'Select at least one time slot.';
-    if (!form.callLength)                return 'Select a call length.';
     if (!form.timezone)                  return 'Select your time zone.';
   }
   return null;
