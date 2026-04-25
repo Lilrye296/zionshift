@@ -462,12 +462,22 @@ function Screen3({ form, set }: { form: FormState; set: (f: FormState) => void }
       </div>
 
       <div className="field">
-        <label>Anything you never want said in outreach — competitors, phrases, or topics to avoid</label>
+        <label>Anything specific prospects should know before getting on a call with you? <span className="ob-optional">(optional)</span></label>
+        <textarea
+          value={form.prospectNote}
+          onChange={e => set({ ...form, prospectNote: e.target.value })}
+          rows={3}
+          placeholder="e.g. I prefer clients who have been in business at least one year and have a dedicated point of contact for their finances."
+        />
+      </div>
+
+      <div className="field">
+        <label>Anything you never want said in outreach — competitors, phrases, or topics to avoid <span className="ob-optional">(optional)</span></label>
         <textarea
           value={form.avoidances}
           onChange={ta('avoidances')}
           rows={2}
-          placeholder="e.g. Don't reference competitors by name, avoid overly salesy language…"
+          placeholder="e.g. Don't reference competitors by name, no industry jargon or buzzwords…"
         />
       </div>
     </div>
@@ -531,16 +541,6 @@ function Screen5({ form, set }: { form: FormState; set: (f: FormState) => void }
     <div className="ob-screen">
       <h2 className="ob-screen-title">Final details.</h2>
       <p className="ob-screen-sub">A few last things to make sure your campaign is dialed in perfectly.</p>
-
-      <div className="field">
-        <label>Anything specific prospects should know before getting on a call with you?</label>
-        <textarea
-          value={form.prospectNote}
-          onChange={e => set({ ...form, prospectNote: e.target.value })}
-          rows={3}
-          placeholder="I only work with businesses that have been operating for at least 1 year…"
-        />
-      </div>
 
       <div className="field">
         <label>How did you hear about ZionShift?</label>
