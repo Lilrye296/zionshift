@@ -27,7 +27,7 @@ interface FormState {
   cityState: string; yearsInBusiness: string; websiteUrl: string;
   logo: File | null; headshot: File | null;
   industries: string[]; otherIndustry: string;
-  employeeCount: string[]; revenueRange: string[]; geoFocus: string[];
+  employeeCount: string[]; revenueRange: string[]; geoFocus: string[]; regionalStates: string;
   differentiator: string; painPoint: string; transformation: string;
   tone: string; avoidances: string;
   availableDays: string[]; timeSlots: string[]; callLength: string; timezone: string;
@@ -39,7 +39,7 @@ const DEFAULT_FORM: FormState = {
   cityState: '', yearsInBusiness: '', websiteUrl: '',
   logo: null, headshot: null,
   industries: [], otherIndustry: '',
-  employeeCount: [], revenueRange: [], geoFocus: [],
+  employeeCount: [], revenueRange: [], geoFocus: [], regionalStates: '',
   differentiator: '', painPoint: '', transformation: '',
   tone: '', avoidances: '',
   availableDays: [], timeSlots: [], callLength: '', timezone: '',
@@ -379,6 +379,19 @@ function Screen2({ form, set }: { form: FormState; set: (f: FormState) => void }
         <p className="ob-helper" style={{ marginTop: 8 }}>
           <strong>Local only</strong> — your city/metro (~50 mi)&nbsp;&nbsp;·&nbsp;&nbsp;<strong>Regional</strong> — a cluster of nearby states&nbsp;&nbsp;·&nbsp;&nbsp;<strong>Nationwide</strong> — all 50 states, any time zone
         </p>
+        {form.geoFocus.includes('Regional') && (
+          <div className="field" style={{ marginTop: 14 }}>
+            <label>Which states or region? <span className="ob-req">*</span></label>
+            <input
+              type="text"
+              value={form.regionalStates}
+              onChange={e => set({ ...form, regionalStates: e.target.value })}
+              placeholder="e.g. Texas, Oklahoma, Louisiana, Arkansas…"
+              autoFocus
+            />
+            <p className="ob-helper">List all the states you want us to target for you.</p>
+          </div>
+        )}
       </div>
     </div>
   );
@@ -605,6 +618,7 @@ function validate(step: number, form: FormState): string | null {
     if (form.employeeCount.length === 0) return 'Select at least one employee range.';
     if (form.revenueRange.length === 0) return 'Select a revenue range.';
     if (form.geoFocus.length === 0)    return 'Select a geographic focus.';
+    if (form.geoFocus.includes('Regional') && !form.regionalStates.trim()) return 'Please specify which states or region you want to target.';
   }
   if (step === 3) {
     if (!form.differentiator.trim()) return 'Tell us what makes your firm different.';
