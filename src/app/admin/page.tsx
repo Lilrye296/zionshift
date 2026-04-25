@@ -129,8 +129,9 @@ function AdminCalModal({
 interface ActiveClient {
   id: string;
   name: string;
+  email: string;
   firm: string;
-  status: 'live' | 'paused' | 'cancelled';
+  status: 'pending' | 'live' | 'paused' | 'cancelled';
   mrr: number;
   since: string;
   firstMonthPaid: boolean;
@@ -209,6 +210,8 @@ export default function AdminPage() {
   const [activityFeed, setActivityFeed]       = useState<ActivityItem[]>([]);
   const [meetings, setMeetings]               = useState<ProspectMeeting[]>([]);
   const [periodStats, setPeriodStats]     = useState<AdminPeriodStats | null>(null);
+  const [resendingId, setResendingId]     = useState<string | null>(null);
+  const [resentId, setResentId]           = useState<string | null>(null);
   const [onboardOpen, setOnboardOpen]     = useState(false);
   const [onboardName, setOnboardName]     = useState('');
   const [onboardEmail, setOnboardEmail]   = useState('');
@@ -234,15 +237,16 @@ export default function AdminPage() {
         // Fetch all clients
         const { data: clientsData } = await supabase
           .from('clients')
-          .select('id, name, firm, status, mrr, since, first_month_paid, setup_fee_paid')
+          .select('id, name, email, firm, status, mrr, since, first_month_paid, setup_fee_paid')
           .order('created_at', { ascending: false });
 
         if (clientsData) {
           setClients(clientsData.map(c => ({
             id: c.id,
             name: c.name,
-            firm: c.firm,
-            status: (c.status === 'active' ? 'live' : c.status) as 'live' | 'paused' | 'cancelled',
+            email: c.email ?? '',
+            firm: c.firm ?? '',
+            status: (c.status === 'active' ? 'live' : c.status) as 'pending' | 'live' | 'paused' | 'cancelled',
             mrr: Number(c.mrr),
             since: c.since ? fmtDate(c.since) : '—',
             firstMonthPaid: c.first_month_paid,
@@ -340,6 +344,25 @@ export default function AdminPage() {
     }
   }
 
+  async function handleResendOnboarding(clientId: string) {
+    setResendingId(clientId);
+    try {
+      const res = await fetch('/api/resend-onboarding', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ clientId }),
+      });
+      if (res.ok) {
+        setResentId(clientId);
+        setTimeout(() => setResentId(null), 3000);
+      }
+    } catch {
+      // Silently fail — button returns to normal state
+    } finally {
+      setResendingId(null);
+    }
+  }
+
   async function handleSignOut() {
     if (process.env.NEXT_PUBLIC_SUPABASE_URL && process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY) {
       try {
@@ -366,8 +389,8 @@ export default function AdminPage() {
   const mrrProgress    = nextMilestone === prevMilestone ? 100
     : Math.min(Math.round(((totalMRR - prevMilestone) / (nextMilestone - prevMilestone)) * 100), 100);
 
-  // Live + paused only (cancelled excluded)
-  const activeClientCount = clients.filter(c => c.status !== 'cancelled').length;
+  // Live + paused only (pending and cancelled excluded)
+  const activeClientCount = clients.filter(c => c.status === 'live' || c.status === 'paused').length;
 
   // Reply Rate
   const replyRate: string = (
@@ -697,7 +720,11 @@ export default function AdminPage() {
                           </div>
                           <div className="adm-client-info">
                             <span className="adm-client-name">{c.name}</span>
-                            <span className="adm-client-firm">{c.firm} · since {c.since}</span>
+                            {c.status === 'pending' ? (
+                              <span className="adm-client-firm">{c.email}</span>
+                            ) : (
+                              <span className="adm-client-firm">{c.firm} · since {c.since}</span>
+                            )}
                             {!c.firstMonthPaid && c.status === 'live' && (
                               <span className="adm-billing-pending">Billing pending</span>
                             )}
@@ -706,12 +733,22 @@ export default function AdminPage() {
                             <span className={`adm-client-pill adm-client-pill--${c.status}`}>
                               ●&nbsp;{c.status === 'live' ? 'Active' : c.status.charAt(0).toUpperCase() + c.status.slice(1)}
                             </span>
-                            <button
-                              className="adm-view-btn"
-                              onClick={() => router.push(`/client?view=${c.id}`)}
-                            >
-                              View →
-                            </button>
+                            {c.status === 'pending' ? (
+                              <button
+                                className="adm-view-btn"
+                                disabled={resendingId === c.id}
+                                onClick={() => handleResendOnboarding(c.id)}
+                              >
+                                {resentId === c.id ? 'Sent ✓' : resendingId === c.id ? 'Sending…' : 'Resend Link'}
+                              </button>
+                            ) : (
+                              <button
+                                className="adm-view-btn"
+                                onClick={() => router.push(`/client?view=${c.id}`)}
+                              >
+                                View →
+                              </button>
+                            )}
                           </div>
                         </div>
                       </Fragment>

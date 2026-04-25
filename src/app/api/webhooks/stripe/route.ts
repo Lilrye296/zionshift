@@ -80,7 +80,25 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ error: 'Database error.' }, { status: 500 });
     }
 
-    // ── 4. Send branded welcome email ──────────────────────────────
+    // ── 4. Insert pending client row ───────────────────────────────
+    const { error: clientError } = await supabase
+      .from('clients')
+      .insert({
+        name,
+        email,
+        firm: '',
+        status: 'pending',
+        mrr: 0,
+        setup_fee_paid: true,
+        first_month_paid: false,
+      });
+
+    if (clientError) {
+      console.error('[stripe-webhook] Client insert error:', clientError);
+      // Non-fatal — token already saved, continue to send email.
+    }
+
+    // ── 5. Send branded welcome email ──────────────────────────────
     const firstName   = getFirstName(name);
     const onboardUrl  = `https://www.zionshift.com/onboard?token=${token}`;
 
