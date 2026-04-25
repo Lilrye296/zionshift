@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { Resend } from 'resend';
 
-const STRIPE_PAYMENT_LINK = 'STRIPE_LINK_HERE';
+const STRIPE_PAYMENT_LINK = 'https://buy.stripe.com/test_6oU3cu4b27Kf7f94vS57W00';
 
 const resend = new Resend(process.env.RESEND_API_KEY);
 
