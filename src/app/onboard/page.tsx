@@ -90,12 +90,13 @@ function ChipGroup({ options, selected, onToggle }: {
 
 /* ─── CheckDropdown ──────────────────────────────────────────── */
 
-function CheckDropdown({ options, selected, onToggle, placeholder, multi = true, inlineInput, descriptions }: {
+function CheckDropdown({ options, selected, onToggle, placeholder, multi = true, radio = false, inlineInput, descriptions }: {
   options: string[];
   selected: string[];
   onToggle: (val: string) => void;
   placeholder: string;
   multi?: boolean;
+  radio?: boolean;
   inlineInput?: {
     forOption: string;
     value: string;
@@ -161,11 +162,13 @@ function CheckDropdown({ options, selected, onToggle, placeholder, multi = true,
                 role="option"
                 aria-selected={checked}
               >
-                <span className={`ob-dd-check${checked ? ' checked' : ''}`} aria-hidden>
+                <span className={`ob-dd-check${radio ? ' radio' : ''}${checked ? ' checked' : ''}`} aria-hidden>
                   {checked && (
-                    <svg width="9" height="9" viewBox="0 0 12 12" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
-                      <polyline points="2 6 5 9 10 3" />
-                    </svg>
+                    radio
+                      ? <span className="ob-dd-radio-dot" />
+                      : <svg width="9" height="9" viewBox="0 0 12 12" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+                          <polyline points="2 6 5 9 10 3" />
+                        </svg>
                   )}
                 </span>
                 <span className="ob-dd-opt-label">{opt}</span>
@@ -376,9 +379,9 @@ function Screen2({ form, set }: { form: FormState; set: (f: FormState) => void }
         <CheckDropdown
           options={GEO_OPTIONS}
           selected={form.geoFocus}
-          onToggle={val => set({ ...form, geoFocus: tog(form.geoFocus, val) })}
+          onToggle={val => set({ ...form, geoFocus: form.geoFocus[0] === val ? [] : [val] })}
           placeholder="Select geographic focus…"
-          multi
+          radio
           descriptions={{
             'Local only':   '~50 mi radius of your city',
             'Regional':     'cluster of nearby states',

@@ -1066,6 +1066,8 @@ footer.zs-footer { padding: 40px 0; border-top: 1px solid var(--zs-border); }
 .ob-dd-row.checked { background: var(--zs-paper); }
 .ob-dd-check { flex-shrink: 0; width: 16px; height: 16px; border: 1.5px solid var(--zs-border); border-radius: 4px; background: #fff; display: flex; align-items: center; justify-content: center; transition: background 160ms, border-color 160ms; color: transparent; }
 .ob-dd-check.checked { background: var(--zs-ink); border-color: var(--zs-ink); color: #fff; }
+.ob-dd-check.radio { border-radius: 50%; }
+.ob-dd-radio-dot { width: 6px; height: 6px; border-radius: 50%; background: #fff; }
 .ob-dd-opt-label { font: 400 14px var(--zs-sans); color: var(--zs-ink); letter-spacing: -0.01em; line-height: 1.35; }
 .ob-dd-opt-desc { font: 400 12px var(--zs-sans); color: var(--zs-ink-5); margin-left: 6px; white-space: nowrap; flex-shrink: 0; }
 .ob-dd-inline-row { padding: 8px 14px 10px 42px; border-bottom: 1px solid var(--zs-border-soft); background: var(--zs-paper); }
