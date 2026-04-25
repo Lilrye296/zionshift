@@ -90,7 +90,7 @@ function ChipGroup({ options, selected, onToggle }: {
 
 /* ─── CheckDropdown ──────────────────────────────────────────── */
 
-function CheckDropdown({ options, selected, onToggle, placeholder, multi = true, inlineInput }: {
+function CheckDropdown({ options, selected, onToggle, placeholder, multi = true, inlineInput, descriptions }: {
   options: string[];
   selected: string[];
   onToggle: (val: string) => void;
@@ -102,6 +102,7 @@ function CheckDropdown({ options, selected, onToggle, placeholder, multi = true,
     onChange: (v: string) => void;
     placeholder: string;
   };
+  descriptions?: Record<string, string>;
 }) {
   const [open, setOpen] = useState(false);
   const ref = useRef<HTMLDivElement>(null);
@@ -168,6 +169,9 @@ function CheckDropdown({ options, selected, onToggle, placeholder, multi = true,
                   )}
                 </span>
                 <span className="ob-dd-opt-label">{opt}</span>
+                {descriptions?.[opt] && (
+                  <span className="ob-dd-opt-desc">{descriptions[opt]}</span>
+                )}
               </button>,
             ];
             if (inlineInput && opt === inlineInput.forOption && checked) {
@@ -375,23 +379,18 @@ function Screen2({ form, set }: { form: FormState; set: (f: FormState) => void }
           onToggle={val => set({ ...form, geoFocus: tog(form.geoFocus, val) })}
           placeholder="Select geographic focus…"
           multi
+          descriptions={{
+            'Local only':   '~50 mi radius of your city',
+            'Regional':     'cluster of nearby states',
+            'Nationwide':   'all 50 states, any time zone',
+          }}
+          inlineInput={{
+            forOption: 'Regional',
+            value: form.regionalStates,
+            onChange: v => set({ ...form, regionalStates: v }),
+            placeholder: 'e.g. Texas, Oklahoma, Louisiana…',
+          }}
         />
-        <p className="ob-helper" style={{ marginTop: 8 }}>
-          <strong>Local only</strong> — your city/metro (~50 mi)&nbsp;&nbsp;·&nbsp;&nbsp;<strong>Regional</strong> — a cluster of nearby states&nbsp;&nbsp;·&nbsp;&nbsp;<strong>Nationwide</strong> — all 50 states, any time zone
-        </p>
-        {form.geoFocus.includes('Regional') && (
-          <div className="field" style={{ marginTop: 14 }}>
-            <label>Which states or region? <span className="ob-req">*</span></label>
-            <input
-              type="text"
-              value={form.regionalStates}
-              onChange={e => set({ ...form, regionalStates: e.target.value })}
-              placeholder="e.g. Texas, Oklahoma, Louisiana, Arkansas…"
-              autoFocus
-            />
-            <p className="ob-helper">List all the states you want us to target for you.</p>
-          </div>
-        )}
       </div>
     </div>
   );
