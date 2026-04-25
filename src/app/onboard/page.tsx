@@ -27,7 +27,7 @@ interface FormState {
   cityState: string; yearsInBusiness: string; websiteUrl: string;
   logo: File | null; headshot: File | null;
   industries: string[]; otherIndustry: string;
-  employeeCount: string[]; revenueRange: string; geoFocus: string;
+  employeeCount: string[]; revenueRange: string[]; geoFocus: string[];
   differentiator: string; painPoint: string; transformation: string;
   tone: string; avoidances: string;
   availableDays: string[]; timeSlots: string[]; callLength: string; timezone: string;
@@ -39,7 +39,7 @@ const DEFAULT_FORM: FormState = {
   cityState: '', yearsInBusiness: '', websiteUrl: '',
   logo: null, headshot: null,
   industries: [], otherIndustry: '',
-  employeeCount: [], revenueRange: '', geoFocus: '',
+  employeeCount: [], revenueRange: [], geoFocus: [],
   differentiator: '', painPoint: '', transformation: '',
   tone: '', avoidances: '',
   availableDays: [], timeSlots: [], callLength: '', timezone: '',
@@ -360,10 +360,10 @@ function Screen2({ form, set }: { form: FormState; set: (f: FormState) => void }
         <label className="ob-group-label">Typical annual revenue <span className="ob-req">*</span></label>
         <CheckDropdown
           options={REVENUE_RANGES}
-          selected={form.revenueRange ? [form.revenueRange] : []}
-          onToggle={val => set({ ...form, revenueRange: single(form.revenueRange, val) })}
-          placeholder="Select a revenue range…"
-          multi={false}
+          selected={form.revenueRange}
+          onToggle={val => set({ ...form, revenueRange: tog(form.revenueRange, val) })}
+          placeholder="Select revenue ranges…"
+          multi
         />
       </div>
 
@@ -371,10 +371,10 @@ function Screen2({ form, set }: { form: FormState; set: (f: FormState) => void }
         <label className="ob-group-label">Geographic focus <span className="ob-req">*</span></label>
         <CheckDropdown
           options={GEO_OPTIONS}
-          selected={form.geoFocus ? [form.geoFocus] : []}
-          onToggle={val => set({ ...form, geoFocus: single(form.geoFocus, val) })}
+          selected={form.geoFocus}
+          onToggle={val => set({ ...form, geoFocus: tog(form.geoFocus, val) })}
           placeholder="Select geographic focus…"
-          multi={false}
+          multi
         />
       </div>
     </div>
@@ -600,8 +600,8 @@ function validate(step: number, form: FormState): string | null {
   if (step === 2) {
     if (form.industries.length === 0) return 'Select at least one industry.';
     if (form.employeeCount.length === 0) return 'Select at least one employee range.';
-    if (!form.revenueRange)           return 'Select a revenue range.';
-    if (!form.geoFocus)               return 'Select a geographic focus.';
+    if (form.revenueRange.length === 0) return 'Select a revenue range.';
+    if (form.geoFocus.length === 0)    return 'Select a geographic focus.';
   }
   if (step === 3) {
     if (!form.differentiator.trim()) return 'Tell us what makes your firm different.';
