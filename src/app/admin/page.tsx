@@ -390,7 +390,7 @@ export default function AdminPage() {
     : Math.min(Math.round(((totalMRR - prevMilestone) / (nextMilestone - prevMilestone)) * 100), 100);
 
   // Live + paused only (pending and cancelled excluded)
-  const activeClientCount = clients.filter(c => c.status === 'live' || c.status === 'paused').length;
+  const activeClientCount = clients.length;
 
   // Reply Rate
   const replyRate: string = (
