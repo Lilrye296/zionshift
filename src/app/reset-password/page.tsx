@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useEffect, Suspense } from 'react';
-import { useRouter, useSearchParams } from 'next/navigation';
+import { useRouter } from 'next/navigation';
 import { createClient } from '@/utils/supabase/client';
 
 function ResetPasswordForm() {
@@ -14,37 +14,18 @@ function ResetPasswordForm() {
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirm, setShowConfirm]   = useState(false);
   const router = useRouter();
-  const searchParams = useSearchParams();
 
   useEffect(() => {
-    const code      = searchParams.get('code');
-    const tokenHash = searchParams.get('token_hash');
-    const type      = searchParams.get('type');
-
+    // Session is established server-side by /auth/callback before we arrive here
     const supabase = createClient();
-
-    if (code) {
-      // PKCE flow — @supabase/ssr sends a code, not a token_hash
-      supabase.auth.exchangeCodeForSession(code).then(({ error: err }) => {
-        if (!err) {
-          setReady(true);
-        } else {
-          setError('This reset link is invalid or has expired. Please request a new one.');
-        }
-      });
-    } else if (tokenHash && type === 'recovery') {
-      // Legacy implicit flow fallback
-      supabase.auth.verifyOtp({ token_hash: tokenHash, type: 'recovery' }).then(({ error: err }) => {
-        if (!err) {
-          setReady(true);
-        } else {
-          setError('This reset link is invalid or has already been used. Please request a new one.');
-        }
-      });
-    } else {
-      setError('No valid reset link found. Please request a new one from the login page.');
-    }
-  }, [searchParams]);
+    supabase.auth.getSession().then(({ data: { session } }) => {
+      if (session) {
+        setReady(true);
+      } else {
+        setError('This reset link is invalid or has expired. Please request a new one from the login page.');
+      }
+    });
+  }, []);
 
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
