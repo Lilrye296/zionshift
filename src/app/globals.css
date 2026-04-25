@@ -1031,10 +1031,11 @@ footer.zs-footer { padding: 40px 0; border-top: 1px solid var(--zs-border); }
 .ob-screen-sub   { font: 400 14px var(--zs-sans); color: var(--zs-ink-4); margin: 0 0 28px; line-height: 1.6; }
 
 /* Vertical spacing between every combination of field / two-col row */
-.ob-body .field + .field     { margin-top: 24px; }
-.ob-body .ob-row-2 + .field  { margin-top: 24px; }
-.ob-body .field + .ob-row-2  { margin-top: 24px; }
-.ob-body .ob-row-2 + .ob-row-2 { margin-top: 24px; }
+.ob-body .field + .field          { margin-top: 24px; }
+.ob-body .ob-row-2 + .field       { margin-top: 24px; }
+.ob-body .field + .ob-row-2       { margin-top: 24px; }
+.ob-body .ob-row-2 + .ob-row-2    { margin-top: 24px; }
+.ob-body .ob-field-group + .field { margin-top: 28px; }
 
 /* Two-column layout — reset adjacent-sibling margin so both columns start at the same baseline */
 .ob-row-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }

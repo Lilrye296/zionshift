@@ -402,7 +402,7 @@ function Screen2({ form, set }: { form: FormState; set: (f: FormState) => void }
           value={form.exclusions}
           onChange={e => set({ ...form, exclusions: e.target.value })}
           rows={3}
-          placeholder="e.g. No bars or nightclubs, no cannabis businesses…"
+          placeholder="e.g. Businesses under 1 year old, sole proprietors, companies outside my target industries…"
         />
       </div>
     </div>
