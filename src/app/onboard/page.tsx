@@ -614,6 +614,21 @@ function Screen6({ submitting, submitError, onSubmit }: {
   submitError: string;
   onSubmit: () => void;
 }) {
+  async function handleSubmit() {
+    // Fire a minimal, brand-matched confetti burst
+    const confetti = (await import('canvas-confetti')).default;
+    confetti({
+      particleCount: 70,
+      spread: 55,
+      origin: { x: 0.5, y: 0.65 },
+      colors: ['#1A1715', '#C8C4BC', '#F0EDE8', '#9A9AA0', '#ffffff'],
+      gravity: 1.1,
+      scalar: 0.85,
+      ticks: 180,
+    });
+    onSubmit();
+  }
+
   return (
     <div className="ob-screen" style={{ paddingBottom: 28 }}>
       <h2 className="ob-screen-title">You&apos;re all set.</h2>
@@ -646,7 +661,7 @@ function Screen6({ submitting, submitError, onSubmit }: {
       <button
         type="button"
         className="btn btn-primary"
-        onClick={onSubmit}
+        onClick={handleSubmit}
         disabled={submitting}
         style={{ width: '100%', marginTop: 28, padding: '16px', borderRadius: '10px', fontSize: '15px', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 8 }}
       >
