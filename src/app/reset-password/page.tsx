@@ -17,22 +17,33 @@ function ResetPasswordForm() {
   const searchParams = useSearchParams();
 
   useEffect(() => {
+    const code      = searchParams.get('code');
     const tokenHash = searchParams.get('token_hash');
     const type      = searchParams.get('type');
 
-    if (!tokenHash || type !== 'recovery') {
-      setError('No valid reset link found. Please request a new one from the login page.');
-      return;
-    }
-
     const supabase = createClient();
-    supabase.auth.verifyOtp({ token_hash: tokenHash, type: 'recovery' }).then(({ error: err }) => {
-      if (!err) {
-        setReady(true);
-      } else {
-        setError('This reset link is invalid or has already been used. Please request a new one.');
-      }
-    });
+
+    if (code) {
+      // PKCE flow — @supabase/ssr sends a code, not a token_hash
+      supabase.auth.exchangeCodeForSession(code).then(({ error: err }) => {
+        if (!err) {
+          setReady(true);
+        } else {
+          setError('This reset link is invalid or has expired. Please request a new one.');
+        }
+      });
+    } else if (tokenHash && type === 'recovery') {
+      // Legacy implicit flow fallback
+      supabase.auth.verifyOtp({ token_hash: tokenHash, type: 'recovery' }).then(({ error: err }) => {
+        if (!err) {
+          setReady(true);
+        } else {
+          setError('This reset link is invalid or has already been used. Please request a new one.');
+        }
+      });
+    } else {
+      setError('No valid reset link found. Please request a new one from the login page.');
+    }
   }, [searchParams]);
 
   async function handleSubmit(e: React.FormEvent) {
