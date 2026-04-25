@@ -436,26 +436,6 @@ function Screen3({ form, set }: { form: FormState; set: (f: FormState) => void }
           multi={false}
         />
       </div>
-
-      <div className="field">
-        <label>Anything specific prospects should know before getting on a call with you? <span className="ob-optional">(optional)</span></label>
-        <textarea
-          value={form.prospectNote}
-          onChange={e => set({ ...form, prospectNote: e.target.value })}
-          rows={3}
-          placeholder="e.g. I prefer clients who have been in business at least one year and have a dedicated point of contact for their finances."
-        />
-      </div>
-
-      <div className="field">
-        <label>Anything you never want said in outreach — competitors, phrases, or topics to avoid <span className="ob-optional">(optional)</span></label>
-        <textarea
-          value={form.avoidances}
-          onChange={ta('avoidances')}
-          rows={2}
-          placeholder="e.g. Don't reference competitors by name, no industry jargon or buzzwords…"
-        />
-      </div>
     </div>
   );
 }
@@ -514,12 +494,32 @@ function Screen5({ form, set }: { form: FormState; set: (f: FormState) => void }
       <p className="ob-screen-sub">A few last things to make sure your campaign is dialed in perfectly.</p>
 
       <div className="field">
-        <label>How did you hear about ZionShift?</label>
+        <label>Anything specific prospects should know before getting on a call with you? <span className="ob-optional">(optional)</span></label>
+        <textarea
+          value={form.prospectNote}
+          onChange={e => set({ ...form, prospectNote: e.target.value })}
+          rows={3}
+          placeholder="e.g. I prefer clients who have been in business at least one year and have a dedicated point of contact for their finances."
+        />
+      </div>
+
+      <div className="field">
+        <label>Anything you never want said in outreach — competitors, phrases, or topics to avoid <span className="ob-optional">(optional)</span></label>
+        <textarea
+          value={form.avoidances}
+          onChange={e => set({ ...form, avoidances: e.target.value })}
+          rows={3}
+          placeholder="e.g. Don't reference competitors by name, no industry jargon or buzzwords…"
+        />
+      </div>
+
+      <div className="field">
+        <label>How did you hear about ZionShift? <span className="ob-optional">(optional)</span></label>
         <input
           type="text"
           value={form.referralSource}
           onChange={e => set({ ...form, referralSource: e.target.value })}
-          placeholder="Referred by a friend, social media, Google…"
+          placeholder="e.g. Referred by a friend, social media, Google…"
         />
       </div>
     </div>
