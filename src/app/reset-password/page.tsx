@@ -20,38 +20,55 @@ function ResetPasswordForm() {
     const supabase = createClient();
 
     async function establish() {
-      // 1. Session already established by /auth/callback (PKCE server-side exchange)
-      const { data: { session } } = await supabase.auth.getSession();
-      if (session) { setReady(true); return; }
+      const code      = searchParams.get('code');
+      const tokenHash = searchParams.get('token_hash');
+      const type      = searchParams.get('type');
+      const errorParam = searchParams.get('error');
+      const errorDesc  = searchParams.get('error_description');
 
-      // 2. PKCE code in URL — exchange it client-side
-      const code = searchParams.get('code');
+      // Collect debug info
+      const debug: string[] = [
+        `code=${code ? 'yes' : 'no'}`,
+        `token_hash=${tokenHash ? 'yes' : 'no'}`,
+        `type=${type ?? 'none'}`,
+        `error_param=${errorParam ?? 'none'}`,
+      ];
+
+      // 1. Session already established
+      const { data: { session: s1 } } = await supabase.auth.getSession();
+      if (s1) { setReady(true); return; }
+      debug.push('getSession=null');
+
+      // 2. PKCE code exchange
       if (code) {
         const { error: codeErr } = await supabase.auth.exchangeCodeForSession(code);
         if (!codeErr) { setReady(true); return; }
+        debug.push(`codeErr=${codeErr.message}`);
       }
 
-      // 3. Legacy token_hash in URL — verify OTP
-      const tokenHash = searchParams.get('token_hash');
-      const type      = searchParams.get('type');
+      // 3. token_hash OTP verify
       if (tokenHash && type === 'recovery') {
         const { error: otpErr } = await supabase.auth.verifyOtp({ token_hash: tokenHash, type: 'recovery' });
         if (!otpErr) { setReady(true); return; }
+        debug.push(`otpErr=${otpErr.message}`);
       }
 
-      // 4. Also listen for PASSWORD_RECOVERY event (handles implicit flow hash tokens)
+      // 4. Wait for onAuthStateChange (implicit hash flow)
       const { data: { subscription } } = supabase.auth.onAuthStateChange((event) => {
-        if (event === 'PASSWORD_RECOVERY') { setReady(true); }
+        if (event === 'PASSWORD_RECOVERY' || event === 'SIGNED_IN') { setReady(true); }
       });
-      // Give implicit-flow hash tokens a moment to fire onAuthStateChange
-      await new Promise(res => setTimeout(res, 800));
+      await new Promise(res => setTimeout(res, 2000));
       subscription.unsubscribe();
 
-      // 5. Final check after waiting
+      // 5. Final session check
       const { data: { session: s2 } } = await supabase.auth.getSession();
       if (s2) { setReady(true); return; }
+      debug.push('finalSession=null');
 
-      setError('This reset link is invalid or has expired. Please request a new one from the login page.');
+      const debugMsg = errorParam
+        ? `Supabase error: ${errorParam} — ${errorDesc ?? ''}`
+        : `Debug: ${debug.join(' | ')}`;
+      setError(debugMsg);
     }
 
     establish();
