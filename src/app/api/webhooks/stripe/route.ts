@@ -160,6 +160,14 @@ export async function POST(req: NextRequest) {
           </p>
         </div>
 
+        <!-- Timing note -->
+        <div style="margin:24px 0 0;padding:20px 24px;background:#FAFAF9;border-radius:10px;border:1px solid #EEEBE6;">
+          <p style="margin:0 0 6px;font-size:11px;font-weight:700;letter-spacing:0.1em;text-transform:uppercase;color:#9CA3AF;">A note on timing</p>
+          <p style="margin:0;font-size:14px;color:#4B5563;line-height:1.65;">
+            The first 14 days are your account warmup period &mdash; this is normal and intentional. After that, outreach begins and booked meetings start coming in. Sit tight, we&apos;ve got it from here.
+          </p>
+        </div>
+
         <p style="margin:28px 0 0;font-size:13px;color:#9CA3AF;line-height:1.7;">
           This link expires in 48 hours. If you need a new one, just reply to this email.
         </p>
