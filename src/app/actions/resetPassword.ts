@@ -22,7 +22,7 @@ export async function sendPasswordResetEmail(email: string): Promise<{ error?: s
   );
 
   const { error } = await supabase.auth.resetPasswordForEmail(email, {
-    redirectTo: 'https://www.zionshift.com/auth/callback?next=/reset-password',
+    redirectTo: 'https://www.zionshift.com/reset-password',
   });
 
   if (error) {

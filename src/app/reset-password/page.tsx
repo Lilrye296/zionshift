@@ -16,15 +16,47 @@ function ResetPasswordForm() {
   const router = useRouter();
 
   useEffect(() => {
-    // Session is established server-side by /auth/callback before we arrive here
     const supabase = createClient();
-    supabase.auth.getSession().then(({ data: { session } }) => {
-      if (session) {
+    let settled = false;
+
+    function resolve(ok: boolean) {
+      if (settled) return;
+      settled = true;
+      if (ok) {
         setReady(true);
       } else {
         setError('This reset link is invalid or has expired. Please request a new one from the login page.');
       }
+    }
+
+    // onAuthStateChange fires immediately with INITIAL_SESSION (existing session)
+    // AND with PASSWORD_RECOVERY when implicit-flow hash tokens are processed.
+    // Setting this up first ensures we don't miss the event.
+    const { data: { subscription } } = supabase.auth.onAuthStateChange((event, session) => {
+      if (session && (
+        event === 'PASSWORD_RECOVERY' ||
+        event === 'SIGNED_IN' ||
+        event === 'INITIAL_SESSION'
+      )) {
+        resolve(true);
+      }
     });
+
+    // Also catch any already-active session (e.g. /auth/callback PKCE path)
+    supabase.auth.getSession().then(({ data: { session } }) => {
+      if (session) resolve(true);
+    });
+
+    // Give implicit-flow hash processing enough time, then fail if nothing fired
+    const timeout = setTimeout(async () => {
+      const { data: { session } } = await supabase.auth.getSession();
+      resolve(!!session);
+    }, 3000);
+
+    return () => {
+      subscription.unsubscribe();
+      clearTimeout(timeout);
+    };
   }, []);
 
   async function handleSubmit(e: React.FormEvent) {
