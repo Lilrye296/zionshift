@@ -1030,8 +1030,9 @@ footer.zs-footer { padding: 40px 0; border-top: 1px solid var(--zs-border); }
 .ob-screen-title { font: 700 28px var(--zs-sans); letter-spacing: -0.04em; color: var(--zs-ink); margin: 0 0 6px; line-height: 1.1; }
 .ob-screen-sub   { font: 400 14px var(--zs-sans); color: var(--zs-ink-4); margin: 0 0 24px; line-height: 1.6; }
 
-/* Two-column layout */
+/* Two-column layout — reset adjacent-sibling margin so both columns start at the same baseline */
 .ob-row-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+.ob-row-2 .field + .field { margin-top: 0; }
 
 /* Field groups */
 .ob-field-group { margin-bottom: 20px; }
