@@ -1004,6 +1004,93 @@ footer.zs-footer { padding: 40px 0; border-top: 1px solid var(--zs-border); }
 .adm-view-banner-back { font: 500 12px var(--zs-sans); color: #92400e; background: none; border: 1px solid #fde68a; border-radius: 999px; padding: 5px 13px; cursor: pointer; transition: all 160ms; text-decoration: none; display: inline-block; }
 .adm-view-banner-back:hover { background: #fef3c7; border-color: #f59e0b; }
 
+/* ─── ONBOARDING FORM ─────────────────────────────────────────── */
+
+/* Card — wider than login card (600px vs 440px) */
+.ob-card { background: #fff; border: 1px solid var(--zs-border); border-radius: 24px; width: 100%; max-width: 600px; box-shadow: 0 20px 60px rgba(11,11,12,0.07); overflow: hidden; }
+
+/* Logo row */
+.ob-logo-row { padding: 28px 36px 24px; border-bottom: 1px solid var(--zs-border-soft); }
+
+/* Progress bar */
+.ob-progress-track { height: 3px; background: var(--zs-mist); }
+.ob-progress-fill  { height: 100%; background: var(--zs-ink); border-radius: 0 999px 999px 0; transition: width 500ms cubic-bezier(0.2,0.7,0.2,1); }
+
+/* Nav row */
+.ob-nav { display: flex; align-items: center; justify-content: space-between; padding: 16px 36px 0; }
+.ob-back-btn { display: inline-flex; align-items: center; gap: 5px; font: 500 13px var(--zs-sans); color: var(--zs-ink-4); background: none; border: none; cursor: pointer; padding: 0; transition: color 160ms; letter-spacing: -0.005em; }
+.ob-back-btn:hover { color: var(--zs-ink); }
+.ob-step-label { font: 400 12px var(--zs-mono); color: var(--zs-ink-5); letter-spacing: 0.04em; }
+
+/* Screen body — key on parent drives re-mount animation each step */
+.ob-body { padding: 24px 36px 0; animation: obSlideIn 300ms cubic-bezier(0.2,0.7,0.2,1) both; }
+@keyframes obSlideIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: none; } }
+
+/* Screen titles */
+.ob-screen-title { font: 700 28px var(--zs-sans); letter-spacing: -0.04em; color: var(--zs-ink); margin: 0 0 6px; line-height: 1.1; }
+.ob-screen-sub   { font: 400 14px var(--zs-sans); color: var(--zs-ink-4); margin: 0 0 24px; line-height: 1.6; }
+
+/* Two-column layout */
+.ob-row-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+
+/* Field groups */
+.ob-field-group { margin-bottom: 20px; }
+.ob-group-label { display: block; font: 500 11px var(--zs-mono); letter-spacing: 0.12em; text-transform: uppercase; color: var(--zs-ink-4); margin-bottom: 10px; }
+
+/* Multi-select chips */
+.ob-chip-group { display: flex; flex-wrap: wrap; gap: 8px; }
+.ob-chip { font: 500 13px var(--zs-sans); color: var(--zs-ink-3); background: var(--zs-mist); border: 1px solid var(--zs-border); border-radius: 999px; padding: 7px 16px; cursor: pointer; transition: all 160ms; letter-spacing: -0.01em; line-height: 1; }
+.ob-chip:hover { border-color: var(--zs-ink-3); color: var(--zs-ink); }
+.ob-chip.selected { background: var(--zs-ink); color: #fff; border-color: var(--zs-ink); }
+
+/* Select dropdown */
+.ob-select { width: 100%; padding: 12px 40px 12px 14px; font: 400 15px var(--zs-sans); color: var(--zs-ink); background: #fff url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%239A9AA0' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='6 9 12 15 18 9'/%3E%3C/svg%3E") no-repeat right 14px center; border: 1px solid var(--zs-border); border-radius: 6px; outline: none; appearance: none; -webkit-appearance: none; cursor: pointer; transition: border-color 160ms, box-shadow 200ms; }
+.ob-select:focus { border-color: var(--zs-ink); box-shadow: 0 0 0 4px rgba(11,11,12,0.04); }
+
+/* Helper + required */
+.ob-helper   { font: 400 12px var(--zs-sans); color: var(--zs-ink-5); margin: 6px 0 0; line-height: 1.5; }
+.ob-req      { color: #dc2626; }
+.ob-optional { font: 400 12px var(--zs-sans); color: var(--zs-ink-5); letter-spacing: 0; text-transform: none; font-weight: 400; }
+
+/* File upload */
+.ob-upload-heading { font: 500 11px var(--zs-mono); letter-spacing: 0.12em; text-transform: uppercase; color: var(--zs-ink-4); margin: 0 0 8px; }
+.ob-upload-zone { border: 1.5px dashed var(--zs-border); border-radius: 12px; padding: 24px 16px; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 8px; cursor: pointer; transition: border-color 160ms, background 160ms; background: var(--zs-paper); text-align: center; min-height: 96px; }
+.ob-upload-zone:hover { border-color: var(--zs-ink); background: var(--zs-mist); }
+.ob-upload-label   { font: 500 13px var(--zs-sans); color: var(--zs-ink-3); }
+.ob-upload-preview { max-height: 60px; max-width: 100%; object-fit: contain; border-radius: 6px; }
+.ob-upload-reselect { display: block; margin: 6px 0 0; font: 400 11px var(--zs-mono); color: var(--zs-ink-4); background: none; border: none; cursor: pointer; text-decoration: underline; text-underline-offset: 2px; padding: 0; }
+.ob-upload-reselect:hover { color: var(--zs-ink); }
+
+/* Confirmation cards (screen 6) */
+.ob-confirm-grid { display: flex; flex-direction: column; gap: 12px; }
+.ob-confirm-card  { background: var(--zs-paper); border: 1px solid var(--zs-border); border-radius: 14px; padding: 20px 22px; }
+.ob-confirm-icon  { width: 36px; height: 36px; border-radius: 50%; background: var(--zs-mist); border: 1px solid var(--zs-border); display: flex; align-items: center; justify-content: center; margin-bottom: 12px; color: var(--zs-ink-3); }
+.ob-confirm-label { font: 700 15px var(--zs-sans); letter-spacing: -0.02em; color: var(--zs-ink); margin: 0 0 6px; }
+.ob-confirm-body  { font: 400 13px var(--zs-sans); color: var(--zs-ink-4); margin: 0; line-height: 1.6; }
+
+/* Footer (next button) */
+.ob-footer { padding: 20px 36px 32px; }
+
+/* Error text */
+.ob-error { font: 400 13px var(--zs-sans); color: #dc2626; margin: 8px 0 0; line-height: 1.4; }
+
+/* Spinners */
+.ob-spinner      { width: 14px; height: 14px; border: 2px solid rgba(255,255,255,0.3); border-top-color: #fff; border-radius: 50%; animation: obSpin 0.7s linear infinite; display: inline-block; flex-shrink: 0; }
+.ob-spinner-dark { width: 14px; height: 14px; border: 2px solid var(--zs-border); border-top-color: var(--zs-ink); border-radius: 50%; animation: obSpin 0.7s linear infinite; display: inline-block; flex-shrink: 0; }
+@keyframes obSpin { to { transform: rotate(360deg); } }
+
+/* Onboard responsive */
+@media (max-width: 680px) {
+  .ob-card { border-radius: 16px; }
+  .ob-logo-row { padding: 20px 20px 18px; }
+  .ob-nav { padding: 12px 20px 0; }
+  .ob-body { padding: 20px 20px 0; }
+  .ob-footer { padding: 16px 20px 24px; }
+  .ob-error { padding: 0 20px; }
+  .ob-row-2 { grid-template-columns: 1fr; }
+  .ob-screen-title { font-size: 24px; }
+}
+
 @media (max-width: 900px) {
   /* Use minmax(0,1fr) everywhere — plain 1fr = minmax(auto,1fr) which lets cells
      grow past their track, causing cards to bleed off-screen on mobile */
