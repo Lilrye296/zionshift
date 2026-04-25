@@ -88,6 +88,90 @@ function ChipGroup({ options, selected, onToggle }: {
   );
 }
 
+/* ─── CheckDropdown ──────────────────────────────────────────── */
+
+function CheckDropdown({ options, selected, onToggle, placeholder, multi = true }: {
+  options: string[];
+  selected: string[];
+  onToggle: (val: string) => void;
+  placeholder: string;
+  multi?: boolean;
+}) {
+  const [open, setOpen] = useState(false);
+  const ref = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    function onMouseDown(e: MouseEvent) {
+      if (ref.current && !ref.current.contains(e.target as Node)) {
+        setOpen(false);
+      }
+    }
+    document.addEventListener('mousedown', onMouseDown);
+    return () => document.removeEventListener('mousedown', onMouseDown);
+  }, []);
+
+  function triggerLabel() {
+    if (selected.length === 0) return placeholder;
+    if (selected.length === 1) return selected[0];
+    return `${selected.length} selected`;
+  }
+
+  function handleToggle(val: string) {
+    onToggle(val);
+    if (!multi) setOpen(false);
+  }
+
+  return (
+    <div className="ob-dd" ref={ref}>
+      <button
+        type="button"
+        className={`ob-dd-trigger${open ? ' open' : ''}${selected.length > 0 ? ' has-value' : ''}`}
+        onClick={() => setOpen(o => !o)}
+        aria-expanded={open}
+        aria-haspopup="listbox"
+      >
+        <span className="ob-dd-trigger-label">{triggerLabel()}</span>
+        <svg
+          className={`ob-dd-caret${open ? ' open' : ''}`}
+          width="14" height="14" viewBox="0 0 24 24"
+          fill="none" stroke="currentColor" strokeWidth="2.5"
+          strokeLinecap="round" strokeLinejoin="round"
+          aria-hidden
+        >
+          <polyline points="6 9 12 15 18 9" />
+        </svg>
+      </button>
+
+      {open && (
+        <div className="ob-dd-panel" role="listbox" aria-multiselectable={multi}>
+          {options.map(opt => {
+            const checked = selected.includes(opt);
+            return (
+              <button
+                key={opt}
+                type="button"
+                className={`ob-dd-row${checked ? ' checked' : ''}`}
+                onClick={() => handleToggle(opt)}
+                role="option"
+                aria-selected={checked}
+              >
+                <span className={`ob-dd-check${checked ? ' checked' : ''}`} aria-hidden>
+                  {checked && (
+                    <svg width="9" height="9" viewBox="0 0 12 12" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+                      <polyline points="2 6 5 9 10 3" />
+                    </svg>
+                  )}
+                </span>
+                <span className="ob-dd-opt-label">{opt}</span>
+              </button>
+            );
+          })}
+        </div>
+      )}
+    </div>
+  );
+}
+
 /* ─── FileUpload ─────────────────────────────────────────────── */
 
 function FileUpload({ label, helper, file, onChange }: {
@@ -225,11 +309,13 @@ function Screen2({ form, set }: { form: FormState; set: (f: FormState) => void }
       <p className="ob-screen-sub">We use this to target the right business owners for your firm.</p>
 
       <div className="ob-field-group">
-        <label className="ob-group-label">What industries do your best clients come from? <span className="ob-req">*</span></label>
-        <ChipGroup
+        <label className="ob-group-label">Industries your best clients come from <span className="ob-req">*</span></label>
+        <CheckDropdown
           options={INDUSTRIES}
           selected={form.industries}
           onToggle={val => set({ ...form, industries: tog(form.industries, val) })}
+          placeholder="Select industries…"
+          multi
         />
         {hasOther && (
           <div className="field" style={{ marginTop: 12 }}>
@@ -245,29 +331,35 @@ function Screen2({ form, set }: { form: FormState; set: (f: FormState) => void }
       </div>
 
       <div className="ob-field-group">
-        <label className="ob-group-label">How many employees do your ideal clients typically have? <span className="ob-req">*</span></label>
-        <ChipGroup
+        <label className="ob-group-label">Typical employee count of ideal clients <span className="ob-req">*</span></label>
+        <CheckDropdown
           options={EMPLOYEE_COUNTS}
           selected={form.employeeCount}
           onToggle={val => set({ ...form, employeeCount: tog(form.employeeCount, val) })}
+          placeholder="Select employee ranges…"
+          multi
         />
       </div>
 
       <div className="ob-field-group">
-        <label className="ob-group-label">Typical annual revenue? <span className="ob-req">*</span></label>
-        <ChipGroup
+        <label className="ob-group-label">Typical annual revenue <span className="ob-req">*</span></label>
+        <CheckDropdown
           options={REVENUE_RANGES}
           selected={form.revenueRange ? [form.revenueRange] : []}
           onToggle={val => set({ ...form, revenueRange: single(form.revenueRange, val) })}
+          placeholder="Select a revenue range…"
+          multi={false}
         />
       </div>
 
-      <div className="ob-field-group">
+      <div className="ob-field-group" style={{ marginBottom: 0 }}>
         <label className="ob-group-label">Geographic focus <span className="ob-req">*</span></label>
-        <ChipGroup
+        <CheckDropdown
           options={GEO_OPTIONS}
           selected={form.geoFocus ? [form.geoFocus] : []}
           onToggle={val => set({ ...form, geoFocus: single(form.geoFocus, val) })}
+          placeholder="Select geographic focus…"
+          multi={false}
         />
       </div>
     </div>
