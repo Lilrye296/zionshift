@@ -22,7 +22,7 @@ export async function POST(req: NextRequest) {
       logoBase64, logoExt, headshotBase64, headshotExt,
       industries, otherIndustry, employeeCount, revenueRange, geoFocus,
       differentiator, painPoint, transformation, tone, avoidances,
-      availableDays, timeSlots, callLength, timezone,
+      availability, callLength, timezone,
       exclusions, prospectNote, referralSource,
     } = body;
 
@@ -104,7 +104,7 @@ export async function POST(req: NextRequest) {
           firstName, lastName, businessName, cityState, yearsInBusiness, websiteUrl,
           industries, otherIndustry, employeeCount, revenueRange, geoFocus,
           differentiator, painPoint, transformation, tone, avoidances,
-          availableDays, timeSlots, callLength, timezone,
+          availability, callLength, timezone,
           exclusions, prospectNote, referralSource,
         },
         submitted_at: new Date().toISOString(),
@@ -130,8 +130,8 @@ export async function POST(req: NextRequest) {
         transformation,
         tone,
         exclusions: avoidances,
-        available_days: Array.isArray(availableDays) ? availableDays.join(', ') : '',
-        time_slots: Array.isArray(timeSlots) ? timeSlots.join(', ') : '',
+        available_days: Object.keys(availability || {}).join(', '),
+        time_slots: Object.entries(availability || {}).map(([d, s]) => `${d}: ${s.join(', ')}`).join('; '),
         call_length: callLength,
         timezone,
         submitted_at: new Date().toISOString(),
@@ -159,8 +159,10 @@ export async function POST(req: NextRequest) {
     try {
       const industryList = Array.isArray(industries) ? industries.join(', ') : industries;
       const empList = Array.isArray(employeeCount) ? employeeCount.join(', ') : employeeCount;
-      const daysList = Array.isArray(availableDays) ? availableDays.join(', ') : availableDays;
-      const slotsList = Array.isArray(timeSlots) ? timeSlots.join(', ') : timeSlots;
+      const availabilityRows = Object.entries(availability || {})
+        .map(([day, slots]: [string, string[]]) =>
+          `<tr><td style="padding:4px 0;font-size:12px;font-weight:600;color:#6B7280;">${day}</td><td style="padding:4px 0;font-size:14px;color:#1A1715;">${slots.join(', ')}</td></tr>`
+        ).join('');
 
       await resendClient().emails.send({
         from: 'ZionShift <hello@zionshift.com>',
@@ -208,8 +210,7 @@ export async function POST(req: NextRequest) {
 
       <table style="width:100%;border-collapse:collapse;margin-bottom:28px;">
         <tr><td colspan="2" style="padding:0 0 12px;font-size:11px;font-weight:700;letter-spacing:0.14em;text-transform:uppercase;color:#9CA3AF;border-bottom:1px solid #F0EDE8;">Screen 4 &mdash; Availability</td></tr>
-        <tr><td style="padding:10px 0 4px;font-size:12px;font-weight:600;color:#6B7280;width:40%;">Available Days</td><td style="padding:10px 0 4px;font-size:14px;color:#1A1715;">${daysList}</td></tr>
-        <tr><td style="padding:4px 0;font-size:12px;font-weight:600;color:#6B7280;">Time Slots</td><td style="padding:4px 0;font-size:14px;color:#1A1715;">${slotsList}</td></tr>
+        ${availabilityRows}
         <tr><td style="padding:4px 0;font-size:12px;font-weight:600;color:#6B7280;">Call Length</td><td style="padding:4px 0;font-size:14px;color:#1A1715;">${callLength}</td></tr>
         <tr><td style="padding:4px 0 10px;font-size:12px;font-weight:600;color:#6B7280;">Time Zone</td><td style="padding:4px 0 10px;font-size:14px;color:#1A1715;">${timezone}</td></tr>
       </table>

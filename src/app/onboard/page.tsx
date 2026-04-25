@@ -16,7 +16,6 @@ const REVENUE_RANGES = ['Under $500K', '$500K–$2M', '$2M–$10M', '$10M+', 'No
 const GEO_OPTIONS    = ['Local only', 'Regional', 'Nationwide'];
 const TONES          = ['Formal and professional', 'Friendly and conversational', 'Somewhere in between'];
 const DAYS           = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday'];
-const TIME_SLOTS     = ['Morning (8am–12pm)', 'Afternoon (12pm–5pm)', 'Evening (5pm–8pm)'];
 const TIMEZONES      = ['Eastern', 'Central', 'Mountain', 'Pacific', 'Alaska', 'Hawaii'];
 
 /* ─── Types ──────────────────────────────────────────────────── */
@@ -29,7 +28,7 @@ interface FormState {
   employeeCount: string[]; revenueRange: string[]; geoFocus: string[]; regionalStates: string;
   differentiator: string; painPoint: string; transformation: string;
   tone: string; avoidances: string;
-  availableDays: string[]; timeSlots: string[]; callLength: string; timezone: string;
+  availability: Record<string, string[]>; callLength: string; timezone: string;
   exclusions: string; prospectNote: string; referralSource: string;
 }
 
@@ -41,7 +40,7 @@ const DEFAULT_FORM: FormState = {
   employeeCount: [], revenueRange: [], geoFocus: [], regionalStates: '',
   differentiator: '', painPoint: '', transformation: '',
   tone: '', avoidances: '',
-  availableDays: [], timeSlots: [], callLength: '', timezone: '',
+  availability: {}, callLength: '', timezone: '',
   exclusions: '', prospectNote: '', referralSource: '',
 };
 
@@ -440,6 +439,75 @@ function Screen3({ form, set }: { form: FormState; set: (f: FormState) => void }
   );
 }
 
+/* ─── AvailabilityGrid ───────────────────────────────────────── */
+
+const SLOT_LABELS = ['Morning', 'Afternoon', 'Evening'];
+const SLOT_HOURS: Record<string, string> = {
+  'Morning':   '8am–12pm',
+  'Afternoon': '12pm–5pm',
+  'Evening':   '5pm–8pm',
+};
+
+function AvailabilityGrid({ availability, onChange }: {
+  availability: Record<string, string[]>;
+  onChange: (v: Record<string, string[]>) => void;
+}) {
+  function toggleSlot(day: string, slot: string) {
+    const current = availability[day] ?? [];
+    const next = current.includes(slot)
+      ? current.filter(s => s !== slot)
+      : [...current, slot];
+    const updated = { ...availability };
+    if (next.length === 0) {
+      delete updated[day];
+    } else {
+      updated[day] = next;
+    }
+    onChange(updated);
+  }
+
+  return (
+    <div className="ob-avail-grid">
+      <div className="ob-avail-header">
+        <span className="ob-avail-header-day" />
+        {SLOT_LABELS.map(s => (
+          <span key={s} className="ob-avail-header-slot">
+            <span className="ob-avail-slot-name">{s}</span>
+            <span className="ob-avail-slot-hours">{SLOT_HOURS[s]}</span>
+          </span>
+        ))}
+      </div>
+      {DAYS.map(day => {
+        const selected = availability[day] ?? [];
+        return (
+          <div key={day} className="ob-avail-row">
+            <span className="ob-avail-day">{day}</span>
+            {SLOT_LABELS.map(slot => {
+              const on = selected.includes(slot);
+              return (
+                <button
+                  key={slot}
+                  type="button"
+                  className={`ob-avail-slot${on ? ' on' : ''}`}
+                  onClick={() => toggleSlot(day, slot)}
+                  aria-pressed={on}
+                  aria-label={`${day} ${slot}`}
+                >
+                  {on && (
+                    <svg width="11" height="11" viewBox="0 0 12 12" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" aria-hidden>
+                      <polyline points="2 6 5 9 10 3" />
+                    </svg>
+                  )}
+                </button>
+              );
+            })}
+          </div>
+        );
+      })}
+    </div>
+  );
+}
+
 /* ─── Screen 4 ───────────────────────────────────────────────── */
 
 function Screen4({ form, set }: { form: FormState; set: (f: FormState) => void }) {
@@ -449,24 +517,11 @@ function Screen4({ form, set }: { form: FormState; set: (f: FormState) => void }
       <p className="ob-screen-sub">We use this to set up your booking page so prospects can only schedule when you&apos;re free.</p>
 
       <div className="ob-field-group">
-        <label className="ob-group-label">What days are you available for discovery calls? <span className="ob-req">*</span></label>
-        <CheckDropdown
-          options={DAYS}
-          selected={form.availableDays}
-          onToggle={val => set({ ...form, availableDays: tog(form.availableDays, val) })}
-          placeholder="Select available days…"
-          multi
-        />
-      </div>
-
-      <div className="ob-field-group">
-        <label className="ob-group-label">What time slots work best? <span className="ob-req">*</span></label>
-        <CheckDropdown
-          options={TIME_SLOTS}
-          selected={form.timeSlots}
-          onToggle={val => set({ ...form, timeSlots: tog(form.timeSlots, val) })}
-          placeholder="Select time slots…"
-          multi
+        <label className="ob-group-label">When are you available for discovery calls? <span className="ob-req">*</span></label>
+        <p className="ob-helper" style={{ marginTop: 0, marginBottom: 10 }}>Toggle the time slots that work for each day. Leave a day blank if you&apos;re unavailable.</p>
+        <AvailabilityGrid
+          availability={form.availability}
+          onChange={v => set({ ...form, availability: v })}
         />
       </div>
 
@@ -603,9 +658,8 @@ function validate(step: number, form: FormState): string | null {
     if (!form.tone)                  return 'Select a preferred tone.';
   }
   if (step === 4) {
-    if (form.availableDays.length === 0) return 'Select at least one available day.';
-    if (form.timeSlots.length === 0)     return 'Select at least one time slot.';
-    if (!form.timezone)                  return 'Select your time zone.';
+    if (Object.keys(form.availability).length === 0) return 'Select at least one day and time slot.';
+    if (!form.timezone)                              return 'Select your time zone.';
   }
   return null;
 }
@@ -683,7 +737,7 @@ function OnboardInner() {
           geoFocus: form.geoFocus, differentiator: form.differentiator,
           painPoint: form.painPoint, transformation: form.transformation,
           tone: form.tone, avoidances: form.avoidances,
-          availableDays: form.availableDays, timeSlots: form.timeSlots,
+          availability: form.availability,
           callLength: form.callLength, timezone: form.timezone,
           exclusions: form.exclusions, prospectNote: form.prospectNote,
           referralSource: form.referralSource,
