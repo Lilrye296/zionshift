@@ -425,7 +425,7 @@ function Screen3({ form, set }: { form: FormState; set: (f: FormState) => void }
           value={form.differentiator}
           onChange={ta('differentiator')}
           rows={3}
-          placeholder="We specialize in construction companies and give every client a dedicated bookkeeper who actually picks up the phone."
+          placeholder="e.g. We specialize in construction companies and give every client a dedicated bookkeeper who actually picks up the phone."
         />
       </div>
 
@@ -435,7 +435,7 @@ function Screen3({ form, set }: { form: FormState; set: (f: FormState) => void }
           value={form.painPoint}
           onChange={ta('painPoint')}
           rows={3}
-          placeholder="They&apos;re drowning in receipts, behind on their books, and terrified of tax season."
+          placeholder="e.g. They're drowning in receipts, behind on their books, and terrified of tax season."
         />
       </div>
 
@@ -445,16 +445,19 @@ function Screen3({ form, set }: { form: FormState; set: (f: FormState) => void }
           value={form.transformation}
           onChange={ta('transformation')}
           rows={3}
-          placeholder="Their books are clean, they have real-time P&L reports, and they finally feel in control of their business finances."
+          placeholder="e.g. Their books are clean, they have real-time P&L reports, and they finally feel in control of their business finances."
         />
       </div>
 
       <div className="ob-field-group">
         <label className="ob-group-label">Preferred tone for outreach <span className="ob-req">*</span></label>
-        <ChipGroup
+        <CheckDropdown
           options={TONES}
           selected={form.tone ? [form.tone] : []}
           onToggle={val => set({ ...form, tone: single(form.tone, val) })}
+          placeholder="Select a tone…"
+          radio
+          multi={false}
         />
       </div>
 
@@ -464,7 +467,7 @@ function Screen3({ form, set }: { form: FormState; set: (f: FormState) => void }
           value={form.avoidances}
           onChange={ta('avoidances')}
           rows={2}
-          placeholder="Don&apos;t mention QuickBooks, don&apos;t compare us to competitors…"
+          placeholder="e.g. Don't reference competitors by name, avoid overly salesy language…"
         />
       </div>
     </div>

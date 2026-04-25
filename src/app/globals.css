@@ -1036,6 +1036,8 @@ footer.zs-footer { padding: 40px 0; border-top: 1px solid var(--zs-border); }
 .ob-body .field + .ob-row-2       { margin-top: 24px; }
 .ob-body .ob-row-2 + .ob-row-2    { margin-top: 24px; }
 .ob-body .ob-field-group + .field { margin-top: 28px; }
+.ob-body .field + .ob-field-group { margin-top: 28px; }
+.ob-body input::placeholder, .ob-body textarea::placeholder { font-style: italic; color: var(--zs-ink-5); }
 
 /* Two-column layout — reset adjacent-sibling margin so both columns start at the same baseline */
 .ob-row-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
