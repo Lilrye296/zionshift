@@ -15,7 +15,7 @@ const EMPLOYEE_COUNTS = ['1–10', '11–50', '51–200', '201–500', '501–1,
 const REVENUE_RANGES = ['Under $500K', '$500K–$2M', '$2M–$10M', '$10M+', 'Not sure'];
 const GEO_OPTIONS    = ['Local only', 'Regional', 'Nationwide'];
 const TONES          = ['Formal and professional', 'Friendly and conversational', 'Somewhere in between'];
-const DAYS           = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
+const DAYS           = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday'];
 const TIME_SLOTS     = ['Morning (8am–12pm)', 'Afternoon (12pm–5pm)', 'Evening (5pm–8pm)'];
 const TIMEZONES      = ['Eastern', 'Central', 'Mountain', 'Pacific', 'Alaska', 'Hawaii'];
 
