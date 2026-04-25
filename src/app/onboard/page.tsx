@@ -90,12 +90,18 @@ function ChipGroup({ options, selected, onToggle }: {
 
 /* ─── CheckDropdown ──────────────────────────────────────────── */
 
-function CheckDropdown({ options, selected, onToggle, placeholder, multi = true }: {
+function CheckDropdown({ options, selected, onToggle, placeholder, multi = true, inlineInput }: {
   options: string[];
   selected: string[];
   onToggle: (val: string) => void;
   placeholder: string;
   multi?: boolean;
+  inlineInput?: {
+    forOption: string;
+    value: string;
+    onChange: (v: string) => void;
+    placeholder: string;
+  };
 }) {
   const [open, setOpen] = useState(false);
   const ref = useRef<HTMLDivElement>(null);
@@ -144,9 +150,9 @@ function CheckDropdown({ options, selected, onToggle, placeholder, multi = true 
 
       {open && (
         <div className="ob-dd-panel" role="listbox" aria-multiselectable={multi}>
-          {options.map(opt => {
+          {options.flatMap(opt => {
             const checked = selected.includes(opt);
-            return (
+            const rows = [
               <button
                 key={opt}
                 type="button"
@@ -163,8 +169,24 @@ function CheckDropdown({ options, selected, onToggle, placeholder, multi = true 
                   )}
                 </span>
                 <span className="ob-dd-opt-label">{opt}</span>
-              </button>
-            );
+              </button>,
+            ];
+            if (inlineInput && opt === inlineInput.forOption && checked) {
+              rows.push(
+                <div key={`${opt}-inline`} className="ob-dd-inline-row">
+                  <input
+                    type="text"
+                    className="ob-dd-inline-input"
+                    value={inlineInput.value}
+                    onChange={e => inlineInput.onChange(e.target.value)}
+                    placeholder={inlineInput.placeholder}
+                    autoFocus
+                    onClick={e => e.stopPropagation()}
+                  />
+                </div>
+              );
+            }
+            return rows;
           })}
         </div>
       )}
@@ -302,7 +324,6 @@ function Screen1({ form, set }: { form: FormState; set: (f: FormState) => void }
 /* ─── Screen 2 ───────────────────────────────────────────────── */
 
 function Screen2({ form, set }: { form: FormState; set: (f: FormState) => void }) {
-  const hasOther = form.industries.includes('Other');
   return (
     <div className="ob-screen">
       <h2 className="ob-screen-title">Your ideal client.</h2>
@@ -316,18 +337,13 @@ function Screen2({ form, set }: { form: FormState; set: (f: FormState) => void }
           onToggle={val => set({ ...form, industries: tog(form.industries, val) })}
           placeholder="Select industries…"
           multi
+          inlineInput={{
+            forOption: 'Other',
+            value: form.otherIndustry,
+            onChange: v => set({ ...form, otherIndustry: v }),
+            placeholder: 'e.g. Agriculture, Entertainment…',
+          }}
         />
-        {hasOther && (
-          <div className="field" style={{ marginTop: 12 }}>
-            <label>Describe the other industry</label>
-            <input
-              type="text"
-              value={form.otherIndustry}
-              onChange={e => set({ ...form, otherIndustry: e.target.value })}
-              placeholder="e.g. Agriculture, Entertainment…"
-            />
-          </div>
-        )}
       </div>
 
       <div className="ob-field-group">
