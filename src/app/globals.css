@@ -1080,8 +1080,8 @@ footer.zs-footer { padding: 40px 0; border-top: 1px solid var(--zs-border); }
 
 /* Availability grid (screen 4) */
 .ob-avail-grid { border: 1.5px solid var(--zs-border); border-radius: 10px; overflow: hidden; }
-.ob-avail-header { display: grid; grid-template-columns: 110px repeat(3, 1fr); background: var(--zs-paper); border-bottom: 1.5px solid var(--zs-border); }
-.ob-avail-header-day { padding: 10px 12px; display: flex; align-items: center; }
+.ob-avail-header { display: grid; grid-template-columns: 110px repeat(3, 1fr); background: var(--zs-paper); border-bottom: 1.5px solid var(--zs-border); padding: 0 14px; }
+.ob-avail-header-day { padding: 10px 0; display: flex; align-items: center; }
 .ob-avail-selectall { display: inline-flex; align-items: center; background: #fff; border: 1px solid var(--zs-border); border-radius: 999px; padding: 4px 11px; font: 500 11px var(--zs-sans); color: var(--zs-ink-3); letter-spacing: -0.01em; cursor: pointer; transition: border-color 160ms, color 160ms, box-shadow 160ms; white-space: nowrap; }
 .ob-avail-selectall:hover { border-color: var(--zs-ink-3); color: var(--zs-ink); box-shadow: 0 1px 4px rgba(11,11,12,0.07); }
 .ob-avail-header-slot { padding: 10px 0; text-align: center; }
