@@ -3,6 +3,7 @@
 import { useState, useEffect, useRef } from 'react';
 import { useRouter } from 'next/navigation';
 import { createClient } from '@/utils/supabase/client';
+import { sendPasswordResetEmail } from '@/app/actions/resetPassword';
 
 /* ── Forgot Password Modal ────────────────────────── */
 function ForgotPasswordModal({ onClose }: { onClose: () => void }) {
@@ -33,17 +34,13 @@ function ForgotPasswordModal({ onClose }: { onClose: () => void }) {
     setLoading(true);
     setError('');
     try {
-      const supabase = createClient();
-      const { error: resetError } = await supabase.auth.resetPasswordForEmail(email, {
-        redirectTo: 'https://www.zionshift.com/reset-password',
-      });
-      if (resetError) {
-        // Rate-limited (429) or similar — tell the user to wait
-        if (resetError.status === 429 || resetError.message?.toLowerCase().includes('rate')) {
+      const result = await sendPasswordResetEmail(email);
+      if (result.error) {
+        if (result.error === 'rate_limited') {
           setError('Too many requests. Please wait a minute before trying again.');
           startCooldown(60);
         } else {
-          setError(resetError.message || 'Something went wrong. Please try again.');
+          setError(result.error);
         }
         return;
       }
