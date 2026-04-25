@@ -3,8 +3,13 @@ import Stripe from 'stripe';
 import { createClient } from '@supabase/supabase-js';
 import { Resend } from 'resend';
 
-const stripe = new Stripe(process.env.STRIPE_SECRET_KEY!);
-const resend = new Resend(process.env.RESEND_API_KEY);
+function stripeClient() {
+  return new Stripe(process.env.STRIPE_SECRET_KEY!);
+}
+
+function resendClient() {
+  return new Resend(process.env.RESEND_API_KEY);
+}
 
 function supabaseAdmin() {
   return createClient(
@@ -34,7 +39,7 @@ export async function POST(req: NextRequest) {
   let event: Stripe.Event;
   try {
     const rawBody = await req.text();
-    event = stripe.webhooks.constructEvent(rawBody, sig, webhookSecret);
+    event = stripeClient().webhooks.constructEvent(rawBody, sig, webhookSecret);
   } catch (err) {
     console.error('[stripe-webhook] Signature verification failed:', err);
     return NextResponse.json({ error: 'Invalid signature.' }, { status: 400 });
@@ -79,7 +84,7 @@ export async function POST(req: NextRequest) {
     const firstName   = getFirstName(name);
     const onboardUrl  = `https://www.zionshift.com/onboard?token=${token}`;
 
-    const { error: emailError } = await resend.emails.send({
+    const { error: emailError } = await resendClient().emails.send({
       from:    'ZionShift <hello@zionshift.com>',
       to:      email,
       replyTo: 'ryan@zionshift.com',
