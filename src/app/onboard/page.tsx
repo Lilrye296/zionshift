@@ -118,8 +118,7 @@ function CheckDropdown({ options, selected, onToggle, placeholder, multi = true,
 
   function triggerLabel() {
     if (selected.length === 0) return placeholder;
-    if (selected.length === 1) return selected[0];
-    return `${selected.length} selected`;
+    return selected.join(', ');
   }
 
   function handleToggle(val: string) {
