@@ -762,7 +762,7 @@ function OnboardInner() {
         {/* Logo */}
         <div className="ob-logo-row">
           {/* eslint-disable-next-line @next/next/no-img-element */}
-          <a href="/"><img src="/logo.png" alt="ZionShift" className="login-logo" style={{ marginBottom: 0 }} /></a>
+          <img src="/logo.png" alt="ZionShift" className="login-logo" style={{ marginBottom: 0 }} />
         </div>
 
         {/* Progress bar (steps 1–5 only) */}
