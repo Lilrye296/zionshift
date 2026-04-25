@@ -106,7 +106,7 @@ export async function POST(req: NextRequest) {
       from:    'ZionShift <hello@zionshift.com>',
       to:      email,
       replyTo: 'ryan@zionshift.com',
-      subject: 'Welcome to ZionShift \u2014 Set Up Your Account',
+      subject: 'Welcome to ZionShift \u2014 You\u2019re officially in.',
       html: `
 <!DOCTYPE html>
 <html lang="en">
@@ -125,22 +125,43 @@ export async function POST(req: NextRequest) {
 
       <!-- Body -->
       <div style="padding:44px 36px 36px;">
-        <p style="margin:0 0 10px;font-size:11px;font-weight:700;letter-spacing:0.1em;text-transform:uppercase;color:#9CA3AF;">You&apos;re In</p>
-        <h1 style="margin:0 0 16px;font-size:30px;font-weight:800;color:#1A1715;letter-spacing:-0.03em;line-height:1.15;">
-          Welcome,<br>${firstName}.
+
+        <p style="margin:0 0 12px;font-size:11px;font-weight:700;letter-spacing:0.12em;text-transform:uppercase;color:#9CA3AF;">Welcome to the team</p>
+
+        <h1 style="margin:0 0 20px;font-size:32px;font-weight:800;color:#1A1715;letter-spacing:-0.04em;line-height:1.1;">
+          This is just<br>the beginning,<br>${firstName}.
         </h1>
-        <p style="margin:0 0 32px;font-size:15px;color:#6B7280;line-height:1.7;">
-          Payment confirmed &mdash; you&apos;re officially a ZionShift client. Click below to set up your account and get access to your client dashboard.
+
+        <p style="margin:0 0 12px;font-size:15px;color:#6B7280;line-height:1.75;">
+          You just made a great decision &mdash; and we don&apos;t take that lightly. From here, we handle the outreach, the follow-ups, and the conversations. Your job is simple: show up to the calls we book.
+        </p>
+
+        <p style="margin:0 0 32px;font-size:15px;color:#6B7280;line-height:1.75;">
+          Let&apos;s get your account set up so we can hit the ground running.
         </p>
 
         <a href="${onboardUrl}"
            target="_blank"
            style="display:inline-block;background:#1A1715;color:#ffffff;text-decoration:none;font-size:15px;font-weight:700;padding:16px 32px;border-radius:8px;letter-spacing:-0.01em;">
-          Set Up Your Account &rarr;
+          Set Up My Account &rarr;
         </a>
 
-        <p style="margin:32px 0 0;font-size:13px;color:#9CA3AF;line-height:1.7;">
-          This link expires in 48 hours. If you need a new one, reply to this email.
+        <!-- What happens next -->
+        <div style="margin:36px 0 0;padding:24px;background:#FAFAF9;border-radius:10px;border:1px solid #EEEBE6;">
+          <p style="margin:0 0 14px;font-size:11px;font-weight:700;letter-spacing:0.1em;text-transform:uppercase;color:#9CA3AF;">What happens next</p>
+          <p style="margin:0 0 10px;font-size:14px;color:#4B5563;line-height:1.6;">
+            <span style="font-weight:700;color:#1A1715;">1 &nbsp;&mdash;</span>&nbsp; Complete your account setup using the button above.
+          </p>
+          <p style="margin:0 0 10px;font-size:14px;color:#4B5563;line-height:1.6;">
+            <span style="font-weight:700;color:#1A1715;">2 &nbsp;&mdash;</span>&nbsp; We&apos;ll reach out to kick off your onboarding call.
+          </p>
+          <p style="margin:0;font-size:14px;color:#4B5563;line-height:1.6;">
+            <span style="font-weight:700;color:#1A1715;">3 &nbsp;&mdash;</span>&nbsp; We launch your campaign and the meetings start rolling in.
+          </p>
+        </div>
+
+        <p style="margin:28px 0 0;font-size:13px;color:#9CA3AF;line-height:1.7;">
+          This link expires in 48 hours. If you need a new one, just reply to this email.
         </p>
       </div>
 
