@@ -136,6 +136,8 @@ interface ActiveClient {
   since: string;
   firstMonthPaid: boolean;
   setupFeePaid: boolean;
+  headshotUrl: string | null;
+  logoUrl: string | null;
 }
 
 interface ActivityItem {
@@ -212,6 +214,10 @@ export default function AdminPage() {
   const [periodStats, setPeriodStats]     = useState<AdminPeriodStats | null>(null);
   const [resendingId, setResendingId]     = useState<string | null>(null);
   const [resentId, setResentId]           = useState<string | null>(null);
+  const [openDropdownId, setOpenDropdownId] = useState<string | null>(null);
+  const [intakeClient, setIntakeClient]     = useState<ActiveClient | null>(null);
+  const [intakeData, setIntakeData]         = useState<Record<string, unknown> | null>(null);
+  const [intakeLoading, setIntakeLoading]   = useState(false);
   const [onboardOpen, setOnboardOpen]     = useState(false);
   const [onboardName, setOnboardName]     = useState('');
   const [onboardEmail, setOnboardEmail]   = useState('');
@@ -237,7 +243,7 @@ export default function AdminPage() {
         // Fetch all clients
         const { data: clientsData } = await supabase
           .from('clients')
-          .select('id, name, email, firm, status, mrr, since, first_month_paid, setup_fee_paid')
+          .select('id, name, email, firm, status, mrr, since, first_month_paid, setup_fee_paid, headshot_url, logo_url')
           .order('created_at', { ascending: false });
 
         if (clientsData) {
@@ -251,6 +257,8 @@ export default function AdminPage() {
             since: c.since ? fmtDate(c.since) : '—',
             firstMonthPaid: c.first_month_paid,
             setupFeePaid: c.setup_fee_paid,
+            headshotUrl: c.headshot_url ?? null,
+            logoUrl: c.logo_url ?? null,
           })));
         }
 
@@ -312,6 +320,19 @@ export default function AdminPage() {
     return () => document.removeEventListener('mousedown', handleClick);
   }, []);
 
+  // Close client actions dropdown on outside click
+  useEffect(() => {
+    function handleClick(e: MouseEvent) {
+      if (!(e.target as Element).closest('.adm-actions-wrap')) {
+        setOpenDropdownId(null);
+      }
+    }
+    if (openDropdownId) {
+      document.addEventListener('mousedown', handleClick);
+      return () => document.removeEventListener('mousedown', handleClick);
+    }
+  }, [openDropdownId]);
+
   // Period stats — shows '—' until Smartlead API is wired
   useEffect(() => {
     setPeriodStats(null);
@@ -361,6 +382,24 @@ export default function AdminPage() {
     } finally {
       setResendingId(null);
     }
+  }
+
+  async function handleViewIntake(client: ActiveClient) {
+    setIntakeClient(client);
+    setIntakeData(null);
+    setIntakeLoading(true);
+    try {
+      const supabase = createClient();
+      const { data } = await supabase
+        .from('onboarding_responses')
+        .select('response_data')
+        .eq('email', client.email)
+        .single();
+      setIntakeData((data?.response_data as Record<string, unknown>) ?? null);
+    } catch {
+      setIntakeData(null);
+    }
+    setIntakeLoading(false);
   }
 
   async function handleSignOut() {
@@ -716,7 +755,10 @@ export default function AdminPage() {
                         {i > 0 && <div className="adm-divider" />}
                         <div className="adm-client-row">
                           <div className={`adm-client-avatar${c.status !== 'live' ? ' inactive' : ''}`}>
-                            {c.name.split(' ').map(w => w[0]).join('')}
+                            {c.headshotUrl
+                              ? <img src={c.headshotUrl} alt={c.name} className="adm-client-avatar-img" />
+                              : c.name.split(' ').map(w => w[0]).join('')
+                            }
                           </div>
                           <div className="adm-client-info">
                             <span className="adm-client-name">{c.name}</span>
@@ -742,12 +784,34 @@ export default function AdminPage() {
                                 {resentId === c.id ? 'Sent ✓' : resendingId === c.id ? 'Sending…' : 'Resend Invite'}
                               </button>
                             ) : (
-                              <button
-                                className="adm-view-btn"
-                                onClick={() => router.push(`/client?view=${c.id}`)}
-                              >
-                                View →
-                              </button>
+                              <div className="adm-actions-wrap">
+                                <button
+                                  className="adm-menu-btn"
+                                  onClick={() => setOpenDropdownId(id => id === c.id ? null : c.id)}
+                                  aria-label="Client actions"
+                                >
+                                  •••
+                                </button>
+                                {openDropdownId === c.id && (
+                                  <div className="adm-actions-menu">
+                                    <button className="adm-actions-item" onClick={() => { router.push(`/client?view=${c.id}`); setOpenDropdownId(null); }}>
+                                      View Dashboard →
+                                    </button>
+                                    <div className="adm-actions-divider" />
+                                    <button
+                                      className={`adm-actions-item${!c.logoUrl ? ' disabled' : ''}`}
+                                      disabled={!c.logoUrl}
+                                      onClick={() => { if (c.logoUrl) { window.open(c.logoUrl, '_blank'); } setOpenDropdownId(null); }}
+                                    >
+                                      Download Logo
+                                    </button>
+                                    <div className="adm-actions-divider" />
+                                    <button className="adm-actions-item" onClick={() => { handleViewIntake(c); setOpenDropdownId(null); }}>
+                                      View Intake Form
+                                    </button>
+                                  </div>
+                                )}
+                              </div>
                             )}
                           </div>
                         </div>
@@ -841,6 +905,127 @@ export default function AdminPage() {
           onDisconnect={() => setConnectedCal(null)}
           onClose={() => setCalModal(null)}
         />
+      )}
+
+      {/* Intake Form Modal */}
+      {intakeClient && (
+        <div className="modal-overlay" onClick={() => { setIntakeClient(null); setIntakeData(null); }}>
+          <div className="modal" style={{ maxWidth: 560, maxHeight: '85vh' }} onClick={e => e.stopPropagation()}>
+            <button className="modal-close" onClick={() => { setIntakeClient(null); setIntakeData(null); }}>✕</button>
+            <div className="modal-scroll">
+              <div style={{ marginBottom: 20 }}>
+                <p style={{ margin: '0 0 4px', fontSize: 11, fontWeight: 700, letterSpacing: '0.12em', textTransform: 'uppercase', color: '#9CA3AF' }}>Intake Form</p>
+                <h2 style={{ margin: 0, fontSize: 20, fontWeight: 700, letterSpacing: '-0.03em', color: '#1A1715' }}>{intakeClient.name}</h2>
+                <p style={{ margin: '2px 0 0', fontSize: 13, color: '#6B7280' }}>{intakeClient.email}</p>
+              </div>
+
+              {intakeLoading ? (
+                <div style={{ padding: '32px 0', textAlign: 'center', color: '#9CA3AF', fontSize: 14 }}>Loading…</div>
+              ) : !intakeData ? (
+                <div style={{ padding: '32px 0', textAlign: 'center', color: '#9CA3AF', fontSize: 14 }}>No intake data found.</div>
+              ) : (
+                <div className="adm-intake">
+                  {/* Screen 1 */}
+                  <div className="adm-intake-section">
+                    <div className="adm-intake-section-title">About You</div>
+                    {[
+                      ['Business', intakeData.businessName],
+                      ['Location', intakeData.cityState],
+                      ['Years in Business', intakeData.yearsInBusiness],
+                      ['Website', intakeData.websiteUrl || '—'],
+                    ].map(([label, val]) => (
+                      <div key={label as string} className="adm-intake-row">
+                        <span className="adm-intake-label">{label}</span>
+                        <span className="adm-intake-val">{val as string || '—'}</span>
+                      </div>
+                    ))}
+                  </div>
+
+                  {/* Screen 2 */}
+                  <div className="adm-intake-section">
+                    <div className="adm-intake-section-title">Ideal Client</div>
+                    {[
+                      ['Industries', Array.isArray(intakeData.industries) ? (intakeData.industries as string[]).join(', ') + (intakeData.otherIndustry ? ` (Other: ${intakeData.otherIndustry})` : '') : '—'],
+                      ['Employee Count', Array.isArray(intakeData.employeeCount) ? (intakeData.employeeCount as string[]).join(', ') : '—'],
+                      ['Revenue Range', Array.isArray(intakeData.revenueRange) ? (intakeData.revenueRange as string[]).join(', ') : String(intakeData.revenueRange || '—')],
+                      ['Geo Focus', Array.isArray(intakeData.geoFocus) ? (intakeData.geoFocus as string[]).join(', ') + (intakeData.regionalStates ? ` — ${intakeData.regionalStates}` : '') : '—'],
+                      ['Client Exclusions', intakeData.exclusions || '—'],
+                    ].map(([label, val]) => (
+                      <div key={label as string} className="adm-intake-row">
+                        <span className="adm-intake-label">{label}</span>
+                        <span className="adm-intake-val">{val as string}</span>
+                      </div>
+                    ))}
+                  </div>
+
+                  {/* Screen 3 */}
+                  <div className="adm-intake-section">
+                    <div className="adm-intake-section-title">Voice &amp; Messaging</div>
+                    {[
+                      ['Differentiator', intakeData.differentiator],
+                      ['Pain Point', intakeData.painPoint],
+                      ['Transformation', intakeData.transformation],
+                      ['Tone', intakeData.tone],
+                      ['Avoidances', intakeData.avoidances || '—'],
+                    ].map(([label, val]) => (
+                      <div key={label as string} className="adm-intake-row">
+                        <span className="adm-intake-label">{label}</span>
+                        <span className="adm-intake-val">{val as string || '—'}</span>
+                      </div>
+                    ))}
+                  </div>
+
+                  {/* Screen 4 */}
+                  <div className="adm-intake-section">
+                    <div className="adm-intake-section-title">Availability</div>
+                    {intakeData.availability && typeof intakeData.availability === 'object'
+                      ? Object.entries(intakeData.availability as Record<string, string[]>).map(([day, slots]) => (
+                          <div key={day} className="adm-intake-row">
+                            <span className="adm-intake-label">{day}</span>
+                            <span className="adm-intake-val">{slots.join(', ')}</span>
+                          </div>
+                        ))
+                      : (intakeData.availableDays || intakeData.timeSlots) ? (
+                          <>
+                            <div className="adm-intake-row">
+                              <span className="adm-intake-label">Days</span>
+                              <span className="adm-intake-val">{Array.isArray(intakeData.availableDays) ? (intakeData.availableDays as string[]).join(', ') : '—'}</span>
+                            </div>
+                            <div className="adm-intake-row">
+                              <span className="adm-intake-label">Time Slots</span>
+                              <span className="adm-intake-val">{Array.isArray(intakeData.timeSlots) ? (intakeData.timeSlots as string[]).join(', ') : '—'}</span>
+                            </div>
+                          </>
+                        ) : null
+                    }
+                    {[
+                      ['Timezone', intakeData.timezone],
+                    ].map(([label, val]) => (
+                      <div key={label as string} className="adm-intake-row">
+                        <span className="adm-intake-label">{label}</span>
+                        <span className="adm-intake-val">{val as string || '—'}</span>
+                      </div>
+                    ))}
+                  </div>
+
+                  {/* Screen 5 */}
+                  <div className="adm-intake-section" style={{ borderBottom: 'none', marginBottom: 0 }}>
+                    <div className="adm-intake-section-title">Final Details</div>
+                    {[
+                      ['Prospect Note', intakeData.prospectNote || '—'],
+                      ['Referral Source', intakeData.referralSource || '—'],
+                    ].map(([label, val]) => (
+                      <div key={label as string} className="adm-intake-row">
+                        <span className="adm-intake-label">{label}</span>
+                        <span className="adm-intake-val">{val as string}</span>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              )}
+            </div>
+          </div>
+        </div>
       )}
 
       {/* Onboard New Client modal */}

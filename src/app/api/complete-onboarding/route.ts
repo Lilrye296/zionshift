@@ -80,17 +80,24 @@ export async function POST(req: NextRequest) {
       }
     }
 
-    // ── 4. Upload headshot (stored path, not displayed) ────────────
+    // ── 4. Upload headshot ─────────────────────────────────────────
+    let headshotUrl: string | null = null;
     if (headshotBase64 && headshotExt) {
       try {
         const buffer = Buffer.from(headshotBase64, 'base64');
         const path = `headshots/${email}/headshot.${headshotExt}`;
-        await supabase.storage
+        const { error: uploadErr } = await supabase.storage
           .from('client-assets')
           .upload(path, buffer, {
             contentType: headshotExt === 'png' ? 'image/png' : 'image/jpeg',
             upsert: true,
           });
+        if (!uploadErr) {
+          const { data: { publicUrl } } = supabase.storage
+            .from('client-assets')
+            .getPublicUrl(path);
+          headshotUrl = publicUrl;
+        }
       } catch (e) {
         console.error('[complete-onboarding] Headshot upload failed:', e);
       }
@@ -148,6 +155,7 @@ export async function POST(req: NextRequest) {
         firm: businessName,
         status: 'live',
         ...(logoUrl ? { logo_url: logoUrl } : {}),
+        ...(headshotUrl ? { headshot_url: headshotUrl } : {}),
       })
       .eq('email', email);
 
