@@ -376,6 +376,9 @@ function Screen2({ form, set }: { form: FormState; set: (f: FormState) => void }
           placeholder="Select geographic focus…"
           multi
         />
+        <p className="ob-helper" style={{ marginTop: 8 }}>
+          <strong>Local only</strong> — your city/metro (~50 mi)&nbsp;&nbsp;·&nbsp;&nbsp;<strong>Regional</strong> — a cluster of nearby states&nbsp;&nbsp;·&nbsp;&nbsp;<strong>Nationwide</strong> — all 50 states, any time zone
+        </p>
       </div>
     </div>
   );
