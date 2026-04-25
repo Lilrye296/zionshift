@@ -1030,8 +1030,11 @@ footer.zs-footer { padding: 40px 0; border-top: 1px solid var(--zs-border); }
 .ob-screen-title { font: 700 28px var(--zs-sans); letter-spacing: -0.04em; color: var(--zs-ink); margin: 0 0 8px; line-height: 1.1; }
 .ob-screen-sub   { font: 400 14px var(--zs-sans); color: var(--zs-ink-4); margin: 0 0 28px; line-height: 1.6; }
 
-/* Override global field spacing inside ob-body to give more room */
-.ob-body .field + .field { margin-top: 20px; }
+/* Vertical spacing between every combination of field / two-col row */
+.ob-body .field + .field     { margin-top: 24px; }
+.ob-body .ob-row-2 + .field  { margin-top: 24px; }
+.ob-body .field + .ob-row-2  { margin-top: 24px; }
+.ob-body .ob-row-2 + .ob-row-2 { margin-top: 24px; }
 
 /* Two-column layout — reset adjacent-sibling margin so both columns start at the same baseline */
 .ob-row-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
@@ -1089,12 +1092,14 @@ footer.zs-footer { padding: 40px 0; border-top: 1px solid var(--zs-border); }
   .ob-logo-row { padding: 20px 20px 16px; }
   .ob-nav { padding: 14px 20px 0; }
   .ob-body { padding: 24px 20px 8px; }
-  .ob-body .field + .field { margin-top: 18px; }
+  .ob-body .field + .field    { margin-top: 20px; }
+  .ob-body .ob-row-2 + .field { margin-top: 20px; }
+  .ob-body .field + .ob-row-2 { margin-top: 20px; }
   .ob-footer { padding: 20px 20px 28px; }
   .ob-error { padding: 0 20px; }
   /* Stack two-column rows on mobile */
   .ob-row-2 { grid-template-columns: 1fr; gap: 0; }
-  .ob-row-2 .field + .field { margin-top: 18px; }
+  .ob-row-2 .field + .field { margin-top: 20px; }
   .ob-screen-title { font-size: 24px; }
   .ob-screen-sub { margin-bottom: 22px; }
   .ob-field-group { margin-bottom: 22px; }
