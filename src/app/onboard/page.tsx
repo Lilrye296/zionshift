@@ -481,13 +481,15 @@ function AvailabilityGrid({ availability, onChange }: {
   }
 
   return (
-    <div className="ob-avail-grid">
+    <div className="ob-avail-wrap">
+      <div className="ob-avail-actions">
+        <button type="button" className="ob-avail-selectall" onClick={allSelected ? () => onChange({}) : selectAll}>
+          {allSelected ? 'Clear all' : 'Select all'}
+        </button>
+      </div>
+      <div className="ob-avail-grid">
       <div className="ob-avail-header">
-        <span className="ob-avail-header-day">
-          <button type="button" className="ob-avail-selectall" onClick={allSelected ? () => onChange({}) : selectAll}>
-            {allSelected ? 'Clear all' : 'Select all'}
-          </button>
-        </span>
+        <span className="ob-avail-header-day" />
         {SLOT_LABELS.map(s => (
           <span key={s} className="ob-avail-header-slot">
             <span className="ob-avail-slot-name">{s}</span>
@@ -530,6 +532,7 @@ function AvailabilityGrid({ availability, onChange }: {
           </div>
         );
       })}
+    </div>
     </div>
   );
 }

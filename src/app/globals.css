@@ -1079,16 +1079,18 @@ footer.zs-footer { padding: 40px 0; border-top: 1px solid var(--zs-border); }
 .ob-dd-inline-input::placeholder { color: var(--zs-ink-5); }
 
 /* Availability grid (screen 4) */
+.ob-avail-wrap { display: flex; flex-direction: column; gap: 8px; }
+.ob-avail-actions { display: flex; justify-content: flex-end; }
+.ob-avail-selectall { display: inline-flex; align-items: center; gap: 5px; background: #fff; border: 1px solid var(--zs-border); border-radius: 999px; padding: 5px 13px; font: 500 12px var(--zs-sans); color: var(--zs-ink-3); letter-spacing: -0.01em; cursor: pointer; transition: border-color 160ms, color 160ms, box-shadow 160ms; }
+.ob-avail-selectall:hover { border-color: var(--zs-ink-3); color: var(--zs-ink); box-shadow: 0 1px 4px rgba(11,11,12,0.07); }
 .ob-avail-grid { border: 1.5px solid var(--zs-border); border-radius: 10px; overflow: hidden; }
 .ob-avail-header { display: grid; grid-template-columns: 110px repeat(3, 1fr); background: var(--zs-paper); border-bottom: 1.5px solid var(--zs-border); }
 .ob-avail-header-day { padding: 10px 14px; }
-.ob-avail-header-slot { padding: 10px 8px; display: flex; flex-direction: column; align-items: center; gap: 2px; }
-.ob-avail-slot-name { font: 600 12px var(--zs-sans); color: var(--zs-ink-3); letter-spacing: -0.01em; }
-.ob-avail-slot-hours { font: 400 10px var(--zs-mono); color: var(--zs-ink-5); }
-.ob-avail-row { display: grid; grid-template-columns: 110px repeat(3, 1fr); border-bottom: 1px solid var(--zs-border-soft); align-items: center; padding: 10px 14px; gap: 8px; }
+.ob-avail-header-slot { padding: 10px 4px; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 2px; }
+.ob-avail-slot-name { font: 600 12px var(--zs-sans); color: var(--zs-ink-3); letter-spacing: -0.01em; text-align: center; }
+.ob-avail-slot-hours { font: 400 10px var(--zs-mono); color: var(--zs-ink-5); text-align: center; }
+.ob-avail-row { display: grid; grid-template-columns: 110px repeat(3, 1fr); border-bottom: 1px solid var(--zs-border-soft); align-items: center; padding: 10px 14px; }
 .ob-avail-row:last-child { border-bottom: none; }
-.ob-avail-selectall { background: none; border: none; padding: 0; font: 500 11px var(--zs-mono); color: var(--zs-ink-4); cursor: pointer; text-decoration: underline; text-underline-offset: 2px; letter-spacing: 0.04em; }
-.ob-avail-selectall:hover { color: var(--zs-ink); }
 .ob-avail-day-btn { background: none; border: none; padding: 0; font: 500 14px var(--zs-sans); color: var(--zs-ink-4); letter-spacing: -0.01em; cursor: pointer; text-align: left; transition: color 140ms; }
 .ob-avail-day-btn:hover { color: var(--zs-ink); }
 .ob-avail-day-btn.partial { color: var(--zs-ink); }
@@ -1154,8 +1156,8 @@ footer.zs-footer { padding: 40px 0; border-top: 1px solid var(--zs-border); }
   .ob-chip { font-size: 12px; padding: 6px 13px; }
   /* Availability grid: tighten day column on small screens */
   .ob-avail-header { grid-template-columns: 82px repeat(3, 1fr); }
-  .ob-avail-row { grid-template-columns: 82px repeat(3, 1fr); padding: 8px 10px; gap: 6px; }
-  .ob-avail-day { font-size: 12px; }
+  .ob-avail-row { grid-template-columns: 82px repeat(3, 1fr); padding: 8px 10px; }
+  .ob-avail-day-btn { font-size: 12px; }
   .ob-avail-header-slot { padding: 8px 4px; }
   .ob-avail-slot-name { font-size: 11px; }
   .ob-avail-slot-hours { font-size: 9px; }
