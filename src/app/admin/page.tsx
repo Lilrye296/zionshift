@@ -739,7 +739,7 @@ export default function AdminPage() {
                                 disabled={resendingId === c.id}
                                 onClick={() => handleResendOnboarding(c.id)}
                               >
-                                {resentId === c.id ? 'Sent ✓' : resendingId === c.id ? 'Sending…' : 'Resend Link'}
+                                {resentId === c.id ? 'Sent ✓' : resendingId === c.id ? 'Sending…' : 'Resend Invite'}
                               </button>
                             ) : (
                               <button
