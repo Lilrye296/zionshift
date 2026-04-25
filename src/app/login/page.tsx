@@ -35,7 +35,7 @@ function ForgotPasswordModal({ onClose }: { onClose: () => void }) {
     try {
       const supabase = createClient();
       const { error: resetError } = await supabase.auth.resetPasswordForEmail(email, {
-        redirectTo: 'https://www.zionshift.com/auth/callback?next=/reset-password',
+        redirectTo: 'https://www.zionshift.com/reset-password',
       });
       if (resetError) {
         // Rate-limited (429) or similar — tell the user to wait
@@ -72,9 +72,6 @@ function ForgotPasswordModal({ onClose }: { onClose: () => void }) {
               <p className="fp-sub">
                 We sent a reset link to <strong>{email}</strong>.<br />
                 It may take a minute to arrive.
-              </p>
-              <p className="fp-sub" style={{ marginTop: 12, fontSize: 13, color: '#9CA3AF' }}>
-                Only click the <em>most recent</em> link in your inbox — older ones won&apos;t work.
               </p>
               <button
                 className="btn btn-primary"
