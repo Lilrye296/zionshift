@@ -37,7 +37,7 @@ export async function POST(req: NextRequest) {
           metadata: { name, email },
         },
         metadata: { name, email },
-        success_url: 'https://www.zionshift.com',
+        success_url: 'https://www.zionshift.com/thank-you',
         cancel_url:  'https://www.zionshift.com',
       });
 
