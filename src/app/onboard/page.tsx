@@ -17,7 +17,6 @@ const GEO_OPTIONS    = ['Local only', 'Regional', 'Nationwide'];
 const TONES          = ['Formal and professional', 'Friendly and conversational', 'Somewhere in between'];
 const DAYS           = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
 const TIME_SLOTS     = ['Morning (8am–12pm)', 'Afternoon (12pm–5pm)', 'Evening (5pm–8pm)'];
-const CALL_LENGTHS   = ['20 minutes', '30 minutes', '45 minutes', '60 minutes'];
 const TIMEZONES      = ['Eastern', 'Central', 'Mountain', 'Pacific', 'Alaska', 'Hawaii'];
 
 /* ─── Types ──────────────────────────────────────────────────── */
@@ -63,29 +62,6 @@ async function fileToBase64(file: File): Promise<string> {
     reader.onerror = reject;
     reader.readAsDataURL(file);
   });
-}
-
-/* ─── ChipGroup ──────────────────────────────────────────────── */
-
-function ChipGroup({ options, selected, onToggle }: {
-  options: string[];
-  selected: string[];
-  onToggle: (val: string) => void;
-}) {
-  return (
-    <div className="ob-chip-group">
-      {options.map(opt => (
-        <button
-          key={opt}
-          type="button"
-          className={`ob-chip${selected.includes(opt) ? ' selected' : ''}`}
-          onClick={() => onToggle(opt)}
-        >
-          {opt}
-        </button>
-      ))}
-    </div>
-  );
 }
 
 /* ─── CheckDropdown ──────────────────────────────────────────── */
