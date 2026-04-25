@@ -395,6 +395,16 @@ function Screen2({ form, set }: { form: FormState; set: (f: FormState) => void }
           }}
         />
       </div>
+
+      <div className="field">
+        <label>Any types of businesses you absolutely do NOT want as clients? <span className="ob-optional">(optional)</span></label>
+        <textarea
+          value={form.exclusions}
+          onChange={e => set({ ...form, exclusions: e.target.value })}
+          rows={3}
+          placeholder="e.g. No bars or nightclubs, no cannabis businesses…"
+        />
+      </div>
     </div>
   );
 }
@@ -518,16 +528,6 @@ function Screen5({ form, set }: { form: FormState; set: (f: FormState) => void }
     <div className="ob-screen">
       <h2 className="ob-screen-title">Final details.</h2>
       <p className="ob-screen-sub">A few last things to make sure your campaign is dialed in perfectly.</p>
-
-      <div className="field">
-        <label>Any types of businesses you absolutely do NOT want as clients?</label>
-        <textarea
-          value={form.exclusions}
-          onChange={e => set({ ...form, exclusions: e.target.value })}
-          rows={3}
-          placeholder="No bars or nightclubs, no cannabis businesses…"
-        />
-      </div>
 
       <div className="field">
         <label>Anything specific prospects should know before getting on a call with you?</label>
