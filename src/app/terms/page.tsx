@@ -20,22 +20,15 @@ export default function TermsPage() {
         backdropFilter: 'blur(12px)',
         zIndex: 50,
       }}>
-        <a
-          href="/"
-          style={{
-            display: 'inline-flex',
-            alignItems: 'center',
-            justifyContent: 'center',
-            lineHeight: 0,
-            padding: '8px 16px',
-            borderRadius: 8,
-            transition: 'background 160ms',
-          }}
-          onMouseEnter={e => (e.currentTarget.style.background = 'var(--zs-paper)')}
-          onMouseLeave={e => (e.currentTarget.style.background = 'transparent')}
-        >
+        <a href="/" style={{ display: 'inline-flex', alignItems: 'center', justifyContent: 'center', lineHeight: 0 }}>
           {/* eslint-disable-next-line @next/next/no-img-element */}
-          <img src="/logo.png" alt="ZionShift" style={{ height: 22, width: 'auto' }} />
+          <img
+            src="/logo.png"
+            alt="ZionShift"
+            style={{ height: 22, width: 'auto', transition: 'filter 180ms, opacity 180ms' }}
+            onMouseEnter={e => { e.currentTarget.style.filter = 'drop-shadow(0 2px 8px rgba(0,0,0,0.18))'; e.currentTarget.style.opacity = '0.75'; }}
+            onMouseLeave={e => { e.currentTarget.style.filter = 'none'; e.currentTarget.style.opacity = '1'; }}
+          />
         </a>
       </header>
 
@@ -187,8 +180,16 @@ export default function TermsPage() {
       {/* ── Footer ────────────────────────────────────────────────── */}
       <footer className="zs-footer">
         <div className="zs-container" style={{ display: 'grid', gridTemplateColumns: '1fr auto 1fr', alignItems: 'center' }}>
-          {/* eslint-disable-next-line @next/next/no-img-element */}
-          <img src="/logo.png" alt="ZionShift" style={{ height: 22, justifySelf: 'start' }} />
+          <a href="/" style={{ display: 'inline-flex', lineHeight: 0, justifySelf: 'start' }}>
+            {/* eslint-disable-next-line @next/next/no-img-element */}
+            <img
+              src="/logo.png"
+              alt="ZionShift"
+              style={{ height: 22, width: 'auto', transition: 'filter 180ms, opacity 180ms' }}
+              onMouseEnter={e => { e.currentTarget.style.filter = 'drop-shadow(0 2px 8px rgba(0,0,0,0.18))'; e.currentTarget.style.opacity = '0.75'; }}
+              onMouseLeave={e => { e.currentTarget.style.filter = 'none'; e.currentTarget.style.opacity = '1'; }}
+            />
+          </a>
           <a href="mailto:ryan@zionshift.com" style={{ fontSize: 13, color: 'var(--zs-ink-5)', textDecoration: 'none', transition: 'color 160ms' }}
             onMouseEnter={e => (e.currentTarget.style.color = 'var(--zs-ink-3)')}
             onMouseLeave={e => (e.currentTarget.style.color = 'var(--zs-ink-5)')}>
