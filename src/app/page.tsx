@@ -708,9 +708,9 @@ function CTA({ onBook }: { onBook: () => void }) {
 function Footer() {
   return (
     <footer className="zs-footer">
-      <div className="zs-container inner">
+      <div className="zs-container" style={{ display: 'grid', gridTemplateColumns: '1fr auto 1fr', alignItems: 'center' }}>
         {/* eslint-disable-next-line @next/next/no-img-element */}
-        <img src="/logo.png" alt="ZionShift" />
+        <img src="/logo.png" alt="ZionShift" style={{ height: 22, justifySelf: 'start' }} />
         <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
           <a href="/terms" style={{ fontSize: 13, color: 'var(--zs-ink-5)', textDecoration: 'none', transition: 'color 160ms' }}
             onMouseEnter={e => (e.currentTarget.style.color = 'var(--zs-ink-3)')}
@@ -724,7 +724,7 @@ function Footer() {
             Privacy
           </a>
         </div>
-        <p>© 2026 ZionShift. All rights reserved.</p>
+        <p style={{ margin: 0, fontSize: 13, color: 'var(--zs-ink-5)', justifySelf: 'end' }}>© 2026 ZionShift. All rights reserved.</p>
       </div>
     </footer>
   );
