@@ -242,8 +242,10 @@ export default function AdminPage() {
 
         // Fetch all clients via server-side API (uses service role, bypasses RLS)
         const clientsRes = await fetch('/api/admin/clients');
+        const clientsJson = await clientsRes.json();
+        console.log('[admin] clients API status:', clientsRes.status, clientsJson);
         if (clientsRes.ok) {
-          const { clients: clientsData } = await clientsRes.json();
+          const clientsData = clientsJson.clients;
           if (clientsData) {
             setClients(clientsData.map((c: {
               id: string; name: string; email: string; firm: string;
@@ -264,6 +266,8 @@ export default function AdminPage() {
               logoUrl: c.logo_url ?? null,
             })));
           }
+        } else {
+          console.error('[admin] clients API error:', clientsRes.status, clientsJson);
         }
 
         // Fetch business events (admin activity feed)
