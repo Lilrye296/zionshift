@@ -167,7 +167,6 @@ export default function PrivacyPage() {
         <Section num="10" title="Contact Us" last>
           <p>If you have any questions, concerns, or requests regarding this Privacy Policy or how your data is handled, please contact us at:</p>
           <p><strong>ryan@zionshift.com</strong></p>
-          <p>ZionShift &mdash; Tampa, Florida</p>
         </Section>
 
       </main>
