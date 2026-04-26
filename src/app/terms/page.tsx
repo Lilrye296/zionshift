@@ -13,31 +13,29 @@ export default function TermsPage() {
         height: 64,
         display: 'flex',
         alignItems: 'center',
-        justifyContent: 'space-between',
+        justifyContent: 'center',
         position: 'sticky',
         top: 0,
         background: 'rgba(255,255,255,0.92)',
         backdropFilter: 'blur(12px)',
         zIndex: 50,
       }}>
-        <a href="/" style={{ display: 'inline-block', lineHeight: 0 }}>
+        <a
+          href="/"
+          style={{
+            display: 'inline-flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            lineHeight: 0,
+            padding: '8px 16px',
+            borderRadius: 8,
+            transition: 'background 160ms',
+          }}
+          onMouseEnter={e => (e.currentTarget.style.background = 'var(--zs-paper)')}
+          onMouseLeave={e => (e.currentTarget.style.background = 'transparent')}
+        >
           {/* eslint-disable-next-line @next/next/no-img-element */}
           <img src="/logo.png" alt="ZionShift" style={{ height: 22, width: 'auto' }} />
-        </a>
-        <a href="/" style={{
-          font: '500 13px var(--zs-sans)',
-          color: 'var(--zs-ink-4)',
-          textDecoration: 'none',
-          letterSpacing: '-0.01em',
-          display: 'flex',
-          alignItems: 'center',
-          gap: 6,
-          transition: 'color 160ms',
-        }}
-          onMouseEnter={e => (e.currentTarget.style.color = 'var(--zs-ink)')}
-          onMouseLeave={e => (e.currentTarget.style.color = 'var(--zs-ink-4)')}
-        >
-          ← Back to home
         </a>
       </header>
 
