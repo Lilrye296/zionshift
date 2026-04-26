@@ -1,4 +1,4 @@
-import { NextRequest, NextResponse } from 'next/server';
+import { NextResponse } from 'next/server';
 import { createClient } from '@supabase/supabase-js';
 import { createServerClient } from '@supabase/ssr';
 import { cookies } from 'next/headers';
@@ -11,7 +11,7 @@ function supabaseAdmin() {
   );
 }
 
-export async function GET(_req: NextRequest) {
+export async function GET() {
   try {
     // Read the caller's session from the browser cookies that are sent automatically
     const cookieStore = await cookies();
