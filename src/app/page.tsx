@@ -712,18 +712,19 @@ function Footer() {
         {/* eslint-disable-next-line @next/next/no-img-element */}
         <img src="/logo.png" alt="ZionShift" />
         <p>© 2026 ZionShift. All rights reserved.</p>
-        <div style={{ display: 'flex', gap: 20, marginTop: 8 }}>
-          <a href="/terms" style={{ font: '400 11px var(--zs-mono)', color: 'var(--zs-ink-5)', textDecoration: 'none', letterSpacing: '0.04em', transition: 'color 160ms' }}
-            onMouseEnter={e => (e.currentTarget.style.color = 'var(--zs-ink-3)')}
-            onMouseLeave={e => (e.currentTarget.style.color = 'var(--zs-ink-5)')}>
-            Terms
-          </a>
-          <a href="/privacy" style={{ font: '400 11px var(--zs-mono)', color: 'var(--zs-ink-5)', textDecoration: 'none', letterSpacing: '0.04em', transition: 'color 160ms' }}
-            onMouseEnter={e => (e.currentTarget.style.color = 'var(--zs-ink-3)')}
-            onMouseLeave={e => (e.currentTarget.style.color = 'var(--zs-ink-5)')}>
-            Privacy
-          </a>
-        </div>
+      </div>
+      <div style={{ textAlign: 'center', paddingTop: 12 }}>
+        <a href="/terms" style={{ fontSize: 13, color: 'var(--zs-ink-5)', textDecoration: 'none', transition: 'color 160ms' }}
+          onMouseEnter={e => (e.currentTarget.style.color = 'var(--zs-ink-3)')}
+          onMouseLeave={e => (e.currentTarget.style.color = 'var(--zs-ink-5)')}>
+          Terms
+        </a>
+        <span style={{ margin: '0 10px', color: 'var(--zs-ink-5)', fontSize: 13 }}>·</span>
+        <a href="/privacy" style={{ fontSize: 13, color: 'var(--zs-ink-5)', textDecoration: 'none', transition: 'color 160ms' }}
+          onMouseEnter={e => (e.currentTarget.style.color = 'var(--zs-ink-3)')}
+          onMouseLeave={e => (e.currentTarget.style.color = 'var(--zs-ink-5)')}>
+          Privacy
+        </a>
       </div>
     </footer>
   );
