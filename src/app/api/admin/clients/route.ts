@@ -1,7 +1,5 @@
-import { NextResponse } from 'next/server';
+import { NextRequest, NextResponse } from 'next/server';
 import { createClient } from '@supabase/supabase-js';
-import { createServerClient } from '@supabase/ssr';
-import { cookies } from 'next/headers';
 
 function supabaseAdmin() {
   return createClient(
@@ -11,40 +9,54 @@ function supabaseAdmin() {
   );
 }
 
-export async function GET() {
+export async function GET(req: NextRequest) {
   try {
-    // Read the caller's session from the browser cookies that are sent automatically
-    const cookieStore = await cookies();
-    const supabase = createServerClient(
-      process.env.NEXT_PUBLIC_SUPABASE_URL!,
-      process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
+    // 1. Extract Bearer token from Authorization header
+    const authHeader = req.headers.get('Authorization') ?? '';
+    const accessToken = authHeader.startsWith('Bearer ')
+      ? authHeader.slice(7).trim()
+      : null;
+
+    if (!accessToken) {
+      return NextResponse.json({ error: 'Unauthorized — no token' }, { status: 401 });
+    }
+
+    // 2. Verify the JWT with a direct HTTP call to Supabase Auth — no library quirks
+    const authRes = await fetch(
+      `${process.env.NEXT_PUBLIC_SUPABASE_URL}/auth/v1/user`,
       {
-        cookies: {
-          getAll() { return cookieStore.getAll(); },
-          // Route Handlers can't write cookies back mid-request — safe no-op
-          setAll() {},
+        headers: {
+          Authorization: `Bearer ${accessToken}`,
+          apikey: process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
         },
       }
     );
 
-    const { data: { user }, error: userError } = await supabase.auth.getUser();
-    if (userError || !user) {
-      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+    if (!authRes.ok) {
+      return NextResponse.json({ error: 'Unauthorized — token invalid' }, { status: 401 });
     }
 
-    // Use service role to bypass RLS for both the role check and the clients fetch
+    const userData = await authRes.json();
+    const userId: string = userData.id;
+
+    if (!userId) {
+      return NextResponse.json({ error: 'Unauthorized — no user id' }, { status: 401 });
+    }
+
+    // 3. Use service role (bypasses RLS) for all data queries
     const admin = supabaseAdmin();
 
     const { data: profile } = await admin
       .from('profiles')
       .select('role')
-      .eq('id', user.id)
+      .eq('id', userId)
       .single();
 
     if (profile?.role !== 'admin') {
       return NextResponse.json({ error: 'Forbidden' }, { status: 403 });
     }
 
+    // 4. Fetch clients
     const { data: clients, error } = await admin
       .from('clients')
       .select('id, name, email, firm, status, mrr, since, first_month_paid, setup_fee_paid, headshot_url, logo_url')
