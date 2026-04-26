@@ -216,21 +216,12 @@ export default function TermsPage() {
             }}>
               B2B cold email outreach &amp; lead generation.
             </p>
-            <p style={{
-              font: '400 12px var(--zs-mono)',
-              color: 'var(--zs-ink-5)',
-              margin: 0,
-              letterSpacing: '0.02em',
-            }}>
-              Tampa, Florida
-            </p>
           </div>
 
           {/* Links */}
           <div style={{ display: 'flex', flexDirection: 'column', gap: 10, paddingTop: 2 }}>
             <a href="/" style={footerLinkStyle}>Home</a>
             <a href="mailto:ryan@zionshift.com" style={footerLinkStyle}>ryan@zionshift.com</a>
-            <a href="mailto:hello@zionshift.com" style={footerLinkStyle}>hello@zionshift.com</a>
           </div>
         </div>
 
