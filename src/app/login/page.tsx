@@ -156,18 +156,17 @@ export default function LoginPage() {
 
   return (
     <div className="login-page">
-      {/* ── Top-left logo ── */}
-      <a href="/" className="login-logo-link">
-        {/* eslint-disable-next-line @next/next/no-img-element */}
-        <img
-          src="/logo.png"
-          alt="ZionShift"
-          className="login-logo-img"
-          onMouseEnter={e => { e.currentTarget.style.filter = 'drop-shadow(0 2px 8px rgba(0,0,0,0.18))'; e.currentTarget.style.opacity = '0.75'; }}
-          onMouseLeave={e => { e.currentTarget.style.filter = 'none'; e.currentTarget.style.opacity = '1'; }}
-        />
-      </a>
       <div className="login-card">
+        <a href="/" className="login-logo-link">
+          {/* eslint-disable-next-line @next/next/no-img-element */}
+          <img
+            src="/logo.png"
+            alt="ZionShift"
+            className="login-logo-img"
+            onMouseEnter={e => { e.currentTarget.style.filter = 'drop-shadow(0 2px 8px rgba(0,0,0,0.18))'; e.currentTarget.style.opacity = '0.75'; }}
+            onMouseLeave={e => { e.currentTarget.style.filter = 'none'; e.currentTarget.style.opacity = '1'; }}
+          />
+        </a>
         <h1 className="login-heading">Welcome back.</h1>
         <p className="login-sub">Sign in to your ZionShift portal.</p>
 
