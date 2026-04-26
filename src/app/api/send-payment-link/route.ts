@@ -33,6 +33,14 @@ export async function POST(req: NextRequest) {
             quantity: 1,
           },
         ],
+        consent_collection: {
+          terms_of_service: 'required',
+        },
+        custom_text: {
+          terms_of_service_acceptance: {
+            message: 'I have read and agree to the [Terms of Service](https://www.zionshift.com/terms) and [Privacy Policy](https://www.zionshift.com/privacy).',
+          },
+        },
         payment_intent_data: {
           metadata: { name, email },
         },
