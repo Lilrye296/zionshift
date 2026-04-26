@@ -241,10 +241,11 @@ export default function AdminPage() {
         if (profile?.role !== 'admin') { router.push('/client'); return; }
 
         // Fetch clients directly — RLS allows admin role (same pattern as profiles/events/meetings)
-        const { data: clientsData } = await supabase
+        const { data: clientsData, error: clientsError } = await supabase
           .from('clients')
           .select('id, name, email, firm, status, mrr, since, first_month_paid, setup_fee_paid, headshot_url, logo_url')
           .order('created_at', { ascending: false });
+        if (clientsError) console.error('[admin] clients error:', JSON.stringify(clientsError));
 
         if (clientsData) {
           setClients(clientsData.map((c: {
