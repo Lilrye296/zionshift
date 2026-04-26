@@ -241,9 +241,13 @@ export default function AdminPage() {
         if (profile?.role !== 'admin') { router.push('/client'); return; }
 
         // Fetch all clients via server-side API (uses service role, bypasses RLS)
-        const clientsRes = await fetch('/api/admin/clients');
+        const { data: { session } } = await supabase.auth.getSession();
+        const clientsRes = await fetch('/api/admin/clients', {
+          headers: session?.access_token
+            ? { Authorization: `Bearer ${session.access_token}` }
+            : {},
+        });
         const clientsJson = await clientsRes.json();
-        console.log('[admin] clients API status:', clientsRes.status, clientsJson);
         if (clientsRes.ok) {
           const clientsData = clientsJson.clients;
           if (clientsData) {
@@ -266,8 +270,6 @@ export default function AdminPage() {
               logoUrl: c.logo_url ?? null,
             })));
           }
-        } else {
-          console.error('[admin] clients API error:', clientsRes.status, clientsJson);
         }
 
         // Fetch business events (admin activity feed)

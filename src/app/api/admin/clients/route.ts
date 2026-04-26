@@ -12,32 +12,15 @@ function supabaseAdmin() {
 export async function GET(req: NextRequest) {
   try {
     const admin = supabaseAdmin();
-    const projectRef = 'apgzaawqmunbuzfryntc';
 
-    // Supabase SSR may chunk the auth cookie across multiple keys
-    let tokenJson = '';
-    for (let i = 0; i < 5; i++) {
-      const chunk = req.cookies.get(`sb-${projectRef}-auth-token.${i}`)?.value;
-      if (!chunk) break;
-      tokenJson += chunk;
-    }
-    // Fall back to non-chunked cookie
-    if (!tokenJson) {
-      tokenJson = req.cookies.get(`sb-${projectRef}-auth-token`)?.value ?? '';
-    }
-
-    let accessToken: string | null = null;
-    if (tokenJson) {
-      try {
-        const parsed = JSON.parse(decodeURIComponent(tokenJson));
-        accessToken = parsed.access_token ?? null;
-      } catch {
-        accessToken = tokenJson; // already a raw token string
-      }
-    }
+    // Read Bearer token from Authorization header (set by the client-side admin page)
+    const authHeader = req.headers.get('Authorization') ?? '';
+    const accessToken = authHeader.startsWith('Bearer ')
+      ? authHeader.slice(7).trim()
+      : null;
 
     if (!accessToken) {
-      return NextResponse.json({ error: 'Unauthorized — no session token found' }, { status: 401 });
+      return NextResponse.json({ error: 'Unauthorized — no token provided' }, { status: 401 });
     }
 
     // Verify the token — admin.auth.getUser(token) validates without needing cookies
