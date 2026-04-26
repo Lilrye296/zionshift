@@ -241,12 +241,7 @@ export default function AdminPage() {
         if (profile?.role !== 'admin') { router.push('/client'); return; }
 
         // Fetch all clients via server-side API (uses service role, bypasses RLS)
-        const { data: { session } } = await supabase.auth.getSession();
-        const clientsRes = await fetch('/api/admin/clients', {
-          headers: session?.access_token
-            ? { Authorization: `Bearer ${session.access_token}` }
-            : {},
-        });
+        const clientsRes = await fetch('/api/admin/clients');
         const clientsJson = await clientsRes.json();
         if (clientsRes.ok) {
           const clientsData = clientsJson.clients;

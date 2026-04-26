@@ -1,5 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { createClient } from '@supabase/supabase-js';
+import { createServerClient } from '@supabase/ssr';
+import { cookies } from 'next/headers';
 
 function supabaseAdmin() {
   return createClient(
@@ -9,27 +11,30 @@ function supabaseAdmin() {
   );
 }
 
-export async function GET(req: NextRequest) {
+export async function GET(_req: NextRequest) {
   try {
+    // Read the caller's session from the browser cookies that are sent automatically
+    const cookieStore = await cookies();
+    const supabase = createServerClient(
+      process.env.NEXT_PUBLIC_SUPABASE_URL!,
+      process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
+      {
+        cookies: {
+          getAll() { return cookieStore.getAll(); },
+          // Route Handlers can't write cookies back mid-request — safe no-op
+          setAll() {},
+        },
+      }
+    );
+
+    const { data: { user }, error: userError } = await supabase.auth.getUser();
+    if (userError || !user) {
+      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+    }
+
+    // Use service role to bypass RLS for both the role check and the clients fetch
     const admin = supabaseAdmin();
 
-    // Read Bearer token from Authorization header (set by the client-side admin page)
-    const authHeader = req.headers.get('Authorization') ?? '';
-    const accessToken = authHeader.startsWith('Bearer ')
-      ? authHeader.slice(7).trim()
-      : null;
-
-    if (!accessToken) {
-      return NextResponse.json({ error: 'Unauthorized — no token provided' }, { status: 401 });
-    }
-
-    // Verify the token — admin.auth.getUser(token) validates without needing cookies
-    const { data: { user }, error: userError } = await admin.auth.getUser(accessToken);
-    if (userError || !user) {
-      return NextResponse.json({ error: 'Unauthorized — invalid or expired token' }, { status: 401 });
-    }
-
-    // Check admin role (service role bypasses RLS)
     const { data: profile } = await admin
       .from('profiles')
       .select('role')
@@ -40,7 +45,6 @@ export async function GET(req: NextRequest) {
       return NextResponse.json({ error: 'Forbidden' }, { status: 403 });
     }
 
-    // Fetch clients — service role bypasses RLS entirely
     const { data: clients, error } = await admin
       .from('clients')
       .select('id, name, email, firm, status, mrr, since, first_month_paid, setup_fee_paid, headshot_url, logo_url')
