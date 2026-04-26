@@ -241,18 +241,16 @@ export default function AdminPage() {
         if (profile?.role !== 'admin') { router.push('/client'); return; }
 
         // Fetch clients directly — RLS allows admin role (same pattern as profiles/events/meetings)
-        const { data: clientsData, error: clientsError } = await supabase
+        const { data: clientsData } = await supabase
           .from('clients')
-          .select('id, name, email, firm, status, mrr, since, first_month_paid, setup_fee_paid, headshot_url, logo_url')
+          .select('id, name, email, firm, status, mrr, since, first_month_paid, setup_fee_paid')
           .order('created_at', { ascending: false });
-        if (clientsError) console.error('[admin] clients error:', JSON.stringify(clientsError));
 
         if (clientsData) {
           setClients(clientsData.map((c: {
             id: string; name: string; email: string; firm: string;
             status: string; mrr: number; since: string;
             first_month_paid: boolean; setup_fee_paid: boolean;
-            headshot_url: string | null; logo_url: string | null;
           }) => ({
             id: c.id,
             name: c.name,
@@ -263,8 +261,8 @@ export default function AdminPage() {
             since: c.since ? fmtDate(c.since) : '—',
             firstMonthPaid: c.first_month_paid,
             setupFeePaid: c.setup_fee_paid,
-            headshotUrl: c.headshot_url ?? null,
-            logoUrl: c.logo_url ?? null,
+            headshotUrl: null,
+            logoUrl: null,
           })));
         }
 
