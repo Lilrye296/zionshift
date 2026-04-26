@@ -774,6 +774,7 @@ export default function AdminPage() {
                         <div className="adm-client-row">
                           <div className={`adm-client-avatar${c.status !== 'live' ? ' inactive' : ''}`}>
                             {c.headshotUrl
+                              // eslint-disable-next-line @next/next/no-img-element
                               ? <img src={c.headshotUrl} alt={c.name} className="adm-client-avatar-img" />
                               : c.name.split(' ').map(w => w[0]).join('')
                             }
@@ -951,7 +952,7 @@ export default function AdminPage() {
                       ['Location', intakeData.cityState],
                       ['Years in Business', intakeData.yearsInBusiness],
                       ['Website', intakeData.websiteUrl || '—'],
-                    ].map(([label, val]) => (
+                    ].map(([label, val]: [string, string]) => (
                       <div key={label as string} className="adm-intake-row">
                         <span className="adm-intake-label">{label}</span>
                         <span className="adm-intake-val">{val as string || '—'}</span>
@@ -968,7 +969,7 @@ export default function AdminPage() {
                       ['Revenue Range', Array.isArray(intakeData.revenueRange) ? (intakeData.revenueRange as string[]).join(', ') : String(intakeData.revenueRange || '—')],
                       ['Geo Focus', Array.isArray(intakeData.geoFocus) ? (intakeData.geoFocus as string[]).join(', ') + (intakeData.regionalStates ? ` — ${intakeData.regionalStates}` : '') : '—'],
                       ['Client Exclusions', intakeData.exclusions || '—'],
-                    ].map(([label, val]) => (
+                    ].map(([label, val]: [string, string]) => (
                       <div key={label as string} className="adm-intake-row">
                         <span className="adm-intake-label">{label}</span>
                         <span className="adm-intake-val">{val as string}</span>
@@ -985,7 +986,7 @@ export default function AdminPage() {
                       ['Transformation', intakeData.transformation],
                       ['Tone', intakeData.tone],
                       ['Avoidances', intakeData.avoidances || '—'],
-                    ].map(([label, val]) => (
+                    ].map(([label, val]: [string, string]) => (
                       <div key={label as string} className="adm-intake-row">
                         <span className="adm-intake-label">{label}</span>
                         <span className="adm-intake-val">{val as string || '—'}</span>
@@ -1018,7 +1019,7 @@ export default function AdminPage() {
                     }
                     {[
                       ['Timezone', intakeData.timezone],
-                    ].map(([label, val]) => (
+                    ].map(([label, val]: [string, string]) => (
                       <div key={label as string} className="adm-intake-row">
                         <span className="adm-intake-label">{label}</span>
                         <span className="adm-intake-val">{val as string || '—'}</span>
@@ -1032,7 +1033,7 @@ export default function AdminPage() {
                     {[
                       ['Prospect Note', intakeData.prospectNote || '—'],
                       ['Referral Source', intakeData.referralSource || '—'],
-                    ].map(([label, val]) => (
+                    ].map(([label, val]: [string, string]) => (
                       <div key={label as string} className="adm-intake-row">
                         <span className="adm-intake-label">{label}</span>
                         <span className="adm-intake-val">{val as string}</span>
