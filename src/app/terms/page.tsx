@@ -200,13 +200,13 @@ export default function TermsPage() {
           flexWrap: 'wrap',
         }}>
           {/* eslint-disable-next-line @next/next/no-img-element */}
-          <img src="/logo.png" alt="ZionShift" style={{ height: 16, width: 'auto', opacity: 0.5 }} />
+          <img src="/logo.png" alt="ZionShift" style={{ height: 22, width: 'auto' }} />
           <div style={{ display: 'flex', alignItems: 'center', gap: 20 }}>
             <a href="/" style={slimLinkStyle}>Home</a>
-            <span style={{ color: 'var(--zs-ink-5)', fontSize: 11 }}>·</span>
+            <span style={{ color: 'var(--zs-ink-5)', fontSize: 13 }}>·</span>
             <a href="mailto:ryan@zionshift.com" style={slimLinkStyle}>ryan@zionshift.com</a>
-            <span style={{ color: 'var(--zs-ink-5)', fontSize: 11 }}>·</span>
-            <span style={{ font: '400 11px var(--zs-mono)', color: 'var(--zs-ink-5)', letterSpacing: '0.03em' }}>
+            <span style={{ color: 'var(--zs-ink-5)', fontSize: 13 }}>·</span>
+            <span style={{ font: '400 13px var(--zs-sans)', color: 'var(--zs-ink-5)', letterSpacing: '-0.005em' }}>
               © {new Date().getFullYear()} ZionShift
             </span>
           </div>
@@ -220,10 +220,10 @@ export default function TermsPage() {
 /* ── Sub-components ─────────────────────────────────────────────── */
 
 const slimLinkStyle: React.CSSProperties = {
-  font: '400 11px var(--zs-mono)',
+  font: '400 13px var(--zs-sans)',
   color: 'var(--zs-ink-5)',
   textDecoration: 'none',
-  letterSpacing: '0.03em',
+  letterSpacing: '-0.005em',
   transition: 'color 160ms',
 };
 
