@@ -50,7 +50,10 @@ function ResetPasswordForm() {
     <div className="login-page">
       <div className="login-card">
         {/* eslint-disable-next-line @next/next/no-img-element */}
-        <a href="/"><img src="/logo.png" alt="ZionShift" className="login-logo" /></a>
+        <a href="/" className="login-logo-link">
+          {/* eslint-disable-next-line @next/next/no-img-element */}
+          <img src="/logo.png" alt="ZionShift" className="login-logo-img" />
+        </a>
         <h1 className="login-heading">Set a new password.</h1>
         <p className="login-sub">Choose a strong password for your ZionShift account.</p>
 
