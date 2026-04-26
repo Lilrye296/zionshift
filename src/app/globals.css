@@ -749,7 +749,16 @@ footer.zs-footer { padding: 40px 0; border-top: 1px solid var(--zs-border); }
   .zs-nav { padding: 8px 12px 8px 16px; gap: 8px; }
   .zs-nav-cta { display: contents; } /* unwrap group on mobile — buttons rejoin nav as direct flex children */
   .zs-nav-cta .btn { padding: 9px 14px; font-size: 12px; }
+
+  /* Buttons — strip all hover/active fancy effects, hide arrow, center label */
   .chev { display: none !important; }
+  .btn { gap: 0; }
+  .btn-primary:hover,
+  .btn-primary:active { background: var(--zs-ink) !important; transform: none !important; box-shadow: none !important; }
+  .btn-primary:hover::before,
+  .btn-primary:active::before { opacity: 0 !important; }
+  .btn-ghost:hover,
+  .btn-ghost:active { border-color: var(--zs-border) !important; }
 
   /* Modal close — larger tap target on mobile */
   .modal-close { width: 44px; height: 44px; font-size: 17px; top: 10px; right: 10px; }
