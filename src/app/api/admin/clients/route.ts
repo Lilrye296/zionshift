@@ -1,41 +1,52 @@
-import { NextResponse } from 'next/server';
-import { createClient as createSupabaseClient } from '@supabase/supabase-js';
-import { createServerClient } from '@supabase/ssr';
-import { cookies } from 'next/headers';
+import { NextRequest, NextResponse } from 'next/server';
+import { createClient } from '@supabase/supabase-js';
 
 function supabaseAdmin() {
-  return createSupabaseClient(
+  return createClient(
     process.env.NEXT_PUBLIC_SUPABASE_URL!,
-    process.env.SUPABASE_SERVICE_ROLE_KEY!
+    process.env.SUPABASE_SERVICE_ROLE_KEY!,
+    { auth: { autoRefreshToken: false, persistSession: false } }
   );
 }
 
-export async function GET() {
+export async function GET(req: NextRequest) {
   try {
-    // Verify the requesting user is authenticated via their session cookie
-    const cookieStore = await cookies();
-    const supabaseAuth = createServerClient(
-      process.env.NEXT_PUBLIC_SUPABASE_URL!,
-      process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
-      {
-        cookies: {
-          getAll() { return cookieStore.getAll(); },
-          setAll(cookiesToSet) {
-            cookiesToSet.forEach(({ name, value, options }) =>
-              cookieStore.set(name, value, options)
-            );
-          },
-        },
-      }
-    );
+    const admin = supabaseAdmin();
+    const projectRef = 'apgzaawqmunbuzfryntc';
 
-    const { data: { user } } = await supabaseAuth.auth.getUser();
-    if (!user) {
-      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+    // Supabase SSR may chunk the auth cookie across multiple keys
+    let tokenJson = '';
+    for (let i = 0; i < 5; i++) {
+      const chunk = req.cookies.get(`sb-${projectRef}-auth-token.${i}`)?.value;
+      if (!chunk) break;
+      tokenJson += chunk;
+    }
+    // Fall back to non-chunked cookie
+    if (!tokenJson) {
+      tokenJson = req.cookies.get(`sb-${projectRef}-auth-token`)?.value ?? '';
     }
 
-    // Verify admin role using service role key (bypasses RLS)
-    const admin = supabaseAdmin();
+    let accessToken: string | null = null;
+    if (tokenJson) {
+      try {
+        const parsed = JSON.parse(decodeURIComponent(tokenJson));
+        accessToken = parsed.access_token ?? null;
+      } catch {
+        accessToken = tokenJson; // already a raw token string
+      }
+    }
+
+    if (!accessToken) {
+      return NextResponse.json({ error: 'Unauthorized — no session token found' }, { status: 401 });
+    }
+
+    // Verify the token — admin.auth.getUser(token) validates without needing cookies
+    const { data: { user }, error: userError } = await admin.auth.getUser(accessToken);
+    if (userError || !user) {
+      return NextResponse.json({ error: 'Unauthorized — invalid or expired token' }, { status: 401 });
+    }
+
+    // Check admin role (service role bypasses RLS)
     const { data: profile } = await admin
       .from('profiles')
       .select('role')
@@ -46,7 +57,7 @@ export async function GET() {
       return NextResponse.json({ error: 'Forbidden' }, { status: 403 });
     }
 
-    // Fetch all clients with service role key — bypasses RLS entirely
+    // Fetch clients — service role bypasses RLS entirely
     const { data: clients, error } = await admin
       .from('clients')
       .select('id, name, email, firm, status, mrr, since, first_month_paid, setup_fee_paid, headshot_url, logo_url')
@@ -58,7 +69,7 @@ export async function GET() {
 
     return NextResponse.json({ clients });
   } catch (err) {
-    console.error('[admin/clients] Error:', err);
-    return NextResponse.json({ error: 'Internal server error' }, { status: 500 });
+    console.error('[admin/clients] Unhandled error:', err);
+    return NextResponse.json({ error: String(err) }, { status: 500 });
   }
 }
