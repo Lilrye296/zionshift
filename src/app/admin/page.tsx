@@ -243,7 +243,7 @@ export default function AdminPage() {
         // Fetch clients directly — RLS allows admin role (same pattern as profiles/events/meetings)
         const { data: clientsData } = await supabase
           .from('clients')
-          .select('id, name, email, firm, status, mrr, since, first_month_paid, setup_fee_paid')
+          .select('id, name, email, firm, status, mrr, since, first_month_paid, setup_fee_paid, headshot_url, logo_url')
           .order('created_at', { ascending: false });
 
         if (clientsData) {
@@ -251,6 +251,7 @@ export default function AdminPage() {
             id: string; name: string; email: string; firm: string;
             status: string; mrr: number; since: string;
             first_month_paid: boolean; setup_fee_paid: boolean;
+            headshot_url: string | null; logo_url: string | null;
           }) => ({
             id: c.id,
             name: c.name,
@@ -261,8 +262,8 @@ export default function AdminPage() {
             since: c.since ? fmtDate(c.since) : '—',
             firstMonthPaid: c.first_month_paid,
             setupFeePaid: c.setup_fee_paid,
-            headshotUrl: null,
-            logoUrl: null,
+            headshotUrl: c.headshot_url ?? null,
+            logoUrl: c.logo_url ?? null,
           })));
         }
 
