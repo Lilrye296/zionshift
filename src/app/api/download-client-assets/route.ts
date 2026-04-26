@@ -60,8 +60,9 @@ export async function GET(req: NextRequest) {
 
   const zipBuffer = await zip.generateAsync({ type: 'uint8array', compression: 'DEFLATE' });
   const slug = (client.firm || client.name || 'client').replace(/[^a-zA-Z0-9]/g, '_');
+  const blob = new Blob([zipBuffer], { type: 'application/zip' });
 
-  return new NextResponse(zipBuffer, {
+  return new NextResponse(blob, {
     headers: {
       'Content-Type': 'application/zip',
       'Content-Disposition': `attachment; filename="${slug}_assets.zip"`,
