@@ -947,15 +947,15 @@ export default function AdminPage() {
                   {/* Screen 1 */}
                   <div className="adm-intake-section">
                     <div className="adm-intake-section-title">About You</div>
-                    {[
+                    {([
                       ['Business', intakeData.businessName],
                       ['Location', intakeData.cityState],
                       ['Years in Business', intakeData.yearsInBusiness],
                       ['Website', intakeData.websiteUrl || '—'],
-                    ].map(([label, val]: [string, string]) => (
-                      <div key={label as string} className="adm-intake-row">
+                    ] as [string, string][]).map(([label, val]) => (
+                      <div key={label} className="adm-intake-row">
                         <span className="adm-intake-label">{label}</span>
-                        <span className="adm-intake-val">{val as string || '—'}</span>
+                        <span className="adm-intake-val">{val || '—'}</span>
                       </div>
                     ))}
                   </div>
@@ -963,16 +963,16 @@ export default function AdminPage() {
                   {/* Screen 2 */}
                   <div className="adm-intake-section">
                     <div className="adm-intake-section-title">Ideal Client</div>
-                    {[
+                    {([
                       ['Industries', Array.isArray(intakeData.industries) ? (intakeData.industries as string[]).join(', ') + (intakeData.otherIndustry ? ` (Other: ${intakeData.otherIndustry})` : '') : '—'],
                       ['Employee Count', Array.isArray(intakeData.employeeCount) ? (intakeData.employeeCount as string[]).join(', ') : '—'],
                       ['Revenue Range', Array.isArray(intakeData.revenueRange) ? (intakeData.revenueRange as string[]).join(', ') : String(intakeData.revenueRange || '—')],
                       ['Geo Focus', Array.isArray(intakeData.geoFocus) ? (intakeData.geoFocus as string[]).join(', ') + (intakeData.regionalStates ? ` — ${intakeData.regionalStates}` : '') : '—'],
                       ['Client Exclusions', intakeData.exclusions || '—'],
-                    ].map(([label, val]: [string, string]) => (
-                      <div key={label as string} className="adm-intake-row">
+                    ] as [string, string][]).map(([label, val]) => (
+                      <div key={label} className="adm-intake-row">
                         <span className="adm-intake-label">{label}</span>
-                        <span className="adm-intake-val">{val as string}</span>
+                        <span className="adm-intake-val">{val}</span>
                       </div>
                     ))}
                   </div>
@@ -980,16 +980,16 @@ export default function AdminPage() {
                   {/* Screen 3 */}
                   <div className="adm-intake-section">
                     <div className="adm-intake-section-title">Voice &amp; Messaging</div>
-                    {[
+                    {([
                       ['Differentiator', intakeData.differentiator],
                       ['Pain Point', intakeData.painPoint],
                       ['Transformation', intakeData.transformation],
                       ['Tone', intakeData.tone],
                       ['Avoidances', intakeData.avoidances || '—'],
-                    ].map(([label, val]: [string, string]) => (
-                      <div key={label as string} className="adm-intake-row">
+                    ] as [string, string][]).map(([label, val]) => (
+                      <div key={label} className="adm-intake-row">
                         <span className="adm-intake-label">{label}</span>
-                        <span className="adm-intake-val">{val as string || '—'}</span>
+                        <span className="adm-intake-val">{val || '—'}</span>
                       </div>
                     ))}
                   </div>
@@ -1017,12 +1017,12 @@ export default function AdminPage() {
                           </>
                         ) : null
                     }
-                    {[
+                    {([
                       ['Timezone', intakeData.timezone],
-                    ].map(([label, val]: [string, string]) => (
-                      <div key={label as string} className="adm-intake-row">
+                    ] as [string, string][]).map(([label, val]) => (
+                      <div key={label} className="adm-intake-row">
                         <span className="adm-intake-label">{label}</span>
-                        <span className="adm-intake-val">{val as string || '—'}</span>
+                        <span className="adm-intake-val">{val || '—'}</span>
                       </div>
                     ))}
                   </div>
@@ -1030,13 +1030,13 @@ export default function AdminPage() {
                   {/* Screen 5 */}
                   <div className="adm-intake-section" style={{ borderBottom: 'none', marginBottom: 0 }}>
                     <div className="adm-intake-section-title">Final Details</div>
-                    {[
+                    {([
                       ['Prospect Note', intakeData.prospectNote || '—'],
                       ['Referral Source', intakeData.referralSource || '—'],
-                    ].map(([label, val]: [string, string]) => (
-                      <div key={label as string} className="adm-intake-row">
+                    ] as [string, string][]).map(([label, val]) => (
+                      <div key={label} className="adm-intake-row">
                         <span className="adm-intake-label">{label}</span>
-                        <span className="adm-intake-val">{val as string}</span>
+                        <span className="adm-intake-val">{val}</span>
                       </div>
                     ))}
                   </div>
