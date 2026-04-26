@@ -1,3 +1,5 @@
+'use client';
+
 export default function TermsPage() {
   const updated = 'April 2026';
 
