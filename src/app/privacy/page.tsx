@@ -176,19 +176,11 @@ export default function PrivacyPage() {
         <div className="zs-container" style={{ display: 'grid', gridTemplateColumns: '1fr auto 1fr', alignItems: 'center' }}>
           {/* eslint-disable-next-line @next/next/no-img-element */}
           <img src="/logo.png" alt="ZionShift" style={{ height: 22, justifySelf: 'start' }} />
-          <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
-            <a href="/" style={{ fontSize: 13, color: 'var(--zs-ink-5)', textDecoration: 'none', transition: 'color 160ms' }}
-              onMouseEnter={e => (e.currentTarget.style.color = 'var(--zs-ink-3)')}
-              onMouseLeave={e => (e.currentTarget.style.color = 'var(--zs-ink-5)')}>
-              Home
-            </a>
-            <span style={{ color: 'var(--zs-ink-5)', fontSize: 13 }}>·</span>
-            <a href="mailto:ryan@zionshift.com" style={{ fontSize: 13, color: 'var(--zs-ink-5)', textDecoration: 'none', transition: 'color 160ms' }}
-              onMouseEnter={e => (e.currentTarget.style.color = 'var(--zs-ink-3)')}
-              onMouseLeave={e => (e.currentTarget.style.color = 'var(--zs-ink-5)')}>
-              ryan@zionshift.com
-            </a>
-          </div>
+          <a href="mailto:ryan@zionshift.com" style={{ fontSize: 13, color: 'var(--zs-ink-5)', textDecoration: 'none', transition: 'color 160ms' }}
+            onMouseEnter={e => (e.currentTarget.style.color = 'var(--zs-ink-3)')}
+            onMouseLeave={e => (e.currentTarget.style.color = 'var(--zs-ink-5)')}>
+            ryan@zionshift.com
+          </a>
           <p style={{ margin: 0, fontSize: 13, color: 'var(--zs-ink-5)', justifySelf: 'end' }}>© 2026 ZionShift. All rights reserved.</p>
         </div>
       </footer>
