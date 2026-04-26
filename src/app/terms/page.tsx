@@ -186,46 +186,10 @@ export default function TermsPage() {
 
       {/* ── Footer ────────────────────────────────────────────────── */}
       <footer style={{
-        marginTop: 80,
+        marginTop: 64,
         borderTop: '1px solid var(--zs-border)',
-        background: 'var(--zs-paper)',
       }}>
-        {/* Top footer row */}
         <div style={{
-          maxWidth: 760,
-          margin: '0 auto',
-          padding: '48px 32px 36px',
-          display: 'flex',
-          alignItems: 'flex-start',
-          justifyContent: 'space-between',
-          gap: 32,
-          flexWrap: 'wrap',
-        }}>
-          {/* Brand block */}
-          <div>
-            {/* eslint-disable-next-line @next/next/no-img-element */}
-            <img src="/logo.png" alt="ZionShift" style={{ height: 20, width: 'auto', marginBottom: 12, display: 'block' }} />
-            <p style={{
-              font: '400 13px var(--zs-sans)',
-              color: 'var(--zs-ink-4)',
-              margin: '0 0 4px',
-              letterSpacing: '-0.005em',
-              lineHeight: 1.6,
-            }}>
-              B2B cold email outreach &amp; lead generation.
-            </p>
-          </div>
-
-          {/* Links */}
-          <div style={{ display: 'flex', flexDirection: 'column', gap: 10, paddingTop: 2 }}>
-            <a href="/" style={footerLinkStyle}>Home</a>
-            <a href="mailto:ryan@zionshift.com" style={footerLinkStyle}>ryan@zionshift.com</a>
-          </div>
-        </div>
-
-        {/* Bottom bar */}
-        <div style={{
-          borderTop: '1px solid var(--zs-border)',
           maxWidth: 760,
           margin: '0 auto',
           padding: '20px 32px',
@@ -235,22 +199,17 @@ export default function TermsPage() {
           gap: 16,
           flexWrap: 'wrap',
         }}>
-          <p style={{
-            font: '400 11px var(--zs-mono)',
-            color: 'var(--zs-ink-5)',
-            margin: 0,
-            letterSpacing: '0.04em',
-          }}>
-            © {new Date().getFullYear()} ZionShift. All rights reserved.
-          </p>
-          <p style={{
-            font: '400 11px var(--zs-mono)',
-            color: 'var(--zs-ink-5)',
-            margin: 0,
-            letterSpacing: '0.04em',
-          }}>
-            Last updated {updated}
-          </p>
+          {/* eslint-disable-next-line @next/next/no-img-element */}
+          <img src="/logo.png" alt="ZionShift" style={{ height: 16, width: 'auto', opacity: 0.5 }} />
+          <div style={{ display: 'flex', alignItems: 'center', gap: 20 }}>
+            <a href="/" style={slimLinkStyle}>Home</a>
+            <span style={{ color: 'var(--zs-ink-5)', fontSize: 11 }}>·</span>
+            <a href="mailto:ryan@zionshift.com" style={slimLinkStyle}>ryan@zionshift.com</a>
+            <span style={{ color: 'var(--zs-ink-5)', fontSize: 11 }}>·</span>
+            <span style={{ font: '400 11px var(--zs-mono)', color: 'var(--zs-ink-5)', letterSpacing: '0.03em' }}>
+              © {new Date().getFullYear()} ZionShift
+            </span>
+          </div>
         </div>
       </footer>
 
@@ -260,11 +219,11 @@ export default function TermsPage() {
 
 /* ── Sub-components ─────────────────────────────────────────────── */
 
-const footerLinkStyle: React.CSSProperties = {
-  font: '400 13px var(--zs-sans)',
-  color: 'var(--zs-ink-4)',
+const slimLinkStyle: React.CSSProperties = {
+  font: '400 11px var(--zs-mono)',
+  color: 'var(--zs-ink-5)',
   textDecoration: 'none',
-  letterSpacing: '-0.005em',
+  letterSpacing: '0.03em',
   transition: 'color 160ms',
 };
 
