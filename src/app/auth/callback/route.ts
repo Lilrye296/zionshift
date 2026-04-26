@@ -28,10 +28,17 @@ export async function GET(request: NextRequest) {
 
   // Path 1: token_hash from custom email template (no PKCE, fully server-side)
   if (tokenHash && type) {
+    // For recovery flows, sign out any existing session first so a previously
+    // used reset link cannot silently resume a session and bypass login.
+    if (type === 'recovery') {
+      await supabase.auth.signOut()
+    }
     const { error } = await supabase.auth.verifyOtp({ token_hash: tokenHash, type })
     if (!error) {
       return NextResponse.redirect(`${origin}${next}`)
     }
+    // OTP failed (already used, expired, etc.) — send to login with error
+    return NextResponse.redirect(`${origin}/login?error=auth`)
   }
 
   // Path 2: PKCE code exchange (OAuth / signup flows)

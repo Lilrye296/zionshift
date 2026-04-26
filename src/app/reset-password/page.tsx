@@ -37,6 +37,8 @@ function ResetPasswordForm() {
       const supabase = createClient();
       const { error: updateError } = await supabase.auth.updateUser({ password });
       if (updateError) throw updateError;
+      // Sign out immediately — recovery session must not persist after reset
+      await supabase.auth.signOut();
       setDone(true);
       setTimeout(() => router.push('/login'), 2500);
     } catch (err: unknown) {
