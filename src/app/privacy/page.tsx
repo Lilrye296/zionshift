@@ -172,31 +172,24 @@ export default function PrivacyPage() {
       </main>
 
       {/* ── Footer ────────────────────────────────────────────────── */}
-      <footer style={{
-        marginTop: 64,
-        borderTop: '1px solid var(--zs-border)',
-      }}>
-        <div style={{
-          maxWidth: 760,
-          margin: '0 auto',
-          padding: '20px 32px',
-          display: 'flex',
-          alignItems: 'center',
-          justifyContent: 'space-between',
-          gap: 16,
-          flexWrap: 'wrap',
-        }}>
+      <footer className="zs-footer">
+        <div className="zs-container" style={{ display: 'grid', gridTemplateColumns: '1fr auto 1fr', alignItems: 'center' }}>
           {/* eslint-disable-next-line @next/next/no-img-element */}
-          <img src="/logo.png" alt="ZionShift" style={{ height: 22, width: 'auto' }} />
-          <div style={{ display: 'flex', alignItems: 'center', gap: 20 }}>
-            <a href="/" style={slimLinkStyle}>Home</a>
+          <img src="/logo.png" alt="ZionShift" style={{ height: 22, justifySelf: 'start' }} />
+          <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
+            <a href="/" style={{ fontSize: 13, color: 'var(--zs-ink-5)', textDecoration: 'none', transition: 'color 160ms' }}
+              onMouseEnter={e => (e.currentTarget.style.color = 'var(--zs-ink-3)')}
+              onMouseLeave={e => (e.currentTarget.style.color = 'var(--zs-ink-5)')}>
+              Home
+            </a>
             <span style={{ color: 'var(--zs-ink-5)', fontSize: 13 }}>·</span>
-            <a href="mailto:ryan@zionshift.com" style={slimLinkStyle}>ryan@zionshift.com</a>
-            <span style={{ color: 'var(--zs-ink-5)', fontSize: 13 }}>·</span>
-            <span style={{ font: '400 13px var(--zs-sans)', color: 'var(--zs-ink-5)', letterSpacing: '-0.005em' }}>
-              © {new Date().getFullYear()} ZionShift
-            </span>
+            <a href="mailto:ryan@zionshift.com" style={{ fontSize: 13, color: 'var(--zs-ink-5)', textDecoration: 'none', transition: 'color 160ms' }}
+              onMouseEnter={e => (e.currentTarget.style.color = 'var(--zs-ink-3)')}
+              onMouseLeave={e => (e.currentTarget.style.color = 'var(--zs-ink-5)')}>
+              ryan@zionshift.com
+            </a>
           </div>
+          <p style={{ margin: 0, fontSize: 13, color: 'var(--zs-ink-5)', justifySelf: 'end' }}>© 2026 ZionShift. All rights reserved.</p>
         </div>
       </footer>
 
@@ -206,13 +199,6 @@ export default function PrivacyPage() {
 
 /* ── Sub-components ─────────────────────────────────────────────── */
 
-const slimLinkStyle: React.CSSProperties = {
-  font: '400 13px var(--zs-sans)',
-  color: 'var(--zs-ink-5)',
-  textDecoration: 'none',
-  letterSpacing: '-0.005em',
-  transition: 'color 160ms',
-};
 
 function Section({ num, title, children, last = false }: {
   num: string;
