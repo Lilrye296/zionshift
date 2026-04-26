@@ -58,9 +58,9 @@ export async function GET(req: NextRequest) {
     return NextResponse.json({ error: 'No files found for this client.' }, { status: 404 });
   }
 
-  const zipBuffer = await zip.generateAsync({ type: 'uint8array', compression: 'DEFLATE' });
+  const zipArrayBuffer = await zip.generateAsync({ type: 'arraybuffer', compression: 'DEFLATE' });
   const slug = (client.firm || client.name || 'client').replace(/[^a-zA-Z0-9]/g, '_');
-  const blob = new Blob([zipBuffer], { type: 'application/zip' });
+  const blob = new Blob([zipArrayBuffer], { type: 'application/zip' });
 
   return new NextResponse(blob, {
     headers: {
