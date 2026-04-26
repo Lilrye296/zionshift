@@ -7,7 +7,7 @@ export default function ThankYouPage() {
         {/* eslint-disable-next-line @next/next/no-img-element */}
         <a href="/" style={{ display: 'inline-block', marginBottom: 40 }}>
           {/* eslint-disable-next-line @next/next/no-img-element */}
-          <img src="/logo.png" alt="ZionShift" className="login-logo" style={{ margin: '0 auto' }} />
+          <img src="/logo.png" alt="ZionShift" className="login-logo-img" style={{ margin: '0 auto' }} />
         </a>
 
         {/* Check circle */}

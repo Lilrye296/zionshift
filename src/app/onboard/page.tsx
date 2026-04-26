@@ -828,7 +828,7 @@ function OnboardInner() {
           {/* eslint-disable-next-line @next/next/no-img-element */}
           <a href="/" style={{ display: 'inline-block', marginBottom: 32 }}>
             {/* eslint-disable-next-line @next/next/no-img-element */}
-            <img src="/logo.png" alt="ZionShift" className="login-logo" style={{ margin: '0 auto' }} />
+            <img src="/logo.png" alt="ZionShift" className="login-logo-img" style={{ margin: '0 auto' }} />
           </a>
           <div style={{ width: 56, height: 56, borderRadius: '50%', background: '#FFF1F2', border: '1px solid #FECACA', display: 'flex', alignItems: 'center', justifyContent: 'center', margin: '0 auto 24px' }}>
             <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#DC2626" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" aria-hidden>
@@ -857,7 +857,7 @@ function OnboardInner() {
         {/* Logo */}
         <div className="ob-logo-row">
           {/* eslint-disable-next-line @next/next/no-img-element */}
-          <img src="/logo.png" alt="ZionShift" className="login-logo" style={{ marginBottom: 0 }} />
+          <img src="/logo.png" alt="ZionShift" className="login-logo-img" style={{ marginBottom: 0 }} />
         </div>
 
         {/* Progress bar (steps 1–5 only) */}
