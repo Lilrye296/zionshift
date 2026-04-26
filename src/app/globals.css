@@ -1224,11 +1224,13 @@ footer.zs-footer { padding: 40px 0; border-top: 1px solid var(--zs-border); }
   /* Admin portal mobile fixes */
   /* Ensure right column (flex child of grid) can shrink — prevents it expanding the grid */
   .adm-biz-right-col { min-width: 0; }
-  /* Stack pill + view button vertically so the client row fits within card width */
-  .adm-client-right { flex-direction: column; align-items: flex-end; gap: 4px; }
+  /* Wrap row so name/email get full first line, pill+button drop to second line */
+  .adm-client-row { flex-wrap: wrap; align-items: flex-start; }
   /* Allow name + firm text to wrap on mobile so nothing is hidden behind ellipsis */
   .adm-client-name { white-space: normal; }
-  .adm-client-firm { white-space: normal; }
+  .adm-client-firm { white-space: normal; word-break: break-all; }
+  /* Second line: full width, indented to align with text (avatar 36px + gap 14px) */
+  .adm-client-right { width: 100%; flex-direction: row; align-items: center; justify-content: space-between; padding-left: 50px; gap: 8px; margin-top: 6px; }
   /* Cap scroll container on mobile and always scroll — overrides the ≤4 client inline style
      that removes the cap on desktop. Rows are taller on mobile due to wrapping so we need
      a reliable cap to keep the tile a sensible height. */
