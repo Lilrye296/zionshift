@@ -371,7 +371,7 @@ export default function AdminPage() {
                                 </>
                             }
                             {c.status === 'live' && !c.firstMonthPaid && (
-                              <span className="adm-billing-pill adm-billing-pill--trial" style={{ marginTop: 4 }}>Trial</span>
+                              <span className="adm-billing-pill adm-billing-pill--trial">Trial</span>
                             )}
                           </div>
 
