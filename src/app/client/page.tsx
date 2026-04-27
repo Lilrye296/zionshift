@@ -477,6 +477,8 @@ export default function ClientPage() {
   const [activeTab, setActiveTab]               = useState<'overview' | 'billing'>('overview');
   const [showLogoUpload, setShowLogoUpload]     = useState(false);
   const [localLogoUrl, setLocalLogoUrl]         = useState<string | null>(null);
+  const [clientLogoUrl, setClientLogoUrl]       = useState<string | null>(null);
+  const [logoImgError, setLogoImgError]         = useState(false);
   const [selectedMeeting, setSelectedMeeting]   = useState<CalMeeting | null>(null);
   const [period, setPeriod]                     = useState<'week' | 'month' | 'alltime'>('month');
   const [periodOpen, setPeriodOpen]             = useState(false);
@@ -523,6 +525,14 @@ export default function ClientPage() {
           setLoading(false);
           return;
         }
+
+        // Fetch logo_url directly from clients table (source of truth from onboarding)
+        const { data: clientRow } = await supabase
+          .from('clients')
+          .select('logo_url')
+          .eq('id', targetClientId)
+          .single();
+        if (clientRow?.logo_url) setClientLogoUrl(clientRow.logo_url);
 
         // Fetch campaign stats
         const { data: statsData } = await supabase
@@ -674,9 +684,14 @@ export default function ClientPage() {
 
           <div className="client-logo-slot">
             <div className="client-logo-clickable" onClick={() => setShowLogoUpload(true)} title="Upload your logo">
-              {localLogoUrl || p?.logo_url ? (
+              {(localLogoUrl || clientLogoUrl || p?.logo_url) && !logoImgError ? (
                 // eslint-disable-next-line @next/next/no-img-element
-                <img src={localLogoUrl ?? p!.logo_url!} alt={p?.firm_name ?? 'Client'} className="client-logo-img" />
+                <img
+                  src={localLogoUrl ?? clientLogoUrl ?? p!.logo_url!}
+                  alt={p?.firm_name ?? 'Client'}
+                  className="client-logo-img"
+                  onError={() => setLogoImgError(true)}
+                />
               ) : p?.firm_name ? (
                 <span className="client-logo-text">{p.firm_name}</span>
               ) : (
@@ -1085,7 +1100,7 @@ export default function ClientPage() {
       {showLogoUpload && (
         <LogoUploadModal
           onClose={() => setShowLogoUpload(false)}
-          onSave={(url) => setLocalLogoUrl(url)}
+          onSave={(url) => { setLocalLogoUrl(url); setLogoImgError(false); }}
         />
       )}
 
