@@ -444,6 +444,7 @@ export default function AdminPage() {
 
   async function handleDeleteClient() {
     if (!deleteClient) return;
+    if (deleteConfirm.trim().toLowerCase() !== deleteClient.name.toLowerCase()) return;
     setDeleting(true);
     try {
       const supabase = createClient();
@@ -1342,7 +1343,7 @@ export default function AdminPage() {
                 </button>
                 <button
                   className="adm-delete-btn"
-                  disabled={deleteConfirm !== deleteClient.name || deleting}
+                  disabled={deleteConfirm.trim().toLowerCase() !== deleteClient.name.toLowerCase() || deleting}
                   onClick={handleDeleteClient}
                 >
                   {deleting ? 'Removing…' : 'Remove Client'}
