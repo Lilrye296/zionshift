@@ -683,7 +683,13 @@ export default function ClientPage() {
           <img src="/logo.png" alt="ZionShift" className="portal-logo" />
 
           <div className="client-logo-slot">
-            <div className="client-logo-clickable" onClick={() => setShowLogoUpload(true)} title="Upload your logo">
+            {/* Logo is clickable/editable only for the actual client, not admin view */}
+            <div
+              className="client-logo-clickable"
+              onClick={() => !isAdminView && setShowLogoUpload(true)}
+              title={isAdminView ? undefined : 'Upload your logo'}
+              style={isAdminView ? { cursor: 'default' } : undefined}
+            >
               {(localLogoUrl || clientLogoUrl || p?.logo_url) && !logoImgError ? (
                 // eslint-disable-next-line @next/next/no-img-element
                 <img
@@ -697,13 +703,19 @@ export default function ClientPage() {
               ) : (
                 <div className="client-logo-placeholder">Client Logo</div>
               )}
-              <div className="client-logo-edit-badge" aria-hidden>✎</div>
+              {!isAdminView && <div className="client-logo-edit-badge" aria-hidden>✎</div>}
             </div>
           </div>
 
-          <button className="btn btn-ghost" onClick={handleSignOut} style={{ fontSize: 13, padding: '8px 16px' }}>
-            Sign out
-          </button>
+          {isAdminView ? (
+            <a href="/admin" className="btn btn-ghost" style={{ fontSize: 13, padding: '8px 16px' }}>
+              ← Back to Admin
+            </a>
+          ) : (
+            <button className="btn btn-ghost" onClick={handleSignOut} style={{ fontSize: 13, padding: '8px 16px' }}>
+              Sign out
+            </button>
+          )}
         </div>
       </header>
 
