@@ -15,8 +15,6 @@ const EMPLOYEE_COUNTS = ['1–10', '11–50', '51–200', '201–500', '501–1,
 const REVENUE_RANGES = ['Under $500K', '$500K–$2M', '$2M–$10M', '$10M+', 'Not sure'];
 const GEO_OPTIONS    = ['Local only', 'Regional', 'Nationwide'];
 const TONES          = ['Formal and Professional', 'Friendly and Conversational', 'Somewhere in between'];
-const DAYS           = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday'];
-const TIMEZONES      = ['Eastern', 'Central', 'Mountain', 'Pacific', 'Alaska', 'Hawaii'];
 
 /* ─── Types ──────────────────────────────────────────────────── */
 
@@ -28,7 +26,7 @@ interface FormState {
   employeeCount: string[]; revenueRange: string[]; geoFocus: string[]; regionalStates: string;
   differentiator: string; painPoint: string; transformation: string;
   tone: string; avoidances: string;
-  availability: Record<string, string[]>; callLength: string; timezone: string;
+  bookingLink: string;
   exclusions: string; prospectNote: string; referralSource: string;
 }
 
@@ -40,7 +38,7 @@ const DEFAULT_FORM: FormState = {
   employeeCount: [], revenueRange: [], geoFocus: [], regionalStates: '',
   differentiator: '', painPoint: '', transformation: '',
   tone: '', avoidances: '',
-  availability: {}, callLength: '', timezone: '',
+  bookingLink: '',
   exclusions: '', prospectNote: '', referralSource: '',
 };
 
@@ -439,127 +437,23 @@ function Screen3({ form, set }: { form: FormState; set: (f: FormState) => void }
   );
 }
 
-/* ─── AvailabilityGrid ───────────────────────────────────────── */
-
-const SLOT_LABELS = ['Morning', 'Afternoon', 'Evening'];
-const SLOT_HOURS: Record<string, string> = {
-  'Morning':   '8am–12pm',
-  'Afternoon': '12pm–5pm',
-  'Evening':   '5pm–8pm',
-};
-
-function AvailabilityGrid({ availability, onChange }: {
-  availability: Record<string, string[]>;
-  onChange: (v: Record<string, string[]>) => void;
-}) {
-  const totalSlots    = DAYS.length * SLOT_LABELS.length;
-  const selectedCount = Object.values(availability).reduce((n, s) => n + s.length, 0);
-  const allSelected   = selectedCount === totalSlots;
-
-  function toggleSlot(day: string, slot: string) {
-    const current = availability[day] ?? [];
-    const next    = current.includes(slot)
-      ? current.filter(s => s !== slot)
-      : [...current, slot];
-    const updated = { ...availability };
-    if (next.length === 0) { delete updated[day]; } else { updated[day] = next; }
-    onChange(updated);
-  }
-
-  function toggleDay(day: string) {
-    const current = availability[day] ?? [];
-    const updated = { ...availability };
-    if (current.length === SLOT_LABELS.length) { delete updated[day]; }
-    else { updated[day] = [...SLOT_LABELS]; }
-    onChange(updated);
-  }
-
-  function selectAll() {
-    const all: Record<string, string[]> = {};
-    DAYS.forEach(d => { all[d] = [...SLOT_LABELS]; });
-    onChange(all);
-  }
-
-  return (
-    <div className="ob-avail-grid">
-      <div className="ob-avail-header">
-        <span className="ob-avail-header-day">
-          <button type="button" className="ob-avail-selectall" onClick={allSelected ? () => onChange({}) : selectAll}>
-            {allSelected ? 'Clear all' : 'Select all'}
-          </button>
-        </span>
-        {SLOT_LABELS.map(s => (
-          <span key={s} className="ob-avail-header-slot">
-            <span className="ob-avail-slot-name">{s}</span>
-            <span className="ob-avail-slot-hours">{SLOT_HOURS[s]}</span>
-          </span>
-        ))}
-      </div>
-      {DAYS.map(day => {
-        const selected      = availability[day] ?? [];
-        const dayAllOn      = selected.length === SLOT_LABELS.length;
-        return (
-          <div key={day} className="ob-avail-row">
-            <button
-              type="button"
-              className={`ob-avail-day-btn${dayAllOn ? ' all-on' : selected.length > 0 ? ' partial' : ''}`}
-              onClick={() => toggleDay(day)}
-              title={dayAllOn ? `Deselect all for ${day}` : `Select all for ${day}`}
-            >
-              {day}
-            </button>
-            {SLOT_LABELS.map(slot => {
-              const on = selected.includes(slot);
-              return (
-                <button
-                  key={slot}
-                  type="button"
-                  className={`ob-avail-slot${on ? ' on' : ''}`}
-                  onClick={() => toggleSlot(day, slot)}
-                  aria-pressed={on}
-                  aria-label={`${day} ${slot}`}
-                >
-                  {on && (
-                    <svg width="11" height="11" viewBox="0 0 12 12" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" aria-hidden>
-                      <polyline points="2 6 5 9 10 3" />
-                    </svg>
-                  )}
-                </button>
-              );
-            })}
-          </div>
-        );
-      })}
-    </div>
-  );
-}
-
 /* ─── Screen 4 ───────────────────────────────────────────────── */
 
 function Screen4({ form, set }: { form: FormState; set: (f: FormState) => void }) {
   return (
     <div className="ob-screen">
-      <h2 className="ob-screen-title">Your availability.</h2>
-      <p className="ob-screen-sub">We use this to set up your booking page so prospects can only schedule when you&apos;re free.</p>
-
-      <div className="ob-field-group">
-        <label className="ob-group-label">When are you available for discovery calls? <span className="ob-req">*</span></label>
-        <p className="ob-helper" style={{ marginTop: 0, marginBottom: 10 }}>Toggle the time slots that work for each day. Leave a day blank if you&apos;re unavailable.</p>
-        <AvailabilityGrid
-          availability={form.availability}
-          onChange={v => set({ ...form, availability: v })}
-        />
-      </div>
+      <h2 className="ob-screen-title">Your booking link.</h2>
+      <p className="ob-screen-sub">This is the link we&apos;ll include in every outreach email so interested prospects can schedule directly with you.</p>
 
       <div className="ob-field-group" style={{ marginBottom: 0 }}>
-        <label className="ob-group-label">Your time zone <span className="ob-req">*</span></label>
-        <CheckDropdown
-          options={TIMEZONES}
-          selected={form.timezone ? [form.timezone] : []}
-          onToggle={val => set({ ...form, timezone: single(form.timezone, val) })}
-          placeholder="Select your time zone…"
-          radio
-          multi={false}
+        <label className="ob-group-label">Your scheduling link <span className="ob-req">*</span></label>
+        <p className="ob-helper" style={{ marginTop: 0, marginBottom: 10 }}>Paste your Calendly, Cal.com, or any other scheduling link you use.</p>
+        <input
+          className="ob-input"
+          type="url"
+          placeholder="https://calendly.com/yourname"
+          value={form.bookingLink}
+          onChange={e => set({ ...form, bookingLink: e.target.value })}
         />
       </div>
     </div>
@@ -699,8 +593,7 @@ function validate(step: number, form: FormState): string | null {
     if (!form.tone)                  return 'Select a preferred tone.';
   }
   if (step === 4) {
-    if (Object.keys(form.availability).length === 0) return 'Select at least one day and time slot.';
-    if (!form.timezone)                              return 'Select your time zone.';
+    if (!form.bookingLink.trim()) return 'Please enter your scheduling link.';
   }
   return null;
 }
@@ -778,8 +671,7 @@ function OnboardInner() {
           geoFocus: form.geoFocus, differentiator: form.differentiator,
           painPoint: form.painPoint, transformation: form.transformation,
           tone: form.tone, avoidances: form.avoidances,
-          availability: form.availability,
-          callLength: form.callLength, timezone: form.timezone,
+          bookingLink: form.bookingLink,
           exclusions: form.exclusions, prospectNote: form.prospectNote,
           referralSource: form.referralSource,
         }),
