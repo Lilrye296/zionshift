@@ -131,6 +131,18 @@ function MiniCalendar({
 
 const MONTH_SHORT = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
 
+function fmtBillingDate(iso: string): string {
+  return new Date(iso).toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric' });
+}
+
+function getNextBillingDate(billingStartedAt: string): Date {
+  const start = new Date(billingStartedAt);
+  const msSince = Date.now() - start.getTime();
+  const daysSince = msSince / (1000 * 60 * 60 * 24);
+  const periods = Math.floor(daysSince / 30);
+  return new Date(start.getTime() + (periods + 1) * 30 * 24 * 60 * 60 * 1000);
+}
+
 // Converts a time string like "2:00 PM EST" to total minutes
 function parseTime(t: string): number {
   const [timePart, pd] = t.split(' ');
@@ -405,6 +417,15 @@ interface PeriodStats {
   meetings_booked: number | null;
 }
 
+interface ClientBillingRecord {
+  trial_started_at:  string | null;
+  trial_ends_at:     string | null;
+  billing_started_at: string | null;
+  billing_status:    string;
+  campaign_status:   string;
+  warmup_started_at: string | null;
+}
+
 interface BillingData {
   plan_name: string;
   status: 'active' | 'paused' | 'cancelled';
@@ -425,13 +446,22 @@ interface BillingData {
 
 const PERIOD_LABEL = { week: 'This Week', month: 'This Month', alltime: 'All Time' };
 
-function getStatusProps(status: string | null) {
+function getStatusProps(status: string | null, warmupStartedAt?: string | null) {
   switch (status) {
-    case 'warming': return { label: 'Warming Up',   variant: 'warming' };
-    case 'idle':    return { label: 'Idle',           variant: 'idle'    };
-    case 'paused':  return { label: 'Paused',         variant: 'paused'  };
-    case 'error':   return { label: 'Error',          variant: 'error'   };
-    default:        return { label: 'Live',            variant: 'live'    };
+    case 'pending':
+      return { label: 'Setting Up — your campaign is being configured', variant: 'idle' };
+    case 'warming': {
+      let day = 1;
+      if (warmupStartedAt) {
+        const d = Math.floor((Date.now() - new Date(warmupStartedAt).getTime()) / (1000 * 60 * 60 * 24)) + 1;
+        day = Math.max(1, Math.min(d, 14));
+      }
+      return { label: `Warming Up — Day ${day} of 14`, variant: 'warming' };
+    }
+    case 'active':  return { label: 'Active — campaign is live', variant: 'live'    };
+    case 'paused':  return { label: 'Paused',                    variant: 'paused'  };
+    case 'error':   return { label: 'Error',                     variant: 'error'   };
+    default:        return { label: 'Live',                      variant: 'live'    };
   }
 }
 
@@ -452,6 +482,9 @@ export default function ClientPage() {
   const [periodOpen, setPeriodOpen]             = useState(false);
   const [periodStats, setPeriodStats]           = useState<PeriodStats | null>(null);
   const [billingData, setBillingData]           = useState<BillingData | null>(null);
+  const [billingRecord, setBillingRecord]       = useState<ClientBillingRecord | null>(null);
+  const [showChargeBanner, setShowChargeBanner] = useState(false);
+  const [nextChargeDate, setNextChargeDate]     = useState<Date | null>(null);
   const periodRef                               = useRef<HTMLDivElement>(null);
   const [connectedCal, setConnectedCal]         = useState<CalProvider | null>(null);
   const [calModal, setCalModal]                 = useState<CalProvider | null>(null);
@@ -536,6 +569,31 @@ export default function ClientPage() {
           })));
         }
 
+        // Fetch billing + campaign data from clients table
+        const { data: billingRow } = await supabase
+          .from('clients')
+          .select('trial_started_at, trial_ends_at, billing_started_at, billing_status, campaign_status, warmup_started_at')
+          .eq('id', targetClientId)
+          .single();
+
+        if (billingRow) {
+          setBillingRecord(billingRow);
+
+          // Calculate next charge date and whether to show the 3-day banner
+          let chargeDate: Date | null = null;
+          const bs = billingRow.billing_status;
+          if ((bs === 'trial' || bs === 'not_started') && billingRow.trial_ends_at) {
+            chargeDate = new Date(billingRow.trial_ends_at);
+          } else if (bs === 'active' && billingRow.billing_started_at) {
+            chargeDate = getNextBillingDate(billingRow.billing_started_at);
+          }
+          if (chargeDate) {
+            setNextChargeDate(chargeDate);
+            const diffDays = (chargeDate.getTime() - Date.now()) / (1000 * 60 * 60 * 24);
+            if (diffDays >= 0 && diffDays <= 3) setShowChargeBanner(true);
+          }
+        }
+
       } catch {
         // Network or Supabase error — render gracefully with empty states.
       }
@@ -587,7 +645,10 @@ export default function ClientPage() {
   const p = profile;
   const greeting  = getGreeting();
   const firstName = p?.client_name?.split(' ')[0] ?? null;
-  const statusProps = getStatusProps(p?.campaign_status ?? null);
+  const statusProps = getStatusProps(
+    billingRecord?.campaign_status ?? p?.campaign_status ?? null,
+    billingRecord?.warmup_started_at,
+  );
 
   // Sorted meetings — descending by month, day, then time
   const sortedMeetings = [...calMeetings].sort(
@@ -644,6 +705,22 @@ export default function ClientPage() {
                   Admin view — {p?.firm_name ?? 'Client'}{p?.client_name ? ` · ${p.client_name}` : ''}
                 </span>
                 <a href="/admin" className="adm-view-banner-back">← Back to Admin</a>
+              </div>
+            )}
+
+            {/* ── 3-day charge warning banner ── */}
+            {showChargeBanner && nextChargeDate && (
+              <div className="cd-charge-banner">
+                <span className="cd-charge-banner-text">
+                  Your card will be charged $2,000 on {fmtBillingDate(nextChargeDate.toISOString())}. No action needed — your card on file will be used.
+                </span>
+                <button
+                  className="cd-charge-banner-close"
+                  onClick={() => setShowChargeBanner(false)}
+                  aria-label="Dismiss"
+                >
+                  ✕
+                </button>
               </div>
             )}
 
@@ -884,71 +961,74 @@ export default function ClientPage() {
 
                     {/* Plan Details */}
                     <div className="cd-card bl-card">
-                      <div className="bl-section-label">Plan Details</div>
-                      <div className="bl-row">
-                        <span className="bl-row-key">Plan</span>
-                        <span className="bl-row-val">{billingData?.plan_name ?? '—'}</span>
-                      </div>
-                      <div className="bl-divider" />
-                      <div className="bl-row">
-                        <span className="bl-row-key">Status</span>
-                        {billingData
-                          ? <span className={`bl-status-pill${
-                              billingData.status === 'paused'    ? ' bl-status-paused'    :
-                              billingData.status === 'cancelled' ? ' bl-status-cancelled' : ''
-                            }`}>
-                              ● {billingData.status.charAt(0).toUpperCase() + billingData.status.slice(1)}
-                            </span>
-                          : <span className="bl-row-val">—</span>
-                        }
-                      </div>
-                      <div className="bl-divider" />
-                      <div className="bl-row">
-                        <span className="bl-row-key">Monthly retainer</span>
-                        <span className="bl-row-val">
-                          {billingData ? `$${billingData.monthly_amount.toLocaleString('en-US')} / mo` : '—'}
-                        </span>
-                      </div>
-                      <div className="bl-divider" />
-                      <div className="bl-row">
-                        <span className="bl-row-key">Billing started</span>
-                        <span className="bl-row-mono">{billingData?.billing_started ?? '—'}</span>
-                      </div>
-                      <div className="bl-divider" />
-                      <div className="bl-row">
-                        <span className="bl-row-key">Next invoice</span>
-                        <span className="bl-row-mono">{billingData?.next_invoice ?? '—'}</span>
-                      </div>
-                    </div>
+                      <div className="bl-section-label">Plan &amp; Billing</div>
 
-                    {/* Payment Method */}
-                    <div className="cd-card bl-card" style={{ marginTop: 16 }}>
-                      <div className="bl-section-label">Payment Method</div>
+                      {/* Setup Fee — always shown */}
                       <div className="bl-row">
-                        <span className="bl-row-key">Card on file</span>
+                        <span className="bl-row-key">Setup Fee</span>
                         <span className="bl-row-val">
-                          {billingData ? `${billingData.card_brand} •••• ${billingData.card_last4}` : '—'}
+                          $1,000 ✅{billingRecord?.trial_started_at
+                            ? ` Paid ${fmtBillingDate(billingRecord.trial_started_at)}`
+                            : ' Paid'}
                         </span>
                       </div>
-                      <div className="bl-divider" />
-                      <div className="bl-row">
-                        <span className="bl-row-key">Expires</span>
-                        <span className="bl-row-mono">{billingData?.card_expires ?? '—'}</span>
-                      </div>
-                      <div className="bl-divider" />
-                      <a
-                        href={billingData?.stripe_portal_url ?? '#'}
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        className="bl-stripe-btn"
-                      >
-                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" aria-hidden>
-                          <rect x="1" y="4" width="22" height="16" rx="3" stroke="currentColor" strokeWidth="1.8"/>
-                          <path d="M1 9h22" stroke="currentColor" strokeWidth="1.8"/>
-                        </svg>
-                        Update payment method
-                        <span className="bl-stripe-via">via Stripe →</span>
-                      </a>
+
+                      {/* Trial / not_started */}
+                      {(!billingRecord?.billing_status || billingRecord.billing_status === 'not_started' || billingRecord.billing_status === 'trial') && (
+                        <>
+                          <div className="bl-divider" />
+                          <div className="bl-row">
+                            <span className="bl-row-key">Free Period</span>
+                            <span className="bl-row-val">
+                              45 days{billingRecord?.trial_ends_at
+                                ? ` — ends ${fmtBillingDate(billingRecord.trial_ends_at)}`
+                                : ''}
+                            </span>
+                          </div>
+                          <div className="bl-divider" />
+                          <div className="bl-row">
+                            <span className="bl-row-key">Next Charge</span>
+                            <span className="bl-row-mono">
+                              {billingRecord?.trial_ends_at
+                                ? `$2,000 on ${fmtBillingDate(billingRecord.trial_ends_at)}`
+                                : '—'}
+                            </span>
+                          </div>
+                        </>
+                      )}
+
+                      {/* Active */}
+                      {billingRecord?.billing_status === 'active' && (
+                        <>
+                          <div className="bl-divider" />
+                          <div className="bl-row">
+                            <span className="bl-row-key">Retainer</span>
+                            <span className="bl-row-val">
+                              $2,000/mo <span className="bl-status-pill">● Active</span>
+                            </span>
+                          </div>
+                          <div className="bl-divider" />
+                          <div className="bl-row">
+                            <span className="bl-row-key">Next Charge</span>
+                            <span className="bl-row-mono">
+                              {billingRecord.billing_started_at
+                                ? `$2,000 on ${fmtBillingDate(getNextBillingDate(billingRecord.billing_started_at).toISOString())}`
+                                : '—'}
+                            </span>
+                          </div>
+                        </>
+                      )}
+
+                      {/* Paused */}
+                      {billingRecord?.billing_status === 'paused' && (
+                        <>
+                          <div className="bl-divider" />
+                          <div className="bl-payment-issue">
+                            There was an issue with your last payment. Please contact{' '}
+                            <a href="mailto:ryan@zionshift.com">ryan@zionshift.com</a>
+                          </div>
+                        </>
+                      )}
                     </div>
 
                   </div>

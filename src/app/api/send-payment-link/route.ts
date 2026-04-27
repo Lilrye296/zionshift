@@ -43,7 +43,9 @@ export async function POST(req: NextRequest) {
         },
         payment_intent_data: {
           metadata: { name, email },
+          setup_future_usage: 'off_session',
         },
+        customer_creation: 'always',
         metadata: { name, email },
         success_url: 'https://www.zionshift.com/thank-you',
         cancel_url:  'https://www.zionshift.com',

@@ -138,6 +138,8 @@ interface ActiveClient {
   setupFeePaid: boolean;
   headshotUrl: string | null;
   logoUrl: string | null;
+  campaignStatus: string;
+  warmupStartedAt: string | null;
 }
 
 interface ActivityItem {
@@ -214,6 +216,8 @@ export default function AdminPage() {
   const [periodStats, setPeriodStats]     = useState<AdminPeriodStats | null>(null);
   const [resendingId, setResendingId]     = useState<string | null>(null);
   const [resentId, setResentId]           = useState<string | null>(null);
+  const [launchingId, setLaunchingId]     = useState<string | null>(null);
+  const [launchToast, setLaunchToast]     = useState<string | null>(null);
   const [openDropdownId, setOpenDropdownId] = useState<string | null>(null);
   const [intakeClient, setIntakeClient]     = useState<ActiveClient | null>(null);
   const [intakeData, setIntakeData]         = useState<Record<string, unknown> | null>(null);
@@ -243,7 +247,7 @@ export default function AdminPage() {
         // Fetch clients directly — RLS allows admin role (same pattern as profiles/events/meetings)
         const { data: clientsData } = await supabase
           .from('clients')
-          .select('id, name, email, firm, status, mrr, since, first_month_paid, setup_fee_paid, headshot_url, logo_url')
+          .select('id, name, email, firm, status, mrr, since, first_month_paid, setup_fee_paid, headshot_url, logo_url, campaign_status, warmup_started_at')
           .order('created_at', { ascending: false });
 
         if (clientsData) {
@@ -264,6 +268,8 @@ export default function AdminPage() {
             setupFeePaid: c.setup_fee_paid,
             headshotUrl: c.headshot_url ?? null,
             logoUrl: c.logo_url ?? null,
+            campaignStatus: c.campaign_status ?? 'pending',
+            warmupStartedAt: c.warmup_started_at ?? null,
           })));
         }
 
@@ -389,6 +395,31 @@ export default function AdminPage() {
     }
   }
 
+  async function handleLaunchCampaign(clientId: string) {
+    setLaunchingId(clientId);
+    setOpenDropdownId(null);
+    try {
+      const res = await fetch('/api/launch-campaign', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ clientId }),
+      });
+      if (res.ok) {
+        setClients(prev => prev.map(c =>
+          c.id === clientId
+            ? { ...c, campaignStatus: 'warming', warmupStartedAt: new Date().toISOString() }
+            : c
+        ));
+        setLaunchToast('Campaign launched — warming up Day 1 of 14');
+        setTimeout(() => setLaunchToast(null), 5000);
+      }
+    } catch {
+      // Silently fail
+    } finally {
+      setLaunchingId(null);
+    }
+  }
+
   async function handleDownloadAssets(client: ActiveClient) {
     try {
       const res = await fetch(`/api/download-client-assets?email=${encodeURIComponent(client.email)}`);
@@ -491,6 +522,14 @@ export default function AdminPage() {
 
   return (
     <div className="portal-page">
+
+      {/* ── Launch Campaign Toast ────────────────────────────────── */}
+      {launchToast && (
+        <div className="adm-toast">
+          <span>{launchToast}</span>
+          <button className="adm-toast-close" onClick={() => setLaunchToast(null)} aria-label="Dismiss">✕</button>
+        </div>
+      )}
 
       {/* ── Nav ─────────────────────────────────────────────────── */}
       <header className="portal-nav">
@@ -818,6 +857,18 @@ export default function AdminPage() {
                                 </button>
                                 {openDropdownId === c.id && (
                                   <div className="adm-actions-menu">
+                                    {c.campaignStatus === 'pending' && (
+                                      <>
+                                        <button
+                                          className="adm-actions-item"
+                                          disabled={launchingId === c.id}
+                                          onClick={() => handleLaunchCampaign(c.id)}
+                                        >
+                                          {launchingId === c.id ? 'Launching…' : 'Launch Campaign'}
+                                        </button>
+                                        <div className="adm-actions-divider" />
+                                      </>
+                                    )}
                                     <button className="adm-actions-item" onClick={() => { router.push(`/client?view=${c.id}`); setOpenDropdownId(null); }}>
                                       View Dashboard →
                                     </button>
