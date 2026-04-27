@@ -467,8 +467,16 @@ export default function ClientPage() {
     billingRecord?.warmup_started_at,
   );
 
-  // Sorted meetings — descending by month, day, then time
-  const sortedMeetings = [...calMeetings].sort(
+  // Filter meetings by selected period, then sort descending
+  const now = new Date();
+  const todayNum = now.getDate();
+  const curMonth = now.getMonth();
+  const filteredMeetings = [...calMeetings].filter(m => {
+    if (period === 'alltime') return true;
+    if (period === 'month')   return m.month === curMonth;
+    if (period === 'week')    return m.month === curMonth && m.day >= todayNum - 7;
+    return true;
+  }).sort(
     (a, b) => b.month - a.month || b.day - a.day || parseTime(b.time) - parseTime(a.time),
   );
 
@@ -623,16 +631,19 @@ export default function ClientPage() {
               </div>
             </div>
 
-            {/* ── All Meetings ── */}
+            {/* ── Meetings Log ── */}
             <div className="cd-card" style={{ padding: 0, overflow: 'hidden', display: 'flex', flexDirection: 'column', marginBottom: 20 }}>
               <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '24px 20px 0', marginBottom: 16, flexShrink: 0 }}>
-                <span className="adm-biz-card-title">All Meetings</span>
-                <span className="adm-count-chip">{calMeetings.length} Total</span>
+                <div>
+                  <span className="adm-biz-card-title">Meetings Log</span>
+                  <div className="cd-metric-period" style={{ marginTop: 2 }}>{PERIOD_LABEL[period]}</div>
+                </div>
+                <span className="adm-count-chip">{filteredMeetings.length} Total</span>
               </div>
               <div className="cd-meet-log">
-                {sortedMeetings.length === 0 ? (
+                {filteredMeetings.length === 0 ? (
                   <p className="adm-empty-text" style={{ padding: '0 20px 24px' }}>No meetings booked yet.</p>
-                ) : sortedMeetings.map((m, i) => {
+                ) : filteredMeetings.map((m, i) => {
                   const isPast = isMeetingPast(m.day, m.time, m.month);
                   return (
                     <Fragment key={i}>
