@@ -361,7 +361,10 @@ export default function AdminPage() {
                             <span className="adm-client-name">{c.name}</span>
                             {c.status === 'pending'
                               ? <span className="adm-client-firm">{c.email}</span>
-                              : <span className="adm-client-firm">{c.firm} · since {c.since}</span>
+                              : <>
+                                  <span className="adm-client-firm">{c.firm}</span>
+                                  <span className="adm-client-since">since {c.since}</span>
+                                </>
                             }
                             {c.status === 'live' && !c.firstMonthPaid && (
                               <span className="adm-billing-pill adm-billing-pill--trial">Trial</span>
