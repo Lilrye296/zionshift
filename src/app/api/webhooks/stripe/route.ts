@@ -350,6 +350,57 @@ export async function POST(req: NextRequest) {
     }
   }
 
+  // ── invoice.payment_succeeded ───────────────────────────────────
+  // Fires when Stripe successfully charges the $2,000 monthly retainer
+  // after the 45-day trial ends (and every 30 days after that).
+  if (event.type === 'invoice.payment_succeeded') {
+    try {
+      const invoice = event.data.object as Stripe.Invoice;
+
+      // Skip $0 trial invoices — only act on real charges
+      if ((invoice.amount_paid ?? 0) === 0) {
+        return NextResponse.json({ received: true });
+      }
+
+      // Only handle subscription invoices (not one-off payment_intent charges)
+      if (!invoice.subscription) {
+        return NextResponse.json({ received: true });
+      }
+
+      const customerId = typeof invoice.customer === 'string'
+        ? invoice.customer
+        : (invoice.customer as Stripe.Customer | null)?.id ?? null;
+
+      if (!customerId) {
+        return NextResponse.json({ received: true });
+      }
+
+      const supabase = supabaseAdmin();
+
+      // Flip first_month_paid → true, set mrr, update billing_status to active
+      const { error: updateError } = await supabase
+        .from('clients')
+        .update({
+          first_month_paid: true,
+          mrr: 2000,
+          billing_status: 'active',
+        })
+        .eq('stripe_customer_id', customerId);
+
+      if (updateError) {
+        console.error('[stripe-webhook] invoice.payment_succeeded update error:', updateError);
+        return NextResponse.json({ error: 'Database error.' }, { status: 500 });
+      }
+
+      console.log(`[stripe-webhook] First payment cleared for customer ${customerId} — MRR updated.`);
+      return NextResponse.json({ received: true });
+
+    } catch (err) {
+      console.error('[stripe-webhook] invoice.payment_succeeded error:', err);
+      return NextResponse.json({ error: 'Internal server error.' }, { status: 500 });
+    }
+  }
+
   // All other events
   return NextResponse.json({ received: true });
 }
