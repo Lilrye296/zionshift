@@ -553,7 +553,19 @@ export default function ClientPage() {
           .eq('client_id', targetClientId)
           .single();
 
-        setProfile(statsData);
+        // Merge stats into profile without overwriting name/firm already set from clients table
+        if (statsData) {
+          setProfile(prev => ({
+            firm_name: prev?.firm_name || statsData.firm_name || '',
+            logo_url: prev?.logo_url || statsData.logo_url || null,
+            client_name: prev?.client_name || statsData.client_name || null,
+            emails_sent: statsData.emails_sent ?? prev?.emails_sent ?? 0,
+            replies: statsData.replies ?? prev?.replies ?? 0,
+            reply_rate: statsData.reply_rate ?? prev?.reply_rate ?? 0,
+            meetings_booked: statsData.meetings_booked ?? prev?.meetings_booked ?? 0,
+            campaign_status: statsData.campaign_status || prev?.campaign_status || '',
+          }));
+        }
 
         // Fetch meetings for this client
         const { data: meetingsData } = await supabase
