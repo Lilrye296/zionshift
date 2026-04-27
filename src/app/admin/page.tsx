@@ -495,7 +495,9 @@ export default function AdminPage() {
         .from('onboarding_responses')
         .select('response_data')
         .eq('email', client.email)
-        .single();
+        .order('submitted_at', { ascending: false })
+        .limit(1)
+        .maybeSingle();
       setIntakeData((data?.response_data as Record<string, unknown>) ?? null);
     } catch {
       setIntakeData(null);
