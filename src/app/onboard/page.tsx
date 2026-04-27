@@ -652,7 +652,7 @@ function Screen6({ submitting, submitError, onSubmit }: {
             </svg>
           </div>
           <p className="ob-confirm-label">You won&apos;t be charged anything yet.</p>
-          <p className="ob-confirm-body">Your $2,000/month retainer doesn&apos;t start until the first qualified lead lands on your calendar &mdash; and even then, billing begins 30 days after that.</p>
+          <p className="ob-confirm-body">Your 45-day free period began when you paid your setup fee &mdash; your first $2,000 retainer starts on day 46, then every 30 days after that.</p>
         </div>
       </div>
 
