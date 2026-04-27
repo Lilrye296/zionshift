@@ -451,12 +451,12 @@ function getStatusProps(status: string | null, warmupStartedAt?: string | null) 
     case 'pending':
       return { label: 'Setting Up — your campaign is being configured', variant: 'idle' };
     case 'warming': {
-      let day = 1;
       if (warmupStartedAt) {
         const d = Math.floor((Date.now() - new Date(warmupStartedAt).getTime()) / (1000 * 60 * 60 * 24)) + 1;
-        day = Math.max(1, Math.min(d, 14));
+        if (d > 14) return { label: 'Active — campaign is live', variant: 'live' };
+        return { label: `Warming Up — Day ${Math.max(1, d)} of 14`, variant: 'warming' };
       }
-      return { label: `Warming Up — Day ${day} of 14`, variant: 'warming' };
+      return { label: 'Warming Up — Day 1 of 14', variant: 'warming' };
     }
     case 'active':  return { label: 'Active — campaign is live', variant: 'live'    };
     case 'paused':  return { label: 'Paused',                    variant: 'paused'  };

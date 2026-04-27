@@ -380,7 +380,8 @@ export default function AdminPage() {
                             {(() => {
                               const cs = c.campaignStatus;
                               if (cs === 'warming' && c.warmupStartedAt) {
-                                const day = Math.min(Math.floor((Date.now() - new Date(c.warmupStartedAt).getTime()) / 86400000) + 1, 14);
+                                const day = Math.floor((Date.now() - new Date(c.warmupStartedAt).getTime()) / 86400000) + 1;
+                                if (day > 14) return <span className="adm-client-pill adm-client-pill--live">● Active</span>;
                                 return <span className="adm-client-pill adm-client-pill--warming"><span style={{ color: '#f59e0b' }}>●</span> Warming — Day {day} of 14</span>;
                               }
                               if (cs === 'active')    return <span className="adm-client-pill adm-client-pill--live">● Active</span>;
