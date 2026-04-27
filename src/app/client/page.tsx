@@ -439,7 +439,7 @@ export default function ClientPage() {
       setLoading(false);
     }
     load();
-  }, [router]);
+  }, [router, isAdminView]); // eslint-disable-line react-hooks/exhaustive-deps
 
   // Period-scoped metrics — update whenever period or profile changes
   useEffect(() => {
@@ -493,14 +493,6 @@ export default function ClientPage() {
   const sortedMeetings = [...calMeetings].sort(
     (a, b) => b.month - a.month || b.day - a.day || parseTime(b.time) - parseTime(a.time),
   );
-
-  // Activity filtered by selected period
-  const today = new Date().getDate();
-  const filteredActivity = activityItems.filter(a => {
-    if (period === 'alltime') return true;
-    if (period === 'week')    return a.day >= today - 7;
-    return true;
-  });
 
   return (
     <div className="portal-page">
