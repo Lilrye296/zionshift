@@ -456,8 +456,11 @@ export default function AdminPage() {
     setOpenDropdownId(null);
     try {
       const supabase = createClient();
-      await supabase.from('clients').update({ campaign_status: 'active' }).eq('id', client.id);
-      setClients(prev => prev.map(c => c.id === client.id ? { ...c, campaignStatus: 'active' } : c));
+      const stillWarming = client.warmupStartedAt
+        && (Date.now() - new Date(client.warmupStartedAt).getTime()) / 86400000 < 14;
+      const resumeStatus = stillWarming ? 'warming' : 'active';
+      await supabase.from('clients').update({ campaign_status: resumeStatus }).eq('id', client.id);
+      setClients(prev => prev.map(c => c.id === client.id ? { ...c, campaignStatus: resumeStatus } : c));
       setLaunchToast(`${client.name}'s campaign resumed.`);
       setTimeout(() => setLaunchToast(null), 5000);
     } catch { /* silently fail */ }
