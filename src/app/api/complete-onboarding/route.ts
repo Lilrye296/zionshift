@@ -254,10 +254,21 @@ export async function POST(req: NextRequest) {
 
     const userId = authData.user?.id;
 
-    // ── 10. Insert profile row ─────────────────────────────────────
+    // ── 10. Insert profile row with client_id ─────────────────────
     if (userId) {
       try {
-        await supabase.from('profiles').insert({ id: userId, role: 'client' });
+        // Look up the clients row to get its id so the dashboard can load their data
+        const { data: clientRecord } = await supabase
+          .from('clients')
+          .select('id')
+          .eq('email', email)
+          .single();
+
+        await supabase.from('profiles').insert({
+          id: userId,
+          role: 'client',
+          client_id: clientRecord?.id ?? null,
+        });
       } catch (e) {
         console.error('[complete-onboarding] Profile insert failed:', e);
       }
