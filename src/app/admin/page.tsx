@@ -256,6 +256,7 @@ export default function AdminPage() {
             status: string; mrr: number; since: string;
             first_month_paid: boolean; setup_fee_paid: boolean;
             headshot_url: string | null; logo_url: string | null;
+            campaign_status: string | null; warmup_started_at: string | null;
           }) => ({
             id: c.id,
             name: c.name,
