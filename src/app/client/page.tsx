@@ -707,11 +707,7 @@ export default function ClientPage() {
             </div>
           </div>
 
-          {isAdminView ? (
-            <a href="/admin" className="btn btn-ghost" style={{ fontSize: 13, padding: '8px 16px' }}>
-              ← Back to Admin
-            </a>
-          ) : (
+          {!isAdminView && (
             <button className="btn btn-ghost" onClick={handleSignOut} style={{ fontSize: 13, padding: '8px 16px' }}>
               Sign out
             </button>
