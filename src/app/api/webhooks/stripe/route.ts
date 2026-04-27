@@ -127,13 +127,12 @@ export async function POST(req: NextRequest) {
           const subParams: Stripe.SubscriptionCreateParams = {
             customer: customerId,
             items: [{
-              // eslint-disable-next-line @typescript-eslint/no-explicit-any
-              price_data: {
+              price_data: ({
                 currency: 'usd',
                 product_data: { name: 'ZionShift Monthly Retainer' },
                 recurring: { interval: 'month' },
                 unit_amount: 200000,
-              } as any,
+              }) as unknown as Stripe.SubscriptionCreateParams.Item.PriceData,
             }],
             trial_period_days: 45,
           };
