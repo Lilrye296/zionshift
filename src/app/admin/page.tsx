@@ -189,15 +189,19 @@ export default function AdminPage() {
     if (deleteConfirm.trim().toLowerCase() !== deleteClient.name.toLowerCase()) return;
     setDeleting(true);
     try {
-      const supabase = createClient();
-      await supabase.from('clients').delete().eq('id', deleteClient.id);
+      const res = await fetch('/api/delete-client', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ clientId: deleteClient.id, clientEmail: deleteClient.email }),
+      });
+      if (!res.ok) throw new Error('Delete failed');
       const removed = deleteClient;
       setClients(prev => prev.filter(c => c.id !== removed.id));
       setDeleteClient(null);
       setDeleteConfirm('');
       showToast(`${removed.name} has been removed.`);
     } catch {
-      // Silently fail
+      showToast('Something went wrong. Please try again.');
     } finally {
       setDeleting(false);
     }
