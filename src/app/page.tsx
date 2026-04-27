@@ -278,7 +278,7 @@ function Hero({ onBook }: { onBook: () => void }) {
           <div className="hero-badge hero-badge-1">
             <div>
               <div className="lbl">New clients this mo.</div>
-              <div className="n"><Counter to={1} /></div>
+              <div className="n"><Counter to={2} /></div>
             </div>
           </div>
           <div className="hero-badge hero-badge-2 ink">
