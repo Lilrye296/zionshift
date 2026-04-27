@@ -466,21 +466,6 @@ export default function AdminPage() {
     } catch { /* silently fail */ }
   }
 
-  async function handleCancelClient(client: ActiveClient) {
-    setOpenDropdownId(null);
-    try {
-      const supabase = createClient();
-      await supabase.from('clients').update({ campaign_status: 'cancelled', status: 'cancelled' }).eq('id', client.id);
-      setClients(prev => prev.map(c => c.id === client.id ? { ...c, campaignStatus: 'cancelled', status: 'cancelled' } : c));
-      await fetch('/api/notify-status-change', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ clientName: client.name, action: 'cancelled' }),
-      });
-      setLaunchToast(`${client.name} marked cancelled — go stop their Smartlead campaign.`);
-      setTimeout(() => setLaunchToast(null), 6000);
-    } catch { /* silently fail */ }
-  }
 
   async function handleDownloadAssets(client: ActiveClient) {
     try {
@@ -544,8 +529,7 @@ export default function AdminPage() {
   const mrrProgress    = nextMilestone === prevMilestone ? 100
     : Math.min(Math.round(((totalMRR - prevMilestone) / (nextMilestone - prevMilestone)) * 100), 100);
 
-  // Exclude cancelled from total count
-  const activeClientCount = clients.filter(c => c.status !== 'cancelled').length;
+  const activeClientCount = clients.length;
 
   // Reply Rate
   const replyRate: string = (
@@ -955,14 +939,6 @@ export default function AdminPage() {
                                       <>
                                         <button className="adm-actions-item adm-actions-item--green" onClick={() => handleResumeClient(c)}>
                                           Resume Campaign
-                                        </button>
-                                        <div className="adm-actions-divider" />
-                                      </>
-                                    )}
-                                    {c.campaignStatus !== 'cancelled' && (
-                                      <>
-                                        <button className="adm-actions-item adm-actions-item--danger" onClick={() => handleCancelClient(c)}>
-                                          Cancel Client
                                         </button>
                                         <div className="adm-actions-divider" />
                                       </>
