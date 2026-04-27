@@ -613,6 +613,25 @@ export default function ClientPage() {
         if (billingRow) {
           setBillingRecord(billingRow);
 
+          // ── Auto-activate: if warmup just crossed 14 days and DB still says warming,
+          //    fire the activation email + flip DB to active (runs once, never again)
+          if (
+            !isAdminView &&
+            billingRow.campaign_status === 'warming' &&
+            billingRow.warmup_started_at
+          ) {
+            const daysSinceWarmup = Math.floor(
+              (Date.now() - new Date(billingRow.warmup_started_at).getTime()) / 86400000
+            );
+            if (daysSinceWarmup >= 14) {
+              fetch('/api/activate-campaign', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ clientId: targetClientId }),
+              }).catch(e => console.error('[activate-campaign] fetch failed:', e));
+            }
+          }
+
           // Calculate next charge date and whether to show the 3-day banner
           let chargeDate: Date | null = null;
           const bs = billingRow.billing_status;
