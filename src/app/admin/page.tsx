@@ -254,27 +254,45 @@ export default function AdminPage() {
           .order('created_at', { ascending: false });
 
         if (clientsData) {
-          setClients(clientsData.map((c: {
+          const mapped = clientsData.map((c: {
             id: string; name: string; email: string; firm: string;
             status: string; mrr: number; since: string;
             first_month_paid: boolean; setup_fee_paid: boolean;
             headshot_url: string | null; logo_url: string | null;
             campaign_status: string | null; warmup_started_at: string | null;
-          }) => ({
-            id: c.id,
-            name: c.name,
-            email: c.email ?? '',
-            firm: c.firm ?? '',
-            status: (c.status === 'active' ? 'live' : c.status) as 'pending' | 'live' | 'paused' | 'cancelled',
-            mrr: Number(c.mrr),
-            since: c.since ? fmtDate(c.since) : '—',
-            firstMonthPaid: c.first_month_paid,
-            setupFeePaid: c.setup_fee_paid,
-            headshotUrl: c.headshot_url ?? null,
-            logoUrl: c.logo_url ?? null,
-            campaignStatus: c.campaign_status ?? 'pending',
-            warmupStartedAt: c.warmup_started_at ?? null,
-          })));
+          }) => {
+            // Auto-flip warming → active after 14 days
+            let campaignStatus = c.campaign_status ?? 'pending';
+            if (campaignStatus === 'warming' && c.warmup_started_at) {
+              const daysSince = (Date.now() - new Date(c.warmup_started_at).getTime()) / 86400000;
+              if (daysSince >= 14) campaignStatus = 'active';
+            }
+            return {
+              id: c.id,
+              name: c.name,
+              email: c.email ?? '',
+              firm: c.firm ?? '',
+              status: (c.status === 'active' ? 'live' : c.status) as 'pending' | 'live' | 'paused' | 'cancelled',
+              mrr: Number(c.mrr),
+              since: c.since ? fmtDate(c.since) : '—',
+              firstMonthPaid: c.first_month_paid,
+              setupFeePaid: c.setup_fee_paid,
+              headshotUrl: c.headshot_url ?? null,
+              logoUrl: c.logo_url ?? null,
+              campaignStatus,
+              warmupStartedAt: c.warmup_started_at ?? null,
+            };
+          });
+
+          // Persist any warming→active flips to DB
+          mapped.forEach(async (client) => {
+            const raw = clientsData.find((c: { id: string; campaign_status: string | null }) => c.id === client.id);
+            if (raw && raw.campaign_status === 'warming' && client.campaignStatus === 'active') {
+              await supabase.from('clients').update({ campaign_status: 'active' }).eq('id', client.id);
+            }
+          });
+
+          setClients(mapped);
         }
 
         // Fetch business events (admin activity feed)
@@ -442,6 +460,49 @@ export default function AdminPage() {
     }
   }
 
+  async function handlePauseClient(client: ActiveClient) {
+    setOpenDropdownId(null);
+    try {
+      const supabase = createClient();
+      await supabase.from('clients').update({ campaign_status: 'paused' }).eq('id', client.id);
+      setClients(prev => prev.map(c => c.id === client.id ? { ...c, campaignStatus: 'paused' } : c));
+      await fetch('/api/notify-status-change', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ clientName: client.name, action: 'paused' }),
+      });
+      setLaunchToast(`${client.name}'s campaign paused — go pause in Smartlead.`);
+      setTimeout(() => setLaunchToast(null), 6000);
+    } catch { /* silently fail */ }
+  }
+
+  async function handleResumeClient(client: ActiveClient) {
+    setOpenDropdownId(null);
+    try {
+      const supabase = createClient();
+      await supabase.from('clients').update({ campaign_status: 'active' }).eq('id', client.id);
+      setClients(prev => prev.map(c => c.id === client.id ? { ...c, campaignStatus: 'active' } : c));
+      setLaunchToast(`${client.name}'s campaign resumed.`);
+      setTimeout(() => setLaunchToast(null), 5000);
+    } catch { /* silently fail */ }
+  }
+
+  async function handleCancelClient(client: ActiveClient) {
+    setOpenDropdownId(null);
+    try {
+      const supabase = createClient();
+      await supabase.from('clients').update({ campaign_status: 'cancelled', status: 'cancelled' }).eq('id', client.id);
+      setClients(prev => prev.map(c => c.id === client.id ? { ...c, campaignStatus: 'cancelled', status: 'cancelled' } : c));
+      await fetch('/api/notify-status-change', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ clientName: client.name, action: 'cancelled' }),
+      });
+      setLaunchToast(`${client.name} marked cancelled — go stop their Smartlead campaign.`);
+      setTimeout(() => setLaunchToast(null), 6000);
+    } catch { /* silently fail */ }
+  }
+
   async function handleDownloadAssets(client: ActiveClient) {
     try {
       const res = await fetch(`/api/download-client-assets?email=${encodeURIComponent(client.email)}`);
@@ -504,8 +565,8 @@ export default function AdminPage() {
   const mrrProgress    = nextMilestone === prevMilestone ? 100
     : Math.min(Math.round(((totalMRR - prevMilestone) / (nextMilestone - prevMilestone)) * 100), 100);
 
-  // Live + paused only (pending and cancelled excluded)
-  const activeClientCount = clients.length;
+  // Exclude cancelled from total count
+  const activeClientCount = clients.filter(c => c.status !== 'cancelled').length;
 
   // Reply Rate
   const replyRate: string = (
@@ -852,14 +913,22 @@ export default function AdminPage() {
                             ) : (
                               <span className="adm-client-firm">{c.firm} · since {c.since}</span>
                             )}
-                            {!c.firstMonthPaid && c.status === 'live' && (
-                              <span className="adm-billing-pending">Billing pending</span>
+                            {c.status === 'live' && !c.firstMonthPaid && (
+                              <span className="adm-billing-pill adm-billing-pill--trial">Trial</span>
                             )}
                           </div>
                           <div className="adm-client-right">
-                            <span className={`adm-client-pill adm-client-pill--${c.status}`}>
-                              ●&nbsp;{c.status === 'live' ? 'Active' : c.status.charAt(0).toUpperCase() + c.status.slice(1)}
-                            </span>
+                            {(() => {
+                              const cs = c.campaignStatus;
+                              if (cs === 'warming' && c.warmupStartedAt) {
+                                const day = Math.min(Math.floor((Date.now() - new Date(c.warmupStartedAt).getTime()) / 86400000) + 1, 14);
+                                return <span className="adm-client-pill adm-client-pill--warming">● Warming — Day {day} of 14</span>;
+                              }
+                              if (cs === 'active')    return <span className="adm-client-pill adm-client-pill--live">● Active</span>;
+                              if (cs === 'paused')    return <span className="adm-client-pill adm-client-pill--paused">● Paused</span>;
+                              if (cs === 'cancelled') return <span className="adm-client-pill adm-client-pill--cancelled">● Cancelled</span>;
+                              return <span className="adm-client-pill adm-client-pill--pending">● Pending</span>;
+                            })()}
                             {c.status === 'pending' ? (
                               <button
                                 className="adm-view-btn"
@@ -879,18 +948,6 @@ export default function AdminPage() {
                                 </button>
                                 {openDropdownId === c.id && (
                                   <div className="adm-actions-menu">
-                                    {c.campaignStatus === 'pending' && (
-                                      <>
-                                        <button
-                                          className="adm-actions-item"
-                                          disabled={launchingId === c.id}
-                                          onClick={() => handleLaunchCampaign(c.id)}
-                                        >
-                                          {launchingId === c.id ? 'Launching…' : 'Launch Campaign'}
-                                        </button>
-                                        <div className="adm-actions-divider" />
-                                      </>
-                                    )}
                                     <button className="adm-actions-item" onClick={() => { router.push(`/client?view=${c.id}`); setOpenDropdownId(null); }}>
                                       View Dashboard →
                                     </button>
@@ -907,6 +964,30 @@ export default function AdminPage() {
                                       View Intake Form
                                     </button>
                                     <div className="adm-actions-divider" />
+                                    {c.campaignStatus !== 'paused' && c.campaignStatus !== 'cancelled' && (
+                                      <>
+                                        <button className="adm-actions-item adm-actions-item--warn" onClick={() => handlePauseClient(c)}>
+                                          Pause Campaign
+                                        </button>
+                                        <div className="adm-actions-divider" />
+                                      </>
+                                    )}
+                                    {c.campaignStatus === 'paused' && (
+                                      <>
+                                        <button className="adm-actions-item adm-actions-item--green" onClick={() => handleResumeClient(c)}>
+                                          Resume Campaign
+                                        </button>
+                                        <div className="adm-actions-divider" />
+                                      </>
+                                    )}
+                                    {c.campaignStatus !== 'cancelled' && (
+                                      <>
+                                        <button className="adm-actions-item adm-actions-item--danger" onClick={() => handleCancelClient(c)}>
+                                          Cancel Client
+                                        </button>
+                                        <div className="adm-actions-divider" />
+                                      </>
+                                    )}
                                     <button className="adm-actions-item adm-actions-item--danger" onClick={() => { setDeleteClient(c); setDeleteConfirm(''); setOpenDropdownId(null); }}>
                                       Remove Client
                                     </button>

@@ -1058,14 +1058,14 @@ export default function ClientPage() {
 
                     {/* Need to make changes */}
                     <div className="cd-card bl-card" style={{ marginTop: 16 }}>
-                      <div className="bl-changes-title">Need to make changes?</div>
+                      <div className="bl-changes-title">Need to pause or cancel?</div>
                       <p className="bl-changes-body">
-                        To update your plan or cancel your subscription, reach out directly at{' '}
-                        <a href="mailto:ryan@zionshift.com" className="bl-changes-link">ryan@zionshift.com</a>.
-                        {' '}We&apos;ll take care of it within one business day.
+                        Just reach out directly at{' '}
+                        <a href="mailto:ryan@zionshift.com" className="bl-changes-link">ryan@zionshift.com</a>
+                        {' '}and we&apos;ll handle it within one business day — whether you need a short break or want to cancel entirely.
                       </p>
                       <p className="bl-changes-note">
-                        No contracts. Your retainer only continues as long as you&apos;re seeing results.
+                        No contracts. No penalties. Your campaign continues only as long as you want it to.
                       </p>
                     </div>
 
