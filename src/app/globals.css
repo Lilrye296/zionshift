@@ -1101,6 +1101,11 @@ footer.zs-footer { padding: 40px 0; border-top: 1px solid var(--zs-border); }
 .ob-screen-title { font: 700 28px var(--zs-sans); letter-spacing: -0.04em; color: var(--zs-ink); margin: 0 0 8px; line-height: 1.1; }
 .ob-screen-sub   { font: 400 14px var(--zs-sans); color: var(--zs-ink-4); margin: 0 0 28px; line-height: 1.6; }
 
+/* Onboarding disclaimer */
+.ob-disclaimer { background: #F5F3EF; border-left: 3px solid var(--zs-ink); border-radius: 8px; padding: 16px 20px; margin: 0 0 28px; }
+.ob-disclaimer-heading { font: 700 13px var(--zs-sans); letter-spacing: 0.06em; text-transform: uppercase; color: var(--zs-ink); margin: 0 0 6px; }
+.ob-disclaimer-body { font: 400 14px var(--zs-sans); color: var(--zs-ink-4); line-height: 1.65; margin: 0; }
+
 /* Vertical spacing between every combination of field / two-col row */
 .ob-body .field + .field          { margin-top: 24px; }
 .ob-body .ob-row-2 + .field       { margin-top: 24px; }

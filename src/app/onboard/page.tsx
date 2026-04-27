@@ -240,6 +240,10 @@ function Screen1({ form, set }: { form: FormState; set: (f: FormState) => void }
     set({ ...form, [key]: e.target.value });
   return (
     <div className="ob-screen">
+      <div className="ob-disclaimer">
+        <p className="ob-disclaimer-heading">This form builds your campaign.</p>
+        <p className="ob-disclaimer-body">Every answer you give is used directly to find your ideal clients and write your outreach emails. The more specific and detailed you are, the better your results. Vague answers produce generic outreach. Specific answers produce meetings. Take your time with this.</p>
+      </div>
       <h2 className="ob-screen-title">About you.</h2>
       <p className="ob-screen-sub">Tell us about yourself and your firm so we can build your campaign around you.</p>
 
