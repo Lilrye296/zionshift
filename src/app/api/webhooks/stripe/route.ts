@@ -355,7 +355,7 @@ export async function POST(req: NextRequest) {
   // after the 45-day trial ends (and every 30 days after that).
   if (event.type === 'invoice.payment_succeeded') {
     try {
-      const invoice = event.data.object as Stripe.Invoice;
+      const invoice = event.data.object as Stripe.Invoice & { subscription?: string | null };
 
       // Skip $0 trial invoices — only act on real charges
       if ((invoice.amount_paid ?? 0) === 0) {
