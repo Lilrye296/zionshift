@@ -1135,35 +1135,15 @@ export default function AdminPage() {
 
                   {/* Screen 4 */}
                   <div className="adm-intake-section">
-                    <div className="adm-intake-section-title">Availability</div>
-                    {intakeData.availability && typeof intakeData.availability === 'object'
-                      ? Object.entries(intakeData.availability as Record<string, string[]>).map(([day, slots]) => (
-                          <div key={day} className="adm-intake-row">
-                            <span className="adm-intake-label">{day}</span>
-                            <span className="adm-intake-val">{slots.join(', ')}</span>
-                          </div>
-                        ))
-                      : (intakeData.availableDays || intakeData.timeSlots) ? (
-                          <>
-                            <div className="adm-intake-row">
-                              <span className="adm-intake-label">Days</span>
-                              <span className="adm-intake-val">{Array.isArray(intakeData.availableDays) ? (intakeData.availableDays as string[]).join(', ') : '—'}</span>
-                            </div>
-                            <div className="adm-intake-row">
-                              <span className="adm-intake-label">Time Slots</span>
-                              <span className="adm-intake-val">{Array.isArray(intakeData.timeSlots) ? (intakeData.timeSlots as string[]).join(', ') : '—'}</span>
-                            </div>
-                          </>
-                        ) : null
-                    }
-                    {([
-                      ['Timezone', intakeData.timezone],
-                    ] as [string, string][]).map(([label, val]) => (
-                      <div key={label} className="adm-intake-row">
-                        <span className="adm-intake-label">{label}</span>
-                        <span className="adm-intake-val">{val || '—'}</span>
-                      </div>
-                    ))}
+                    <div className="adm-intake-section-title">Booking</div>
+                    <div className="adm-intake-row">
+                      <span className="adm-intake-label">Booking Link</span>
+                      <span className="adm-intake-val">
+                        {intakeData.bookingLink
+                          ? <a href={intakeData.bookingLink as string} target="_blank" rel="noreferrer" style={{ color: '#1A1715', wordBreak: 'break-all' }}>{intakeData.bookingLink as string}</a>
+                          : '—'}
+                      </span>
+                    </div>
                   </div>
 
                   {/* Screen 5 */}
