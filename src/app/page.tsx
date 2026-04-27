@@ -633,7 +633,7 @@ function Pricing({ onBook }: { onBook: () => void }) {
             </div>
           </div>
           <p className="pricing-note" style={{ fontWeight: 600, fontSize: 15, color: 'var(--zs-ink)' }}>
-            You don&apos;t pay the $2,000 retainer until your first qualified lead lands in your dashboard &mdash; and even then, billing doesn&apos;t start for another 30 days. No contracts. Cancel anytime.
+            45 days free. Then $2,000/mo. No contracts, cancel anytime.
           </p>
           <button className="btn btn-primary" onClick={onBook} style={{ marginTop: 32 }}>
             Book a free call<span className="chev">→</span>
