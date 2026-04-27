@@ -274,15 +274,6 @@ export async function POST(req: NextRequest) {
       }
     }
 
-    // ── 11. Send password reset email ──────────────────────────────
-    try {
-      await supabase.auth.resetPasswordForEmail(email, {
-        redirectTo: 'https://www.zionshift.com/auth/callback?next=/reset-password',
-      });
-    } catch (e) {
-      console.error('[complete-onboarding] Reset email failed:', e);
-    }
-
     return NextResponse.json({ success: true, tempPass });
 
   } catch (err) {

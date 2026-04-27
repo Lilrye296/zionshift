@@ -622,6 +622,13 @@ function OnboardInner() {
   const [submitting, setSubmitting]       = useState(false);
   const [submitError, setSubmitError]     = useState('');
 
+  // Password creation screen (shown after successful onboarding submission)
+  const [showPasswordScreen, setShowPasswordScreen] = useState(false);
+  const [password, setPassword]                     = useState('');
+  const [confirmPass, setConfirmPass]               = useState('');
+  const [passwordError, setPasswordError]           = useState('');
+  const [settingPassword, setSettingPassword]       = useState(false);
+
   /* Validate token on mount */
   useEffect(() => {
     if (!token) { setTokenState('invalid'); return; }
@@ -692,16 +699,44 @@ function OnboardInner() {
         return;
       }
 
-      /* Sign in with temp credentials if provided */
+      /* Sign in silently with temp credentials, then show password creation screen */
       if (data.tempPass) {
         const supabase = createClient();
         await supabase.auth.signInWithPassword({ email: clientEmail, password: data.tempPass });
       }
 
-      router.push('/client');
+      setSubmitting(false);
+      setShowPasswordScreen(true);
+      window.scrollTo({ top: 0, behavior: 'smooth' });
     } catch {
       setSubmitError('Something went wrong. Please try again.');
       setSubmitting(false);
+    }
+  }
+
+  async function handleSetPassword() {
+    setPasswordError('');
+    if (password.length < 8) {
+      setPasswordError('Password must be at least 8 characters.');
+      return;
+    }
+    if (password !== confirmPass) {
+      setPasswordError('Passwords do not match.');
+      return;
+    }
+    setSettingPassword(true);
+    try {
+      const supabase = createClient();
+      const { error } = await supabase.auth.updateUser({ password });
+      if (error) {
+        setPasswordError('Something went wrong. Please try again.');
+        setSettingPassword(false);
+        return;
+      }
+      router.push('/client');
+    } catch {
+      setPasswordError('Something went wrong. Please try again.');
+      setSettingPassword(false);
     }
   }
 
@@ -740,6 +775,79 @@ function OnboardInner() {
           <p style={{ font: '400 15px var(--zs-sans)', color: 'var(--zs-ink-4)', margin: 0, lineHeight: 1.65 }}>
             Reply to your welcome email and we&apos;ll send you a new one.
           </p>
+        </div>
+      </div>
+    );
+  }
+
+  /* ── Password Creation Screen ── */
+  if (showPasswordScreen) {
+    return (
+      <div className="login-page">
+        <div className="ob-card">
+          <div className="ob-logo-row">
+            {/* eslint-disable-next-line @next/next/no-img-element */}
+            <img src="/logo.png" alt="ZionShift" className="login-logo-img" />
+          </div>
+          <div className="ob-body" style={{ padding: '40px 36px 48px' }}>
+            <p style={{ margin: '0 0 6px', fontSize: 11, fontWeight: 700, letterSpacing: '0.12em', textTransform: 'uppercase', color: '#9CA3AF' }}>Almost there</p>
+            <h1 className="ob-screen-title" style={{ marginBottom: 8 }}>Create your password.</h1>
+            <p className="ob-screen-sub">This is how you&apos;ll log back into your dashboard anytime.</p>
+
+            <div style={{ marginBottom: 12 }}>
+              <label style={{ display: 'block', fontSize: 11, fontWeight: 700, color: '#9CA3AF', marginBottom: 6, textTransform: 'uppercase', letterSpacing: '0.08em' }}>
+                Email
+              </label>
+              <div style={{ padding: '11px 14px', background: '#F9F9F9', border: '1px solid #E5E5E5', borderRadius: 8, fontSize: 14, color: '#9CA3AF' }}>
+                {clientEmail}
+              </div>
+            </div>
+
+            <div style={{ marginBottom: 12 }}>
+              <label style={{ display: 'block', fontSize: 11, fontWeight: 700, color: '#9CA3AF', marginBottom: 6, textTransform: 'uppercase', letterSpacing: '0.08em' }}>
+                Password
+              </label>
+              <input
+                type="password"
+                value={password}
+                onChange={e => setPassword(e.target.value)}
+                placeholder="Min. 8 characters"
+                autoFocus
+                style={{ width: '100%', padding: '11px 14px', fontSize: 14, border: '1px solid #E5E5E5', borderRadius: 8, outline: 'none', boxSizing: 'border-box', background: '#fff', color: '#1A1715' }}
+              />
+            </div>
+
+            <div style={{ marginBottom: 24 }}>
+              <label style={{ display: 'block', fontSize: 11, fontWeight: 700, color: '#9CA3AF', marginBottom: 6, textTransform: 'uppercase', letterSpacing: '0.08em' }}>
+                Confirm Password
+              </label>
+              <input
+                type="password"
+                value={confirmPass}
+                onChange={e => setConfirmPass(e.target.value)}
+                placeholder="Re-enter your password"
+                onKeyDown={e => e.key === 'Enter' && handleSetPassword()}
+                style={{ width: '100%', padding: '11px 14px', fontSize: 14, border: '1px solid #E5E5E5', borderRadius: 8, outline: 'none', boxSizing: 'border-box', background: '#fff', color: '#1A1715' }}
+              />
+            </div>
+
+            {passwordError && (
+              <p style={{ margin: '0 0 16px', fontSize: 13, color: '#DC2626' }}>{passwordError}</p>
+            )}
+
+            <button
+              onClick={handleSetPassword}
+              disabled={settingPassword || !password || !confirmPass}
+              style={{
+                width: '100%', padding: '14px', background: '#1A1715', color: '#fff',
+                border: 'none', borderRadius: 10, fontSize: 15, fontWeight: 700,
+                letterSpacing: '-0.01em', cursor: settingPassword ? 'default' : 'pointer',
+                opacity: (!password || !confirmPass) ? 0.5 : 1, transition: 'opacity 160ms',
+              }}
+            >
+              {settingPassword ? 'Setting up your account…' : 'Enter My Dashboard →'}
+            </button>
+          </div>
         </div>
       </div>
     );
