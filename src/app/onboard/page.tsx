@@ -370,7 +370,7 @@ function Screen2({ form, set }: { form: FormState; set: (f: FormState) => void }
       </div>
 
       <div className="field">
-        <label>Any types of businesses you absolutely do NOT want as clients? <span className="ob-optional">(optional)</span></label>
+        <label>Any types of businesses you absolutely do NOT want as clients? <span className="ob-req">*</span></label>
         <textarea
           value={form.exclusions}
           onChange={e => set({ ...form, exclusions: e.target.value })}
@@ -467,7 +467,7 @@ function Screen5({ form, set }: { form: FormState; set: (f: FormState) => void }
       <p className="ob-screen-sub">A few last things to make sure your campaign is dialed in perfectly.</p>
 
       <div className="field">
-        <label>Anything specific prospects should know before getting on a call with you? <span className="ob-optional">(optional)</span></label>
+        <label>Anything specific prospects should know before getting on a call with you? <span className="ob-req">*</span></label>
         <textarea
           value={form.prospectNote}
           onChange={e => set({ ...form, prospectNote: e.target.value })}
@@ -477,7 +477,7 @@ function Screen5({ form, set }: { form: FormState; set: (f: FormState) => void }
       </div>
 
       <div className="field">
-        <label>Anything you never want said in outreach — competitors, phrases, or topics to avoid <span className="ob-optional">(optional)</span></label>
+        <label>Anything you never want said in outreach — competitors, phrases, or topics to avoid <span className="ob-req">*</span></label>
         <textarea
           value={form.avoidances}
           onChange={e => set({ ...form, avoidances: e.target.value })}
@@ -583,6 +583,7 @@ function validate(step: number, form: FormState): string | null {
     if (form.revenueRange.length === 0) return 'Select a revenue range.';
     if (form.geoFocus.length === 0)    return 'Select a geographic focus.';
     if (form.geoFocus.includes('Regional') && !form.regionalStates.trim()) return 'Please specify which states or region you want to target.';
+    if (!form.exclusions.trim()) return 'Please tell us what types of businesses you don\'t want as clients.';
   }
   if (step === 3) {
     if (!form.differentiator.trim()) return 'Tell us what makes your firm different.';
@@ -592,6 +593,10 @@ function validate(step: number, form: FormState): string | null {
   }
   if (step === 4) {
     if (!form.bookingLink.trim()) return 'Please enter your scheduling link.';
+  }
+  if (step === 5) {
+    if (!form.prospectNote.trim()) return 'Please tell us what prospects should know before getting on a call.';
+    if (!form.avoidances.trim())   return 'Please tell us what to avoid in outreach.';
   }
   return null;
 }
