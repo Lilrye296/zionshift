@@ -225,6 +225,9 @@ export default function AdminPage() {
   const [onboardOpen, setOnboardOpen]     = useState(false);
   const [onboardName, setOnboardName]     = useState('');
   const [onboardEmail, setOnboardEmail]   = useState('');
+  const [deleteClient, setDeleteClient]   = useState<ActiveClient | null>(null);
+  const [deleteConfirm, setDeleteConfirm] = useState('');
+  const [deleting, setDeleting]           = useState(false);
   const [onboardStatus, setOnboardStatus] = useState<'idle' | 'sending' | 'success' | 'error'>('idle');
   const periodRef                         = useRef<HTMLDivElement>(null);
   const router = useRouter();
@@ -418,6 +421,24 @@ export default function AdminPage() {
       // Silently fail
     } finally {
       setLaunchingId(null);
+    }
+  }
+
+  async function handleDeleteClient() {
+    if (!deleteClient) return;
+    setDeleting(true);
+    try {
+      const supabase = createClient();
+      await supabase.from('clients').delete().eq('id', deleteClient.id);
+      setClients(prev => prev.filter(c => c.id !== deleteClient.id));
+      setDeleteClient(null);
+      setDeleteConfirm('');
+      setLaunchToast(`${deleteClient.name} has been removed.`);
+      setTimeout(() => setLaunchToast(null), 5000);
+    } catch {
+      // Silently fail
+    } finally {
+      setDeleting(false);
     }
   }
 
@@ -885,6 +906,10 @@ export default function AdminPage() {
                                     <button className="adm-actions-item" onClick={() => { handleViewIntake(c); setOpenDropdownId(null); }}>
                                       View Intake Form
                                     </button>
+                                    <div className="adm-actions-divider" />
+                                    <button className="adm-actions-item adm-actions-item--danger" onClick={() => { setDeleteClient(c); setDeleteConfirm(''); setOpenDropdownId(null); }}>
+                                      Remove Client
+                                    </button>
                                   </div>
                                 )}
                               </div>
@@ -1196,6 +1221,52 @@ export default function AdminPage() {
                   </div>
                 </>
               )}
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Delete Client Modal */}
+      {deleteClient && (
+        <div className="modal-overlay" onClick={() => { setDeleteClient(null); setDeleteConfirm(''); }}>
+          <div className="modal" style={{ maxWidth: 420 }} onClick={e => e.stopPropagation()}>
+            <button className="modal-close" onClick={() => { setDeleteClient(null); setDeleteConfirm(''); }}>✕</button>
+            <div className="modal-scroll">
+              <div className="adm-delete-icon">⚠</div>
+              <div className="ccm-title" style={{ marginBottom: 6 }}>Remove Client</div>
+              <p style={{ margin: '0 0 24px', fontSize: 13, color: '#6B7280', lineHeight: 1.6 }}>
+                This will permanently remove <strong style={{ color: '#1A1715' }}>{deleteClient.name}</strong> and all their data. This cannot be undone.
+              </p>
+              <label style={{ display: 'block', fontSize: 12, fontWeight: 600, color: '#6B7280', marginBottom: 8, textTransform: 'uppercase', letterSpacing: '0.08em' }}>
+                Type <strong style={{ color: '#1A1715' }}>{deleteClient.name}</strong> to confirm
+              </label>
+              <input
+                type="text"
+                value={deleteConfirm}
+                onChange={e => setDeleteConfirm(e.target.value)}
+                placeholder={deleteClient.name}
+                autoFocus
+                style={{
+                  width: '100%', padding: '10px 14px', border: '1px solid #E5E7EB',
+                  borderRadius: 8, fontSize: 14, outline: 'none',
+                  boxSizing: 'border-box', background: '#FAFAFA', color: '#1A1715', marginBottom: 20,
+                }}
+              />
+              <div className="ccm-actions">
+                <button
+                  className="ccm-btn-cancel"
+                  onClick={() => { setDeleteClient(null); setDeleteConfirm(''); }}
+                >
+                  Cancel
+                </button>
+                <button
+                  className="adm-delete-btn"
+                  disabled={deleteConfirm !== deleteClient.name || deleting}
+                  onClick={handleDeleteClient}
+                >
+                  {deleting ? 'Removing…' : 'Remove Client'}
+                </button>
+              </div>
             </div>
           </div>
         </div>

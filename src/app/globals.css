@@ -927,6 +927,14 @@ footer.zs-footer { padding: 40px 0; border-top: 1px solid var(--zs-border); }
 .adm-actions-item.disabled { color: var(--zs-ink-5); cursor: default; }
 .adm-actions-item.disabled:hover { background: none; }
 .adm-actions-divider { height: 1px; background: var(--zs-border-soft); margin: 0; }
+.adm-actions-item--danger { color: #DC2626 !important; }
+.adm-actions-item--danger:hover { background: #FFF1F2 !important; }
+
+/* Delete client modal */
+.adm-delete-icon { font-size: 28px; margin-bottom: 12px; }
+.adm-delete-btn { padding: 10px 20px; background: #DC2626; color: #fff; border: none; border-radius: 8px; font: 600 14px var(--zs-sans); cursor: pointer; transition: opacity 160ms; }
+.adm-delete-btn:disabled { opacity: 0.35; cursor: default; }
+.adm-delete-btn:not(:disabled):hover { opacity: 0.85; }
 
 /* Admin toast notification */
 .adm-toast { position: fixed; top: 20px; left: 50%; transform: translateX(-50%); background: #1A1715; color: #fff; padding: 12px 20px; border-radius: 8px; display: flex; align-items: center; gap: 12px; z-index: 1000; font: 500 14px var(--zs-sans); box-shadow: 0 4px 16px rgba(0,0,0,0.18); white-space: nowrap; }
