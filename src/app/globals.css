@@ -952,14 +952,14 @@ footer.zs-footer { padding: 40px 0; border-top: 1px solid var(--zs-border); }
 /* Client status pills */
 .adm-client-pill { font: 500 11px var(--zs-sans); border-radius: 999px; padding: 3px 10px; white-space: nowrap; display: inline-block; }
 .adm-client-pill--pending   { background: #F4F4F5; color: #71717A; border: 1px solid #E4E4E7; }
-.adm-client-pill--warming   { background: #fffbeb; color: #b45309; border: 1px solid #fde68a; }
+.adm-client-pill--warming   { background: #fffbeb; color: #9CA3AF; border: 1px solid #fde68a; }
 .adm-client-pill--live      { background: #f0fdf4; color: #16a34a; border: 1px solid #bbf7d0; }
 .adm-client-pill--paused    { background: #eff6ff; color: #2563eb; border: 1px solid #bfdbfe; }
 .adm-client-pill--cancelled { background: #fff1f2; color: #dc2626; border: 1px solid #fecaca; }
 
 /* Billing trial pill */
 .adm-billing-pill { font: 500 11px var(--zs-sans); border-radius: 999px; padding: 2px 8px; display: inline-block; margin-top: 3px; }
-.adm-billing-pill--trial { background: #fffbeb; color: #b45309; border: 1px solid #fde68a; }
+.adm-billing-pill--trial { background: #fffbeb; color: #9CA3AF; border: 1px solid #fde68a; }
 
 /* Dropdown item variants */
 .adm-actions-item--warn  { color: #b45309 !important; }
