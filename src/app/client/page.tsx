@@ -261,7 +261,6 @@ export default function ClientPage() {
   const [loading, setLoading]           = useState(true);
   const [isAdminView, setIsAdminView]   = useState(false);
   const [calMeetings, setCalMeetings]   = useState<CalMeeting[]>([]);
-  const [activityItems, setActivityItems] = useState<ActivityRow[]>([]);
   const router = useRouter();
 
   const [activeTab, setActiveTab]               = useState<'overview' | 'billing'>('overview');
@@ -370,22 +369,6 @@ export default function ClientPage() {
             firm:    m.firm ?? '',
             time:    m.meeting_time ?? '',
             zoomUrl: m.zoom_url ?? undefined,
-          })));
-        }
-
-        // Fetch activity for this client
-        const { data: activityData } = await supabase
-          .from('activity')
-          .select('label, sub, day')
-          .eq('client_id', targetClientId)
-          .order('created_at', { ascending: false })
-          .limit(20);
-
-        if (activityData) {
-          setActivityItems(activityData.map(a => ({
-            label: a.label ?? '',
-            sub:   a.sub   ?? '',
-            day:   a.day   ?? 0,
           })));
         }
 
