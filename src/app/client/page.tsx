@@ -24,11 +24,6 @@ interface CalMeeting {
   zoomUrl?: string;
 }
 
-interface ActivityRow {
-  label: string;
-  sub: string;
-  day: number;
-}
 
 /* ── Helpers ── */
 function getGreeting() {
