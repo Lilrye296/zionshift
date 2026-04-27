@@ -99,10 +99,10 @@ export default function TermsPage() {
           <p>A one-time, non-refundable Setup Fee of <strong>$1,000</strong> is due before services begin. This fee covers account creation, email infrastructure buildout, campaign strategy, and initial warmup. It is non-refundable under any circumstances, including early cancellation.</p>
 
           <SubHeading>Monthly Retainer</SubHeading>
-          <p>Following your first qualified lead (defined in Section 3), a recurring monthly retainer of <strong>$2,000</strong> will be charged to the payment method on file.</p>
+          <p>A recurring monthly retainer of <strong>$2,000</strong> will be charged to the payment method on file beginning 45 days after your Setup Fee payment date.</p>
 
           <SubHeading>Trial Period</SubHeading>
-          <p>Your first monthly retainer will not be charged until <strong>30 days after the date your first qualified lead books a discovery call</strong> on your calendar. This trial period is a courtesy and does not affect the non-refundable nature of the Setup Fee. After the trial period ends, billing continues monthly on the same date until the Agreement is terminated per Section 6.</p>
+          <p>Your 45-day free period begins the moment your Setup Fee is paid. This includes 14 days of email warmup followed by 30 days of active outreach — all at no additional charge. Your first <strong>$2,000</strong> retainer charge occurs automatically on day 45. After that, billing continues every 30 days on the same date until the Agreement is terminated per Section 5.</p>
 
           <SubHeading>Automatic Billing</SubHeading>
           <p>By completing the Setup Fee payment, you authorize ZionShift to store your payment method and automatically charge the monthly retainer of $2,000 on your billing date each month. You will receive advance notice before your first retainer charge and before each subsequent renewal.</p>
@@ -111,19 +111,15 @@ export default function TermsPage() {
           <p>If a charge fails, we will retry up to three times over seven days. If payment is not resolved, services may be paused until the outstanding balance is settled.</p>
         </Section>
 
-        <Section num="3" title="Qualified Lead Definition">
-          <p>A &ldquo;qualified lead&rdquo; is defined as any business owner or decision-maker who books a discovery call through your ZionShift booking page in response to outreach conducted by ZionShift. ZionShift does not control whether prospects attend their scheduled calls, convert to clients, or meet any specific revenue threshold. A booked call &mdash; regardless of outcome &mdash; constitutes a qualified lead for billing purposes.</p>
-        </Section>
-
-        <Section num="4" title="No Guarantee of Results">
+        <Section num="3" title="No Guarantee of Results">
           <Callout>
-            ZionShift makes no guarantee of specific results, including but not limited to: a minimum number of leads, meetings, clients, or revenue generated.
+            ZionShift makes no guarantee of specific results.
           </Callout>
           <p>Cold email outreach performance depends on many factors outside our control, including your industry, offer, geographic market, pricing, and how you conduct discovery calls. We commit to building and managing professional, high-quality campaigns &mdash; we do not commit to specific outcomes.</p>
           <p>By signing this Agreement, you acknowledge that you understand lead generation involves inherent uncertainty and that payment obligations are not contingent on achieving any particular result.</p>
         </Section>
 
-        <Section num="5" title="Client Responsibilities">
+        <Section num="4" title="Client Responsibilities">
           <p>You agree to:</p>
           <ul>
             <li>Complete the onboarding form accurately and in full</li>
@@ -135,7 +131,7 @@ export default function TermsPage() {
           <p>Failure to fulfill these responsibilities may affect campaign performance. ZionShift is not liable for reduced results caused by Client inaction.</p>
         </Section>
 
-        <Section num="6" title="Term &amp; Termination">
+        <Section num="5" title="Term &amp; Termination">
           <p>This Agreement begins on the date the Setup Fee is paid and continues on a month-to-month basis following the trial period.</p>
           <SubHeading>Cancellation by Client</SubHeading>
           <p>You may cancel at any time by providing written notice to <strong>ryan@zionshift.com</strong> at least <strong>7 days before your next billing date.</strong> You will not be charged for the following month. No partial-month refunds are issued.</p>
@@ -143,35 +139,35 @@ export default function TermsPage() {
           <p>We reserve the right to terminate this Agreement immediately if you violate Section 5, fail to pay outstanding balances, or engage in conduct that damages ZionShift&apos;s reputation or infrastructure. Upon termination, your campaign will be wound down and dashboard access will be discontinued at the end of your paid period.</p>
         </Section>
 
-        <Section num="7" title="Refund Policy">
+        <Section num="6" title="Refund Policy">
           <p>The $1,000 Setup Fee is <strong>non-refundable</strong> under all circumstances. Monthly retainer payments are non-refundable once charged. If you believe a charge was made in error, contact us within 7 days at <strong>ryan@zionshift.com</strong> and we will investigate in good faith.</p>
         </Section>
 
-        <Section num="8" title="Chargebacks">
+        <Section num="7" title="Chargebacks">
           <p>Initiating a chargeback or payment dispute without first contacting ZionShift to resolve the issue is a breach of this Agreement. In the event of an unjustified chargeback, you authorize ZionShift to provide this Agreement and all payment records to the card issuer as evidence that services were rendered and agreed to. ZionShift reserves the right to pursue collection of disputed amounts plus any fees incurred as a result of the chargeback.</p>
         </Section>
 
-        <Section num="9" title="Confidentiality">
+        <Section num="8" title="Confidentiality">
           <p>Each party agrees to keep confidential any non-public information shared by the other party in connection with this Agreement, including but not limited to business strategy, client lists, and pricing. This obligation survives termination of the Agreement.</p>
         </Section>
 
-        <Section num="10" title="Limitation of Liability">
+        <Section num="9" title="Limitation of Liability">
           <p>ZionShift&apos;s total liability to you for any claim arising under this Agreement shall not exceed the total amount paid by you to ZionShift in the three months preceding the claim. ZionShift is not liable for any indirect, incidental, consequential, or punitive damages, including lost profits or lost business opportunities.</p>
         </Section>
 
-        <Section num="11" title="Dispute Resolution">
+        <Section num="10" title="Dispute Resolution">
           <p>In the event of a dispute, both parties agree to first attempt resolution in good faith through direct communication. If unresolved within 30 days, disputes shall be settled by binding arbitration under the rules of the American Arbitration Association. The prevailing party shall be entitled to recover reasonable legal fees.</p>
         </Section>
 
-        <Section num="12" title="Governing Law">
+        <Section num="11" title="Governing Law">
           <p>This Agreement is governed by the laws of the <strong>State of Florida</strong>, without regard to conflict of law principles.</p>
         </Section>
 
-        <Section num="13" title="Entire Agreement">
+        <Section num="12" title="Entire Agreement">
           <p>This Agreement constitutes the entire agreement between the parties regarding its subject matter and supersedes any prior discussions, representations, or agreements. ZionShift may update these terms with 30 days&apos; written notice to the Client&apos;s email on file.</p>
         </Section>
 
-        <Section num="14" title="Electronic Acceptance" last>
+        <Section num="13" title="Electronic Acceptance" last>
           <p>By completing payment of the Setup Fee, you confirm that you have read, understood, and agree to be bound by this Agreement. Electronic acceptance carries the same legal weight as a handwritten signature.</p>
         </Section>
 
