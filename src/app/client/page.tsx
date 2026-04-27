@@ -38,96 +38,6 @@ function getGreeting() {
   return 'Good evening';
 }
 
-const MONTH_NAMES = [
-  'January','February','March','April','May','June',
-  'July','August','September','October','November','December',
-];
-const DOW = ['S','M','T','W','T','F','S'];
-
-function MiniCalendar({
-  meetings = [],
-  onDayClick,
-  onMonthChange,
-  selectedDay = null,
-  selectedMonth = null,
-}: {
-  meetings?: CalMeeting[];
-  onDayClick?: (day: number, month: number) => void;
-  onMonthChange?: () => void;
-  selectedDay?: number | null;
-  selectedMonth?: number | null;
-}) {
-  const now = new Date();
-  const [displayYear,  setDisplayYear]  = useState(now.getFullYear());
-  const [displayMonth, setDisplayMonth] = useState(now.getMonth());
-
-  const curYear  = now.getFullYear();
-  const curMonth = now.getMonth();
-  const today    = now.getDate();
-  const isCurrentMonth = displayYear === curYear && displayMonth === curMonth;
-
-  const firstDay    = new Date(displayYear, displayMonth, 1).getDay();
-  const daysInMonth = new Date(displayYear, displayMonth + 1, 0).getDate();
-
-  const cells: (number | null)[] = [];
-  for (let i = 0; i < firstDay; i++) cells.push(null);
-  for (let d = 1; d <= daysInMonth; d++) cells.push(d);
-  while (cells.length % 7 !== 0) cells.push(null);
-
-  const meetingDays = meetings.filter(m => m.month === displayMonth).map(m => m.day);
-
-  function prevMonth() {
-    onMonthChange?.();
-    if (displayMonth === 0) { setDisplayMonth(11); setDisplayYear(y => y - 1); }
-    else setDisplayMonth(m => m - 1);
-  }
-  function nextMonth() {
-    onMonthChange?.();
-    if (displayMonth === 11) { setDisplayMonth(0); setDisplayYear(y => y + 1); }
-    else setDisplayMonth(m => m + 1);
-  }
-
-  return (
-    <div>
-      <div className="mini-cal-nav">
-        <button className="mini-cal-nav-btn" onClick={prevMonth} aria-label="Previous month">
-          <svg width="14" height="14" viewBox="0 0 14 14" fill="none" aria-hidden>
-            <path d="M9 2L4 7L9 12" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
-          </svg>
-        </button>
-        <div className="mini-cal-header" style={{ margin: 0 }}>{MONTH_NAMES[displayMonth].toUpperCase()} {displayYear}</div>
-        <button className="mini-cal-nav-btn" onClick={nextMonth} aria-label="Next month">
-          <svg width="14" height="14" viewBox="0 0 14 14" fill="none" aria-hidden>
-            <path d="M5 2L10 7L5 12" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
-          </svg>
-        </button>
-      </div>
-      <div className="mini-cal-grid">
-        {DOW.map((d, i) => <div key={i} className="mini-cal-dow">{d}</div>)}
-        {cells.map((day, i) => {
-          if (day === null) return <div key={i} className="mini-cal-day empty" />;
-          const hasMeeting  = meetingDays.includes(day);
-          const isSelected  = day === selectedDay && displayMonth === selectedMonth;
-          return (
-            <div
-              key={i}
-              className={[
-                'mini-cal-day',
-                isCurrentMonth && day === today ? 'today'    : '',
-                hasMeeting                      ? 'has-dot'  : '',
-                hasMeeting                      ? 'clickable': '',
-                isSelected                      ? 'selected' : '',
-              ].join(' ').trim()}
-              onClick={() => hasMeeting && onDayClick?.(day, displayMonth)}
-            >
-              {day}
-            </div>
-          );
-        })}
-      </div>
-    </div>
-  );
-}
 
 const MONTH_SHORT = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
 
@@ -163,126 +73,6 @@ function isMeetingPast(day: number, time: string, month?: number): boolean {
     totalMinutes % 60,
   );
   return now > meetingDate;
-}
-
-/* ── Icons ── */
-function GoogleIcon() {
-  return (
-    <svg width="28" height="28" viewBox="0 0 24 24" aria-hidden>
-      <path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"/>
-      <path fill="#34A853" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"/>
-      <path fill="#FBBC05" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l3.66-2.84z"/>
-      <path fill="#EA4335" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z"/>
-    </svg>
-  );
-}
-
-function AppleIcon() {
-  return (
-    <svg width="28" height="28" viewBox="0 0 24 24" fill="currentColor" aria-hidden>
-      <path d="M18.71 19.5c-.83 1.24-1.71 2.45-3.05 2.47-1.34.03-1.77-.79-3.29-.79-1.53 0-2 .77-3.27.82-1.31.05-2.3-1.32-3.14-2.53C4.25 17 2.94 12.45 4.7 9.39c.87-1.52 2.43-2.48 4.12-2.51 1.28-.02 2.5.87 3.29.87.78 0 2.26-1.07 3.8-.91.65.03 2.47.26 3.64 1.98-.09.06-2.17 1.28-2.15 3.81.03 3.02 2.65 4.03 2.68 4.04-.03.07-.42 1.44-1.38 2.83M13 3.5c.73-.83 1.94-1.46 2.94-1.5.13 1.17-.34 2.35-1.04 3.19-.69.85-1.83 1.51-2.95 1.42-.15-1.15.41-2.35 1.05-3.11z"/>
-    </svg>
-  );
-}
-
-function OutlookIcon() {
-  return (
-    // eslint-disable-next-line @next/next/no-img-element
-    <img
-      src="https://img.icons8.com/fluency/48/microsoft-outlook-2019.png"
-      width="30"
-      height="30"
-      alt="Outlook"
-    />
-  );
-}
-
-/* ── Calendar Connect Modal ── */
-type CalProvider = 'google' | 'outlook' | 'apple';
-
-const CAL_INFO: Record<CalProvider, { name: string; icon: () => JSX.Element; steps: string[] }> = {
-  google: {
-    name: 'Google Calendar',
-    icon: GoogleIcon,
-    steps: [
-      'Click Connect below to authorize with your Google account.',
-      'Choose the Google account you want to sync with.',
-      'Allow ZionShift to view your calendar availability.',
-      'Your meetings will appear in Google Calendar automatically.',
-    ],
-  },
-  outlook: {
-    name: 'Outlook / Microsoft 365',
-    icon: OutlookIcon,
-    steps: [
-      'Click Connect below to authorize with your Microsoft account.',
-      'Sign in with the Microsoft 365 or Outlook account you use.',
-      'Grant calendar access when prompted.',
-      'Your meetings will appear in Outlook automatically.',
-    ],
-  },
-  apple: {
-    name: 'Apple Calendar',
-    icon: AppleIcon,
-    steps: [
-      'Open your Apple ID settings at appleid.apple.com.',
-      'Under Sign-In & Security, generate an App-Specific Password.',
-      'Click Connect below and enter that password when prompted.',
-      'Your meetings will sync to Apple Calendar automatically.',
-    ],
-  },
-};
-
-function CalendarConnectModal({
-  provider,
-  isConnected,
-  onConnect,
-  onDisconnect,
-  onClose,
-}: {
-  provider: CalProvider;
-  isConnected: boolean;
-  onConnect: () => void;
-  onDisconnect: () => void;
-  onClose: () => void;
-}) {
-  const info = CAL_INFO[provider];
-  const Icon = info.icon;
-  return (
-    <div className="modal-overlay" onClick={onClose}>
-      <div className="modal" style={{ maxWidth: 420 }} onClick={e => e.stopPropagation()}>
-        <button className="modal-close" onClick={onClose}>✕</button>
-        <div className="modal-scroll">
-          <div className="ccm-header">
-            <Icon />
-            <div>
-              <div className="ccm-title">{info.name}</div>
-              {isConnected && <div className="ccm-connected-label">Connected</div>}
-            </div>
-          </div>
-          <div className="ccm-steps-label">How it works</div>
-          <ol className="ccm-steps">
-            {info.steps.map((s, i) => <li key={i}>{s}</li>)}
-          </ol>
-          <div className="ccm-note">
-            Full OAuth integration coming soon. Connection state is saved for this session.
-          </div>
-          <div className="ccm-actions">
-            {isConnected ? (
-              <button className="ccm-btn-disconnect" onClick={() => { onDisconnect(); onClose(); }}>
-                Disconnect
-              </button>
-            ) : (
-              <button className="ccm-btn-connect" onClick={() => { onConnect(); onClose(); }}>
-                Connect {info.name}
-              </button>
-            )}
-            <button className="ccm-btn-cancel" onClick={onClose}>Cancel</button>
-          </div>
-        </div>
-      </div>
-    </div>
-  );
 }
 
 /* ── Logo Upload Modal ── */
@@ -479,7 +269,6 @@ export default function ClientPage() {
   const [localLogoUrl, setLocalLogoUrl]         = useState<string | null>(null);
   const [clientLogoUrl, setClientLogoUrl]       = useState<string | null>(null);
   const [logoImgError, setLogoImgError]         = useState(false);
-  const [selectedMeeting, setSelectedMeeting]   = useState<CalMeeting | null>(null);
   const [period, setPeriod]                     = useState<'week' | 'month' | 'alltime'>('month');
   const [periodOpen, setPeriodOpen]             = useState(false);
   const [periodStats, setPeriodStats]           = useState<PeriodStats | null>(null);
@@ -488,9 +277,6 @@ export default function ClientPage() {
   const [showChargeBanner, setShowChargeBanner] = useState(false);
   const [nextChargeDate, setNextChargeDate]     = useState<Date | null>(null);
   const periodRef                               = useRef<HTMLDivElement>(null);
-  const [connectedCal, setConnectedCal]         = useState<CalProvider | null>(null);
-  const [calModal, setCalModal]                 = useState<CalProvider | null>(null);
-
   // Load profile + meetings + activity from Supabase
   useEffect(() => {
     async function load() {
@@ -867,142 +653,39 @@ export default function ClientPage() {
               </div>
             </div>
 
-            {/* ── Calendar + All Meetings + Recent Activity ── */}
-            <div className="cd-meet-grid">
-
-              {/* Calendar */}
-              <div className="cd-card">
-                <MiniCalendar
-                  meetings={calMeetings}
-                  selectedDay={selectedMeeting?.day ?? null}
-                  selectedMonth={selectedMeeting?.month ?? null}
-                  onMonthChange={() => setSelectedMeeting(null)}
-                  onDayClick={(day, month) => {
-                    const hit = [...calMeetings]
-                      .filter(m => m.month === month)
-                      .sort((a, b) => parseTime(a.time) - parseTime(b.time))
-                      .find(m => m.day === day);
-                    setSelectedMeeting(prev =>
-                      prev?.day === day && prev?.month === month ? null : (hit ?? null)
-                    );
-                  }}
-                />
-
-                {/* Inline detail */}
-                {selectedMeeting ? (() => {
-                  const isPast = isMeetingPast(selectedMeeting.day, selectedMeeting.time, selectedMeeting.month);
+            {/* ── All Meetings ── */}
+            <div className="cd-card" style={{ padding: 0, overflow: 'hidden', display: 'flex', flexDirection: 'column', marginBottom: 20 }}>
+              <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '24px 20px 0', marginBottom: 16, flexShrink: 0 }}>
+                <span className="adm-biz-card-title">All Meetings</span>
+                <span className="adm-count-chip">{calMeetings.length} Total</span>
+              </div>
+              <div className="cd-meet-log">
+                {sortedMeetings.length === 0 ? (
+                  <p className="adm-empty-text" style={{ padding: '0 20px 24px' }}>No meetings booked yet.</p>
+                ) : sortedMeetings.map((m, i) => {
+                  const isPast = isMeetingPast(m.day, m.time, m.month);
                   return (
-                    <div className="adm-meet-detail">
-                      <div className="adm-meet-detail-head">
-                        <div>
-                          <div className="adm-meet-detail-name">{selectedMeeting.prospect}</div>
-                          <div className="adm-meet-detail-firm">{selectedMeeting.firm}</div>
+                    <Fragment key={i}>
+                      {i > 0 && <div className="adm-divider" style={{ margin: '0 20px' }} />}
+                      <div className="adm-meet-row">
+                        <div className="adm-meet-row-avatar">
+                          {m.prospect.split(' ').map(w => w[0]).join('')}
                         </div>
-                        <span className={`adm-meet-pill adm-meet-pill--${isPast ? 'completed' : 'upcoming'}`}>
-                          {isPast ? 'Completed' : 'Upcoming'}
-                        </span>
+                        <div className="adm-meet-row-info">
+                          <span className="adm-meet-row-name">{m.prospect}</span>
+                          <span className="adm-meet-row-firm">{m.firm}</span>
+                        </div>
+                        <div className="adm-meet-row-right">
+                          <span className="adm-meet-row-date">{MONTH_SHORT[m.month]} {m.day}</span>
+                          <span className="adm-meet-row-time">{m.time}</span>
+                          <span className={`adm-meet-pill adm-meet-pill--${isPast ? 'completed' : 'upcoming'}`}>
+                            {isPast ? 'Completed' : 'Upcoming'}
+                          </span>
+                        </div>
                       </div>
-                      <div className="adm-meet-detail-row">
-                        <span className="adm-meet-detail-label">Date &amp; Time</span>
-                        <span className="adm-meet-detail-val">{MONTH_SHORT[selectedMeeting.month]} {selectedMeeting.day} · {selectedMeeting.time}</span>
-                      </div>
-                      {!isPast && selectedMeeting.zoomUrl && (
-                        <a href={selectedMeeting.zoomUrl} target="_blank" rel="noopener noreferrer" className="adm-zoom-btn">
-                          Join Zoom →
-                        </a>
-                      )}
-                    </div>
+                    </Fragment>
                   );
-                })() : (
-                  <p className="adm-cal-hint">Tap a highlighted date to see meeting details.</p>
-                )}
-              </div>
-
-              {/* All Meetings log */}
-              <div className="cd-card" style={{ padding: 0, overflow: 'hidden', display: 'flex', flexDirection: 'column' }}>
-                <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '24px 20px 0', marginBottom: 16, flexShrink: 0 }}>
-                  <span className="adm-biz-card-title">All Meetings</span>
-                  <span className="adm-count-chip">{calMeetings.length} Total</span>
-                </div>
-                <div className="cd-meet-log">
-                  {sortedMeetings.length === 0 ? (
-                    <p className="adm-empty-text" style={{ padding: '0 20px 24px' }}>No meetings booked yet.</p>
-                  ) : sortedMeetings.map((m, i) => {
-                    const isPast = isMeetingPast(m.day, m.time, m.month);
-                    return (
-                      <Fragment key={i}>
-                        {i > 0 && <div className="adm-divider" style={{ margin: '0 20px' }} />}
-                        <div
-                          className={`adm-meet-row${selectedMeeting?.prospect === m.prospect && selectedMeeting?.day === m.day && selectedMeeting?.month === m.month ? ' selected' : ''}`}
-                          onClick={() => setSelectedMeeting(prev => prev?.prospect === m.prospect && prev?.day === m.day && prev?.month === m.month ? null : m)}
-                        >
-                          <div className="adm-meet-row-avatar">
-                            {m.prospect.split(' ').map(w => w[0]).join('')}
-                          </div>
-                          <div className="adm-meet-row-info">
-                            <span className="adm-meet-row-name">{m.prospect}</span>
-                            <span className="adm-meet-row-firm">{m.firm}</span>
-                          </div>
-                          <div className="adm-meet-row-right">
-                            <span className="adm-meet-row-date">{MONTH_SHORT[m.month]} {m.day}</span>
-                            <span className="adm-meet-row-time">{m.time}</span>
-                            <span className={`adm-meet-pill adm-meet-pill--${isPast ? 'completed' : 'upcoming'}`}>
-                              {isPast ? 'Completed' : 'Upcoming'}
-                            </span>
-                          </div>
-                        </div>
-                      </Fragment>
-                    );
-                  })}
-                </div>
-              </div>
-
-            </div>
-
-            {/* Recent Activity */}
-            <div className="cd-card" style={{ marginBottom: 20 }}>
-              <div className="cd-card-label">Recent Activity</div>
-              <div className="cd-activity-scroll">
-                <ul className="cd-activity-list">
-                  {filteredActivity.length === 0 ? (
-                    <li className="cd-empty-state">No activity yet.</li>
-                  ) : filteredActivity.map((a, i) => (
-                    <li key={i} className="cd-activity-item">
-                      <span className="cd-activity-text">{a.label}</span>
-                      <span className="cd-activity-sub">{a.sub}</span>
-                    </li>
-                  ))}
-                </ul>
-              </div>
-            </div>
-
-            {/* ── Calendar Sync ── */}
-            <div className="cd-card">
-              <div className="cd-cal-sync-top">
-                <div>
-                  <div className="cd-cal-sync-title">Sync to your calendar</div>
-                  <div className="cd-cal-sync-sub">
-                    Your ZionShift meetings will appear automatically on your calendar.
-                  </div>
-                </div>
-              </div>
-              <div className="cd-cal-options">
-                {(['google', 'outlook', 'apple'] as CalProvider[]).map(prov => (
-                  <div
-                    key={prov}
-                    className={`cd-cal-option cd-cal-option-btn${connectedCal === prov ? ' cd-cal-option-active' : ''}`}
-                    onClick={() => setCalModal(prov)}
-                  >
-                    {prov === 'google'  && <GoogleIcon />}
-                    {prov === 'outlook' && <OutlookIcon />}
-                    {prov === 'apple'   && <AppleIcon />}
-                    <span className="cd-cal-option-name">{CAL_INFO[prov].name}</span>
-                    {connectedCal === prov
-                      ? <span className="cd-cal-connected">Connected</span>
-                      : <span className="cd-cal-tap">Tap to connect</span>
-                    }
-                  </div>
-                ))}
+                })}
               </div>
             </div>
 
@@ -1155,15 +838,6 @@ export default function ClientPage() {
         />
       )}
 
-      {calModal && (
-        <CalendarConnectModal
-          provider={calModal}
-          isConnected={connectedCal === calModal}
-          onConnect={() => setConnectedCal(calModal)}
-          onDisconnect={() => setConnectedCal(null)}
-          onClose={() => setCalModal(null)}
-        />
-      )}
     </div>
   );
 }
