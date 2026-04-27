@@ -885,7 +885,7 @@ footer.zs-footer { padding: 40px 0; border-top: 1px solid var(--zs-border); }
 /* Shared card base */
 .adm-biz-card { background: #fff; border: 1px solid var(--zs-border); border-radius: 20px; padding: 26px 28px; display: flex; flex-direction: column; }
 .adm-biz-card-head { display: flex; align-items: center; justify-content: space-between; margin-bottom: 20px; flex-shrink: 0; }
-.adm-biz-card-title { font: 600 14px var(--zs-sans); color: var(--zs-ink); letter-spacing: -0.01em; }
+.adm-biz-card-title { font: 600 17px var(--zs-sans); color: var(--zs-ink); letter-spacing: -0.01em; }
 .adm-count-chip { font: 600 12px var(--zs-sans); background: var(--zs-mist); color: var(--zs-ink-3); border-radius: 999px; padding: 3px 10px; }
 .adm-empty-text { font: 400 13px var(--zs-mono); color: var(--zs-ink-5); margin: 0; padding: 20px 0; text-align: center; }
 
