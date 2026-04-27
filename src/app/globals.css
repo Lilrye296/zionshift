@@ -890,10 +890,6 @@ footer.zs-footer { padding: 40px 0; border-top: 1px solid var(--zs-border); }
 .adm-empty-text { font: 400 13px var(--zs-mono); color: var(--zs-ink-5); margin: 0; padding: 20px 0; text-align: center; }
 
 /* Client list */
-.adm-client-scroll { max-height: 480px; overflow-y: auto; scrollbar-width: thin; scrollbar-color: var(--zs-line) transparent; }
-.adm-client-scroll::-webkit-scrollbar { width: 4px; }
-.adm-client-scroll::-webkit-scrollbar-track { background: transparent; }
-.adm-client-scroll::-webkit-scrollbar-thumb { background: var(--zs-line); border-radius: 999px; }
 .adm-client-row { display: flex; align-items: center; gap: 14px; padding: 14px 0; }
 .adm-client-avatar { width: 38px; height: 38px; background: var(--zs-mist); border: 1px solid var(--zs-border); color: var(--zs-ink-3); border-radius: 50%; display: flex; align-items: center; justify-content: center; font: 600 12px var(--zs-sans); flex-shrink: 0; }
 .adm-client-avatar.inactive { opacity: 0.4; }
