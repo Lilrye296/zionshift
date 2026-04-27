@@ -216,7 +216,6 @@ export default function AdminPage() {
   const [periodStats, setPeriodStats]     = useState<AdminPeriodStats | null>(null);
   const [resendingId, setResendingId]     = useState<string | null>(null);
   const [resentId, setResentId]           = useState<string | null>(null);
-  const [launchingId, setLaunchingId]     = useState<string | null>(null);
   const [launchToast, setLaunchToast]     = useState<string | null>(null);
   const [openDropdownId, setOpenDropdownId] = useState<string | null>(null);
   const [intakeClient, setIntakeClient]     = useState<ActiveClient | null>(null);
@@ -417,30 +416,6 @@ export default function AdminPage() {
     }
   }
 
-  async function handleLaunchCampaign(clientId: string) {
-    setLaunchingId(clientId);
-    setOpenDropdownId(null);
-    try {
-      const res = await fetch('/api/launch-campaign', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ clientId }),
-      });
-      if (res.ok) {
-        setClients(prev => prev.map(c =>
-          c.id === clientId
-            ? { ...c, campaignStatus: 'warming', warmupStartedAt: new Date().toISOString() }
-            : c
-        ));
-        setLaunchToast('Campaign launched — warming up Day 1 of 14');
-        setTimeout(() => setLaunchToast(null), 5000);
-      }
-    } catch {
-      // Silently fail
-    } finally {
-      setLaunchingId(null);
-    }
-  }
 
   async function handleDeleteClient() {
     if (!deleteClient) return;
