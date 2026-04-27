@@ -136,7 +136,7 @@ export default function TermsPage() {
           <SubHeading>Cancellation by Client</SubHeading>
           <p>You may cancel at any time by providing written notice to <strong>ryan@zionshift.com</strong> at least <strong>7 days before your next billing date.</strong> You will not be charged for the following month. No partial-month refunds are issued.</p>
           <SubHeading>Termination by ZionShift</SubHeading>
-          <p>We reserve the right to terminate this Agreement immediately if you violate Section 5, fail to pay outstanding balances, or engage in conduct that damages ZionShift&apos;s reputation or infrastructure. Upon termination, your campaign will be wound down and dashboard access will be discontinued at the end of your paid period.</p>
+          <p>We reserve the right to terminate this Agreement immediately if you violate Section 4, fail to pay outstanding balances, or engage in conduct that damages ZionShift&apos;s reputation or infrastructure. Upon termination, your campaign will be wound down and dashboard access will be discontinued at the end of your paid period.</p>
         </Section>
 
         <Section num="6" title="Refund Policy">
