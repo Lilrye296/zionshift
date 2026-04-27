@@ -445,11 +445,9 @@ function Screen4({ form, set }: { form: FormState; set: (f: FormState) => void }
       <h2 className="ob-screen-title">Your booking link.</h2>
       <p className="ob-screen-sub">This is the link we&apos;ll include in every outreach email so interested prospects can schedule directly with you.</p>
 
-      <div className="ob-field-group" style={{ marginBottom: 0 }}>
-        <label className="ob-group-label">Your scheduling link <span className="ob-req">*</span></label>
-        <p className="ob-helper" style={{ marginTop: 0, marginBottom: 10 }}>Paste your Calendly, Cal.com, or any other scheduling link you use.</p>
+      <div className="field">
+        <label>Your scheduling link <span className="ob-req">*</span></label>
         <input
-          className="ob-input"
           type="url"
           placeholder="https://calendly.com/yourname"
           value={form.bookingLink}
