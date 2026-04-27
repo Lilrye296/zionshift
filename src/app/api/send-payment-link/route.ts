@@ -40,6 +40,9 @@ export async function POST(req: NextRequest) {
           terms_of_service_acceptance: {
             message: 'I have read and agree to the [Terms of Service](https://www.zionshift.com/terms) and [Privacy Policy](https://www.zionshift.com/privacy).',
           },
+          submit: {
+            message: 'Your card will be saved for future billing. After your 45-day free period, you will be charged $2,000 — then $2,000 every 30 days. Cancel anytime at ryan@zionshift.com.',
+          },
         },
         payment_intent_data: {
           metadata: { name, email },
