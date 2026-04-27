@@ -526,13 +526,25 @@ export default function ClientPage() {
           return;
         }
 
-        // Fetch logo_url directly from clients table (source of truth from onboarding)
+        // Fetch core fields directly from clients table (source of truth from onboarding)
         const { data: clientRow } = await supabase
           .from('clients')
-          .select('logo_url')
+          .select('logo_url, name, firm')
           .eq('id', targetClientId)
           .single();
         if (clientRow?.logo_url) setClientLogoUrl(clientRow.logo_url);
+        if (clientRow) {
+          setProfile(prev => ({
+            firm_name: clientRow.firm ?? prev?.firm_name ?? '',
+            logo_url: clientRow.logo_url ?? prev?.logo_url ?? null,
+            client_name: clientRow.name ?? prev?.client_name ?? null,
+            emails_sent: prev?.emails_sent ?? 0,
+            replies: prev?.replies ?? 0,
+            reply_rate: prev?.reply_rate ?? 0,
+            meetings_booked: prev?.meetings_booked ?? 0,
+            campaign_status: prev?.campaign_status ?? '',
+          }));
+        }
 
         // Fetch campaign stats
         const { data: statsData } = await supabase
