@@ -391,6 +391,10 @@ export default function ClientPage() {
         if (data.invoices) {
           setBillingData({ invoices: data.invoices } as BillingData);
         }
+        if (data.logoUrl) {
+          setClientLogoUrl(data.logoUrl);
+          setProfile(prev => prev ? { ...prev, logo_url: data.logoUrl } : prev);
+        }
       })
       .catch(() => { /* silently fail — invoice section shows empty state */ });
   }, [resolvedClientId]);

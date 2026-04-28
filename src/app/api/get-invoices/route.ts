@@ -43,15 +43,15 @@ export async function GET(req: NextRequest) {
 
     const supabase = supabaseAdmin();
 
-    // ── 1. Look up Stripe customer ID for this client ──────────────
+    // ── 1. Look up Stripe customer ID + logo for this client ─────────
     const { data: clientRow } = await supabase
       .from('clients')
-      .select('stripe_customer_id')
+      .select('stripe_customer_id, logo_url')
       .eq('id', clientId)
       .single();
 
     if (!clientRow?.stripe_customer_id) {
-      return NextResponse.json({ invoices: [] });
+      return NextResponse.json({ invoices: [], logoUrl: clientRow?.logo_url ?? null });
     }
 
     const stripe = stripeClient();
@@ -70,7 +70,7 @@ export async function GET(req: NextRequest) {
       status:      mapStatus(charge.status),
     }));
 
-    return NextResponse.json({ invoices });
+    return NextResponse.json({ invoices, logoUrl: clientRow.logo_url ?? null });
 
   } catch (err) {
     console.error('[get-invoices] Error:', err);
