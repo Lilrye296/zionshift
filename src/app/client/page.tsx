@@ -698,12 +698,6 @@ export default function ClientPage() {
                           <div className="bl-plan-name">ZionShift</div>
                           <div className="bl-plan-desc">AI-powered outreach for bookkeepers</div>
                         </div>
-                        {billingRecord?.billing_status === 'active'
-                          ? <span className="bl-status-pill">● Active</span>
-                          : billingRecord?.billing_status === 'paused'
-                          ? <span className="bl-status-pill bl-status-paused">● Paused</span>
-                          : <span className="bl-status-pill bl-status-paused">Trial</span>
-                        }
                       </div>
 
                       <div className="bl-divider" />
