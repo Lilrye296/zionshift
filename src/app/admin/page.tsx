@@ -445,6 +445,7 @@ export default function AdminPage() {
                                   <span className="adm-client-since">since {c.since}</span>
                                 </>
                             }
+                            {/* Desktop-only billing pills (hidden on mobile via direct-child CSS) */}
                             {c.status === 'live' && !c.firstMonthPaid && (c.billingStatus === 'trial' || !c.billingStatus) && (
                               <span className="adm-billing-pill adm-billing-pill--trial">Trial</span>
                             )}
@@ -459,12 +460,10 @@ export default function AdminPage() {
                                 Start Warmup
                               </button>
                             )}
-                          </div>
 
-                          {/* Mobile-only: pills row + quick-action buttons */}
-                          {c.status !== 'pending' && (
-                            <div className="adm-mobile-rows">
-                              <div className="adm-mobile-pills">
+                            {/* Mobile-only: billing pill + campaign status pill + ••• on one row under "since" */}
+                            {c.status !== 'pending' && (
+                              <div className="adm-mobile-pill-row">
                                 {c.status === 'live' && !c.firstMonthPaid && (c.billingStatus === 'trial' || !c.billingStatus) && (
                                   <span className="adm-billing-pill adm-billing-pill--trial">Trial</span>
                                 )}
@@ -483,18 +482,69 @@ export default function AdminPage() {
                                   if (cs === 'cancelled') return <span className="adm-client-pill adm-client-pill--cancelled">● Cancelled</span>;
                                   return <span className="adm-client-pill adm-client-pill--pending">● Pending</span>;
                                 })()}
+                                <div className="adm-actions-wrap">
+                                  <button
+                                    className="adm-menu-btn adm-menu-btn--sm"
+                                    onClick={() => setOpenDropdownId(id => id === c.id ? null : c.id)}
+                                    aria-label="Client actions"
+                                  >
+                                    •••
+                                  </button>
+                                  {openDropdownId === c.id && (
+                                    <div className="adm-actions-menu">
+                                      <button className="adm-actions-item" onClick={() => { router.push(`/client?view=${c.id}`); setOpenDropdownId(null); }}>
+                                        View Dashboard →
+                                      </button>
+                                      <div className="adm-actions-divider" />
+                                      <button
+                                        className={`adm-actions-item${!c.logoUrl && !c.headshotUrl ? ' disabled' : ''}`}
+                                        disabled={!c.logoUrl && !c.headshotUrl}
+                                        onClick={() => { handleDownloadAssets(c); setOpenDropdownId(null); }}
+                                      >
+                                        Download Assets
+                                      </button>
+                                      <div className="adm-actions-divider" />
+                                      <button className="adm-actions-item" onClick={() => { handleViewIntake(c); setOpenDropdownId(null); }}>
+                                        View Intake Form
+                                      </button>
+                                      <div className="adm-actions-divider" />
+                                      <button className="adm-actions-item" onClick={() => { setCampaignIdClient(c); setCampaignIdInput(c.smartleadCampaignId ?? ''); setOpenDropdownId(null); }}>
+                                        {c.smartleadCampaignId ? 'Update Campaign ID' : 'Set Campaign ID'}
+                                      </button>
+                                      <div className="adm-actions-divider" />
+                                      {c.campaignStatus !== 'paused' && c.campaignStatus !== 'cancelled' && (
+                                        <>
+                                          <button className="adm-actions-item adm-actions-item--warn" onClick={() => handlePauseClient(c)}>
+                                            Pause Campaign
+                                          </button>
+                                          <div className="adm-actions-divider" />
+                                        </>
+                                      )}
+                                      {c.campaignStatus === 'paused' && (
+                                        <>
+                                          <button className="adm-actions-item adm-actions-item--green" onClick={() => handleResumeClient(c)}>
+                                            Resume Campaign
+                                          </button>
+                                          <div className="adm-actions-divider" />
+                                        </>
+                                      )}
+                                      {(c.billingStatus === 'past_due' || c.billingStatus === 'paused') && (
+                                        <>
+                                          <button className="adm-actions-item adm-actions-item--warn" onClick={() => handleUpdatePayment(c)}>
+                                            Update Payment →
+                                          </button>
+                                          <div className="adm-actions-divider" />
+                                        </>
+                                      )}
+                                      <button className="adm-actions-item adm-actions-item--danger" onClick={() => { setDeleteClient(c); setDeleteConfirm(''); setOpenDropdownId(null); }}>
+                                        Remove Client
+                                      </button>
+                                    </div>
+                                  )}
+                                </div>
                               </div>
-                              <div className="adm-mobile-actions">
-                                <button className="adm-mobile-action-btn" onClick={() => router.push(`/client?view=${c.id}`)}>Dashboard →</button>
-                                <button
-                                  className={`adm-mobile-action-btn${!c.logoUrl && !c.headshotUrl ? ' disabled' : ''}`}
-                                  disabled={!c.logoUrl && !c.headshotUrl}
-                                  onClick={() => handleDownloadAssets(c)}
-                                >Assets</button>
-                                <button className="adm-mobile-action-btn" onClick={() => handleViewIntake(c)}>Intake Form</button>
-                              </div>
-                            </div>
-                          )}
+                            )}
+                          </div>
 
                           {/* Campaign status pill + actions */}
                           <div className="adm-client-right">
