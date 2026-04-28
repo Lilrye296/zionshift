@@ -1250,7 +1250,7 @@ footer.zs-footer { padding: 40px 0; border-top: 1px solid var(--zs-border); }
   .adm-client-info > .adm-billing-pill { display: none; }
 
   /* Mobile pill row: only renders when Trial / Warming / Paused pills are present */
-  .adm-mobile-pill-row { display: flex; align-items: center; gap: 6px; flex-wrap: wrap; margin-top: 5px; }
+  .adm-mobile-pill-row { display: flex; flex-direction: row; align-items: center; gap: 6px; flex-wrap: nowrap; margin-top: 5px; overflow: hidden; }
   .adm-mobile-pill-row .adm-billing-pill { margin: 0; }
   .adm-mobile-pill-row .adm-client-pill { font-size: 10px; padding: 2px 8px; }
   /* Cap scroll container on mobile and always scroll — overrides the ≤4 client inline style
