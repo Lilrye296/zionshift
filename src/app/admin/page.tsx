@@ -22,6 +22,7 @@ interface ActiveClient {
   warmupStartedAt: string | null;
   billingStatus: string | null;
   failedPaymentAt: string | null;
+  smartleadCampaignId: string | null;
 }
 
 /* ── Helpers ────────────────────────────────────────────────────── */
@@ -52,9 +53,12 @@ export default function AdminPage() {
   const [onboardName, setOnboardName]       = useState('');
   const [onboardEmail, setOnboardEmail]     = useState('');
   const [onboardStatus, setOnboardStatus]   = useState<'idle' | 'sending' | 'success' | 'error'>('idle');
-  const [deleteClient, setDeleteClient]     = useState<ActiveClient | null>(null);
-  const [deleteConfirm, setDeleteConfirm]   = useState('');
-  const [deleting, setDeleting]             = useState(false);
+  const [deleteClient, setDeleteClient]         = useState<ActiveClient | null>(null);
+  const [deleteConfirm, setDeleteConfirm]       = useState('');
+  const [deleting, setDeleting]                 = useState(false);
+  const [campaignIdClient, setCampaignIdClient] = useState<ActiveClient | null>(null);
+  const [campaignIdInput, setCampaignIdInput]   = useState('');
+  const [campaignIdSaving, setCampaignIdSaving] = useState(false);
   const router = useRouter();
 
   // Auth guard + data fetch
@@ -74,7 +78,7 @@ export default function AdminPage() {
 
         const { data: clientsData } = await supabase
           .from('clients')
-          .select('id, name, email, firm, status, mrr, since, first_month_paid, setup_fee_paid, headshot_url, logo_url, campaign_status, warmup_started_at, billing_status, failed_payment_at')
+          .select('id, name, email, firm, status, mrr, since, first_month_paid, setup_fee_paid, headshot_url, logo_url, campaign_status, warmup_started_at, billing_status, failed_payment_at, smartlead_campaign_id')
           .order('created_at', { ascending: false });
 
         if (clientsData) {
@@ -85,6 +89,7 @@ export default function AdminPage() {
             headshot_url: string | null; logo_url: string | null;
             campaign_status: string | null; warmup_started_at: string | null;
             billing_status: string | null; failed_payment_at: string | null;
+            smartlead_campaign_id: string | null;
           }) => {
             // Auto-flip warming → active after 14 days
             let campaignStatus = c.campaign_status ?? 'pending';
@@ -108,6 +113,7 @@ export default function AdminPage() {
               warmupStartedAt: c.warmup_started_at ?? null,
               billingStatus: c.billing_status ?? null,
               failedPaymentAt: c.failed_payment_at ?? null,
+              smartleadCampaignId: c.smartlead_campaign_id ?? null,
             };
           });
 
@@ -249,6 +255,30 @@ export default function AdminPage() {
       }
     } catch {
       showToast('Could not open billing portal. Try again.');
+    }
+  }
+
+  async function handleSaveCampaignId() {
+    if (!campaignIdClient || !campaignIdInput.trim()) return;
+    setCampaignIdSaving(true);
+    try {
+      const supabase = createClient();
+      await supabase
+        .from('clients')
+        .update({ smartlead_campaign_id: campaignIdInput.trim() })
+        .eq('id', campaignIdClient.id);
+      setClients(prev => prev.map(c =>
+        c.id === campaignIdClient.id
+          ? { ...c, smartleadCampaignId: campaignIdInput.trim() }
+          : c
+      ));
+      showToast(`Campaign ID saved for ${campaignIdClient.name}.`);
+      setCampaignIdClient(null);
+      setCampaignIdInput('');
+    } catch {
+      showToast('Something went wrong. Please try again.');
+    } finally {
+      setCampaignIdSaving(false);
     }
   }
 
@@ -479,6 +509,10 @@ export default function AdminPage() {
                                     <div className="adm-actions-divider" />
                                     <button className="adm-actions-item" onClick={() => { handleViewIntake(c); setOpenDropdownId(null); }}>
                                       View Intake Form
+                                    </button>
+                                    <div className="adm-actions-divider" />
+                                    <button className="adm-actions-item" onClick={() => { setCampaignIdClient(c); setCampaignIdInput(c.smartleadCampaignId ?? ''); setOpenDropdownId(null); }}>
+                                      {c.smartleadCampaignId ? 'Update Campaign ID' : 'Set Campaign ID'}
                                     </button>
                                     <div className="adm-actions-divider" />
                                     {c.campaignStatus !== 'paused' && c.campaignStatus !== 'cancelled' && (
@@ -722,6 +756,44 @@ export default function AdminPage() {
                   </div>
                 </>
               )}
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* ── Set Campaign ID Modal ── */}
+      {campaignIdClient && (
+        <div className="modal-overlay" onClick={() => { setCampaignIdClient(null); setCampaignIdInput(''); }}>
+          <div className="modal" style={{ maxWidth: 420 }} onClick={e => e.stopPropagation()}>
+            <button className="modal-close" onClick={() => { setCampaignIdClient(null); setCampaignIdInput(''); }}>✕</button>
+            <div className="modal-scroll">
+              <p style={{ margin: '0 0 4px', fontSize: 11, fontWeight: 700, letterSpacing: '0.12em', textTransform: 'uppercase', color: '#9CA3AF' }}>Smartlead</p>
+              <h2 style={{ margin: '0 0 6px', fontSize: 20, fontWeight: 700, letterSpacing: '-0.03em', color: '#1A1715' }}>Set Campaign ID</h2>
+              <p style={{ margin: '0 0 24px', fontSize: 14, color: '#6B7280', lineHeight: 1.6 }}>
+                Paste the Smartlead campaign ID for <strong style={{ color: '#1A1715' }}>{campaignIdClient.name}</strong>. This links their dashboard metrics to their specific campaign.
+              </p>
+              <label style={{ display: 'block', fontSize: 11, fontWeight: 700, color: '#9CA3AF', marginBottom: 6, textTransform: 'uppercase', letterSpacing: '0.08em' }}>
+                Campaign ID
+              </label>
+              <input
+                type="text"
+                value={campaignIdInput}
+                onChange={e => setCampaignIdInput(e.target.value)}
+                placeholder="e.g. 123456"
+                autoFocus
+                style={{ width: '100%', padding: '11px 14px', fontSize: 14, border: '1px solid #E5E5E5', borderRadius: 8, outline: 'none', boxSizing: 'border-box', background: '#FAFAFA', color: '#1A1715', marginBottom: 24, fontFamily: 'monospace' }}
+              />
+              <div className="ccm-actions">
+                <button
+                  className="ccm-btn-connect"
+                  disabled={!campaignIdInput.trim() || campaignIdSaving}
+                  onClick={handleSaveCampaignId}
+                  style={{ opacity: !campaignIdInput.trim() ? 0.5 : 1 }}
+                >
+                  {campaignIdSaving ? 'Saving…' : 'Save Campaign ID'}
+                </button>
+                <button className="ccm-btn-cancel" onClick={() => { setCampaignIdClient(null); setCampaignIdInput(''); }}>Cancel</button>
+              </div>
             </div>
           </div>
         </div>
