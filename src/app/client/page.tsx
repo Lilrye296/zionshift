@@ -688,7 +688,7 @@ export default function ClientPage() {
                 <div className="cd-card bl-card" style={{ marginBottom: 16 }}>
                   <div className="bl-changes-title">Need to pause or cancel?</div>
                   <p className="bl-changes-body">
-                    Just reach out directly at{' '}
+                    Just reach out directly to{' '}
                     <a href="mailto:ryan@zionshift.com" className="bl-changes-link">ryan@zionshift.com</a>
                     {' '}and we&apos;ll handle it within one business day — whether you need a short break or want to cancel entirely.
                   </p>
