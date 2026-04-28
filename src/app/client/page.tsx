@@ -683,7 +683,7 @@ export default function ClientPage() {
                   <div className="bl-plan-header">
                     <div>
                       <div className="bl-plan-name">ZionShift</div>
-                      <div className="bl-plan-desc">AI-powered outreach for bookkeepers</div>
+                      <div className="bl-plan-desc">AI-powered outreach</div>
                     </div>
                   </div>
 
