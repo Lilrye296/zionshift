@@ -461,89 +461,28 @@ export default function AdminPage() {
                               </button>
                             )}
 
-                            {/* Mobile-only: billing pill + campaign status pill + ••• on one row under "since" */}
-                            {c.status !== 'pending' && (
-                              <div className="adm-mobile-pill-row">
-                                {c.status === 'live' && !c.firstMonthPaid && (c.billingStatus === 'trial' || !c.billingStatus) && (
-                                  <span className="adm-billing-pill adm-billing-pill--trial">Trial</span>
-                                )}
-                                {(c.billingStatus === 'past_due' || c.billingStatus === 'paused') && (
-                                  <span className="adm-billing-pill adm-billing-pill--failed">Payment Failed</span>
-                                )}
-                                {(() => {
-                                  const cs = c.campaignStatus;
-                                  if (cs === 'warming' && c.warmupStartedAt) {
-                                    const day = Math.floor((Date.now() - new Date(c.warmupStartedAt).getTime()) / 86400000) + 1;
-                                    if (day > 14) return <span className="adm-client-pill adm-client-pill--live">● Active</span>;
-                                    return <span className="adm-client-pill adm-client-pill--warming"><span style={{ color: '#f59e0b' }}>●</span> Warming — Day {day} of 14</span>;
-                                  }
-                                  if (cs === 'active')    return <span className="adm-client-pill adm-client-pill--live">● Active</span>;
-                                  if (cs === 'paused')    return <span className="adm-client-pill adm-client-pill--paused">● Paused</span>;
-                                  if (cs === 'cancelled') return <span className="adm-client-pill adm-client-pill--cancelled">● Cancelled</span>;
-                                  return <span className="adm-client-pill adm-client-pill--pending">● Pending</span>;
-                                })()}
-                                <div className="adm-actions-wrap">
-                                  <button
-                                    className="adm-menu-btn adm-menu-btn--sm"
-                                    onClick={() => setOpenDropdownId(id => id === c.id ? null : c.id)}
-                                    aria-label="Client actions"
-                                  >
-                                    •••
-                                  </button>
-                                  {openDropdownId === c.id && (
-                                    <div className="adm-actions-menu">
-                                      <button className="adm-actions-item" onClick={() => { router.push(`/client?view=${c.id}`); setOpenDropdownId(null); }}>
-                                        View Dashboard →
-                                      </button>
-                                      <div className="adm-actions-divider" />
-                                      <button
-                                        className={`adm-actions-item${!c.logoUrl && !c.headshotUrl ? ' disabled' : ''}`}
-                                        disabled={!c.logoUrl && !c.headshotUrl}
-                                        onClick={() => { handleDownloadAssets(c); setOpenDropdownId(null); }}
-                                      >
-                                        Download Assets
-                                      </button>
-                                      <div className="adm-actions-divider" />
-                                      <button className="adm-actions-item" onClick={() => { handleViewIntake(c); setOpenDropdownId(null); }}>
-                                        View Intake Form
-                                      </button>
-                                      <div className="adm-actions-divider" />
-                                      <button className="adm-actions-item" onClick={() => { setCampaignIdClient(c); setCampaignIdInput(c.smartleadCampaignId ?? ''); setOpenDropdownId(null); }}>
-                                        {c.smartleadCampaignId ? 'Update Campaign ID' : 'Set Campaign ID'}
-                                      </button>
-                                      <div className="adm-actions-divider" />
-                                      {c.campaignStatus !== 'paused' && c.campaignStatus !== 'cancelled' && (
-                                        <>
-                                          <button className="adm-actions-item adm-actions-item--warn" onClick={() => handlePauseClient(c)}>
-                                            Pause Campaign
-                                          </button>
-                                          <div className="adm-actions-divider" />
-                                        </>
-                                      )}
-                                      {c.campaignStatus === 'paused' && (
-                                        <>
-                                          <button className="adm-actions-item adm-actions-item--green" onClick={() => handleResumeClient(c)}>
-                                            Resume Campaign
-                                          </button>
-                                          <div className="adm-actions-divider" />
-                                        </>
-                                      )}
-                                      {(c.billingStatus === 'past_due' || c.billingStatus === 'paused') && (
-                                        <>
-                                          <button className="adm-actions-item adm-actions-item--warn" onClick={() => handleUpdatePayment(c)}>
-                                            Update Payment →
-                                          </button>
-                                          <div className="adm-actions-divider" />
-                                        </>
-                                      )}
-                                      <button className="adm-actions-item adm-actions-item--danger" onClick={() => { setDeleteClient(c); setDeleteConfirm(''); setOpenDropdownId(null); }}>
-                                        Remove Client
-                                      </button>
-                                    </div>
-                                  )}
+                            {/* Mobile-only: pill row — only renders when there's at least one pill to show */}
+                            {c.status !== 'pending' && (() => {
+                              const showTrial = c.status === 'live' && !c.firstMonthPaid && (c.billingStatus === 'trial' || !c.billingStatus);
+                              const showPayFailed = c.billingStatus === 'past_due' || c.billingStatus === 'paused';
+                              const cs = c.campaignStatus;
+                              const warmDay = cs === 'warming' && c.warmupStartedAt
+                                ? Math.floor((Date.now() - new Date(c.warmupStartedAt).getTime()) / 86400000) + 1
+                                : 0;
+                              const showWarming = cs === 'warming' && warmDay >= 1 && warmDay <= 14;
+                              const showPaused    = cs === 'paused';
+                              const showCancelled = cs === 'cancelled';
+                              if (!showTrial && !showPayFailed && !showWarming && !showPaused && !showCancelled) return null;
+                              return (
+                                <div className="adm-mobile-pill-row">
+                                  {showTrial    && <span className="adm-billing-pill adm-billing-pill--trial">Trial</span>}
+                                  {showPayFailed && <span className="adm-billing-pill adm-billing-pill--failed">Payment Failed</span>}
+                                  {showWarming  && <span className="adm-client-pill adm-client-pill--warming"><span style={{ color: '#f59e0b' }}>●</span> Warming — Day {warmDay} of 14</span>}
+                                  {showPaused   && <span className="adm-client-pill adm-client-pill--paused">● Paused</span>}
+                                  {showCancelled && <span className="adm-client-pill adm-client-pill--cancelled">● Cancelled</span>}
                                 </div>
-                              </div>
-                            )}
+                              );
+                            })()}
                           </div>
 
                           {/* Campaign status pill + actions */}

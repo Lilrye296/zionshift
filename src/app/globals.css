@@ -1242,12 +1242,14 @@ footer.zs-footer { padding: 40px 0; border-top: 1px solid var(--zs-border); }
   /* Allow name + firm text to wrap on mobile so nothing is hidden behind ellipsis */
   .adm-client-name { white-space: normal; }
   .adm-client-firm { white-space: normal; word-break: break-all; }
-  /* Hide the entire right column on mobile — ••• lives in adm-mobile-pill-row instead */
-  .adm-client-right { display: none; }
-  /* Hide desktop billing pills (direct children of adm-client-info) — pill row shows them instead */
+  /* Right column on mobile: shrink to just the ••• button, pin to top of card */
+  .adm-client-right { width: auto; padding-left: 0; margin-top: 0; align-self: flex-start; }
+  /* Hide the campaign status pill inside adm-client-right on mobile — pill row handles it */
+  .adm-client-right > .adm-client-pill { display: none; }
+  /* Hide desktop billing pills (direct children of adm-client-info) — pill row shows them */
   .adm-client-info > .adm-billing-pill { display: none; }
 
-  /* Mobile pill row: billing pill + campaign status pill + ••• on one line under "since" */
+  /* Mobile pill row: only renders when Trial / Warming / Paused pills are present */
   .adm-mobile-pill-row { display: flex; align-items: center; gap: 6px; flex-wrap: wrap; margin-top: 5px; }
   .adm-mobile-pill-row .adm-billing-pill { margin: 0; }
   .adm-mobile-pill-row .adm-client-pill { font-size: 10px; padding: 2px 8px; }
