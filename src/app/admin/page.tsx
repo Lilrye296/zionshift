@@ -20,6 +20,8 @@ interface ActiveClient {
   logoUrl: string | null;
   campaignStatus: string;
   warmupStartedAt: string | null;
+  billingStatus: string | null;
+  failedPaymentAt: string | null;
 }
 
 /* ── Helpers ────────────────────────────────────────────────────── */
@@ -72,7 +74,7 @@ export default function AdminPage() {
 
         const { data: clientsData } = await supabase
           .from('clients')
-          .select('id, name, email, firm, status, mrr, since, first_month_paid, setup_fee_paid, headshot_url, logo_url, campaign_status, warmup_started_at')
+          .select('id, name, email, firm, status, mrr, since, first_month_paid, setup_fee_paid, headshot_url, logo_url, campaign_status, warmup_started_at, billing_status, failed_payment_at')
           .order('created_at', { ascending: false });
 
         if (clientsData) {
@@ -82,6 +84,7 @@ export default function AdminPage() {
             first_month_paid: boolean; setup_fee_paid: boolean;
             headshot_url: string | null; logo_url: string | null;
             campaign_status: string | null; warmup_started_at: string | null;
+            billing_status: string | null; failed_payment_at: string | null;
           }) => {
             // Auto-flip warming → active after 14 days
             let campaignStatus = c.campaign_status ?? 'pending';
@@ -103,6 +106,8 @@ export default function AdminPage() {
               logoUrl: c.logo_url ?? null,
               campaignStatus,
               warmupStartedAt: c.warmup_started_at ?? null,
+              billingStatus: c.billing_status ?? null,
+              failedPaymentAt: c.failed_payment_at ?? null,
             };
           });
 
@@ -222,6 +227,25 @@ export default function AdminPage() {
       ));
       showToast(`Warmup started for ${client.name} — Day 1 of 14 begins now.`);
     } catch { /* silently fail */ }
+  }
+
+  async function handleUpdatePayment(client: ActiveClient) {
+    setOpenDropdownId(null);
+    try {
+      const res = await fetch('/api/billing-portal', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ clientId: client.id }),
+      });
+      const json = await res.json();
+      if (json.url) {
+        window.open(json.url, '_blank', 'noopener,noreferrer');
+      } else {
+        showToast('Could not open billing portal. Try again.');
+      }
+    } catch {
+      showToast('Could not open billing portal. Try again.');
+    }
   }
 
   async function handlePauseClient(client: ActiveClient) {
@@ -387,8 +411,11 @@ export default function AdminPage() {
                                   <span className="adm-client-since">since {c.since}</span>
                                 </>
                             }
-                            {c.status === 'live' && !c.firstMonthPaid && (
+                            {c.status === 'live' && !c.firstMonthPaid && (c.billingStatus === 'trial' || !c.billingStatus) && (
                               <span className="adm-billing-pill adm-billing-pill--trial">Trial</span>
+                            )}
+                            {(c.billingStatus === 'past_due' || c.billingStatus === 'paused') && (
+                              <span className="adm-billing-pill adm-billing-pill--failed">Payment Failed</span>
                             )}
                             {c.status === 'live' && c.campaignStatus === 'pending' && (
                               <button
@@ -462,6 +489,14 @@ export default function AdminPage() {
                                       <>
                                         <button className="adm-actions-item adm-actions-item--green" onClick={() => handleResumeClient(c)}>
                                           Resume Campaign
+                                        </button>
+                                        <div className="adm-actions-divider" />
+                                      </>
+                                    )}
+                                    {(c.billingStatus === 'past_due' || c.billingStatus === 'paused') && (
+                                      <>
+                                        <button className="adm-actions-item adm-actions-item--warn" onClick={() => handleUpdatePayment(c)}>
+                                          Update Payment →
                                         </button>
                                         <div className="adm-actions-divider" />
                                       </>

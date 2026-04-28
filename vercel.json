@@ -1,0 +1,8 @@
+{
+  "crons": [
+    {
+      "path": "/api/cron/check-failed-payments",
+      "schedule": "0 9 * * *"
+    }
+  ]
+}

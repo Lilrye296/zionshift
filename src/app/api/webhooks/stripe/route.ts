@@ -377,13 +377,60 @@ export async function POST(req: NextRequest) {
 
       const supabase = supabaseAdmin();
 
-      // Flip first_month_paid → true, set mrr, update billing_status to active
+      // Fetch current client to check if this is a past_due resolution
+      const { data: existingClient } = await supabase
+        .from('clients')
+        .select('name, email, billing_status')
+        .eq('stripe_customer_id', customerId)
+        .single();
+
+      // If this payment resolves a past_due status — notify Ryan
+      if (existingClient?.billing_status === 'past_due') {
+        try {
+          await resendClient().emails.send({
+            from: 'ZionShift <hello@zionshift.com>',
+            to: 'ryan@zionshift.com',
+            replyTo: 'ryan@zionshift.com',
+            subject: `✅ Payment resolved — ${existingClient.name} is back on track`,
+            html: `
+<!DOCTYPE html>
+<html lang="en">
+<head><meta charset="UTF-8" /><title>Payment Resolved</title></head>
+<body style="margin:0;padding:40px 0;background:#F0EDE8;font-family:'Helvetica Neue',Helvetica,Arial,sans-serif;">
+  <div style="max-width:560px;margin:0 auto;background:#fff;border-radius:16px;overflow:hidden;box-shadow:0 4px 24px rgba(0,0,0,0.07);">
+    <div style="background:#1A1715;padding:28px 36px;">
+      <p style="margin:0;font-size:11px;font-weight:700;letter-spacing:0.14em;text-transform:uppercase;color:rgba(255,255,255,0.45);">ZionShift — Billing</p>
+      <h1 style="margin:10px 0 0;font-size:24px;font-weight:800;color:#fff;letter-spacing:-0.03em;">✅ Payment resolved.</h1>
+    </div>
+    <div style="padding:32px 36px;">
+      <p style="margin:0 0 16px;font-size:15px;line-height:1.6;color:#374151;">
+        <strong>${existingClient.name}</strong> (${existingClient.email}) just successfully paid their $2,000 retainer. Their account is back in good standing.
+      </p>
+      <p style="margin:0;font-size:15px;line-height:1.6;color:#374151;">
+        If their campaign was paused, go into Smartlead and turn it back on now.
+      </p>
+    </div>
+    <div style="padding:16px 36px 24px;border-top:1px solid #F0EDE8;">
+      <p style="margin:0;font-size:12px;color:#C8C4BC;">ZionShift · Automated billing notification</p>
+    </div>
+  </div>
+</body>
+</html>
+            `.trim(),
+          });
+        } catch (emailErr) {
+          console.error('[stripe-webhook] Payment resolved email failed:', emailErr);
+        }
+      }
+
+      // Flip first_month_paid → true, set mrr, update billing_status to active, clear failed_payment_at
       const { error: updateError } = await supabase
         .from('clients')
         .update({
           first_month_paid: true,
           mrr: 2000,
           billing_status: 'active',
+          failed_payment_at: null,
         })
         .eq('stripe_customer_id', customerId);
 
@@ -392,11 +439,165 @@ export async function POST(req: NextRequest) {
         return NextResponse.json({ error: 'Database error.' }, { status: 500 });
       }
 
-      console.log(`[stripe-webhook] First payment cleared for customer ${customerId} — MRR updated.`);
+      console.log(`[stripe-webhook] Payment cleared for customer ${customerId} — billing active.`);
       return NextResponse.json({ received: true });
 
     } catch (err) {
       console.error('[stripe-webhook] invoice.payment_succeeded error:', err);
+      return NextResponse.json({ error: 'Internal server error.' }, { status: 500 });
+    }
+  }
+
+  // ── invoice.payment_failed ───────────────────────────────────────
+  // Fires when Stripe fails to charge the $2,000 monthly retainer.
+  if (event.type === 'invoice.payment_failed') {
+    try {
+      const invoice = event.data.object as Stripe.Invoice & { subscription?: string | null };
+
+      // Only handle subscription invoices
+      if (!invoice.subscription) {
+        return NextResponse.json({ received: true });
+      }
+
+      const customerId = typeof invoice.customer === 'string'
+        ? invoice.customer
+        : (invoice.customer as Stripe.Customer | null)?.id ?? null;
+
+      if (!customerId) {
+        return NextResponse.json({ received: true });
+      }
+
+      const supabase = supabaseAdmin();
+      const stripe   = stripeClient();
+
+      // Find client by stripe_customer_id
+      const { data: client } = await supabase
+        .from('clients')
+        .select('id, name, email')
+        .eq('stripe_customer_id', customerId)
+        .single();
+
+      if (!client?.email) {
+        console.error('[stripe-webhook] No client found for failed payment, customer:', customerId);
+        return NextResponse.json({ received: true });
+      }
+
+      const now = new Date();
+      const failedAmount = ((invoice.amount_due ?? 0) / 100).toLocaleString('en-US', { style: 'currency', currency: 'USD' });
+      const failedDate   = fmtDate(now);
+
+      // Update billing_status → past_due, record failed_payment_at
+      await supabase
+        .from('clients')
+        .update({
+          billing_status: 'past_due',
+          failed_payment_at: now.toISOString(),
+        })
+        .eq('id', client.id);
+
+      // Generate Stripe billing portal URL for the client
+      let portalUrl = 'https://www.zionshift.com/client';
+      try {
+        const portalSession = await stripe.billingPortal.sessions.create({
+          customer: customerId,
+          return_url: 'https://www.zionshift.com/client',
+        });
+        portalUrl = portalSession.url;
+      } catch (portalErr) {
+        console.error('[stripe-webhook] Portal session creation failed:', portalErr);
+      }
+
+      const clientFirstName = getFirstName(client.name ?? '');
+
+      // ── Email Ryan immediately ──────────────────────────────────
+      try {
+        await resendClient().emails.send({
+          from: 'ZionShift <hello@zionshift.com>',
+          to: 'ryan@zionshift.com',
+          replyTo: 'ryan@zionshift.com',
+          subject: `⚠️ Payment failed — ${client.name}`,
+          html: `
+<!DOCTYPE html>
+<html lang="en">
+<head><meta charset="UTF-8" /><title>Payment Failed</title></head>
+<body style="margin:0;padding:40px 0;background:#F0EDE8;font-family:'Helvetica Neue',Helvetica,Arial,sans-serif;">
+  <div style="max-width:560px;margin:0 auto;background:#fff;border-radius:16px;overflow:hidden;box-shadow:0 4px 24px rgba(0,0,0,0.07);">
+    <div style="background:#1A1715;padding:28px 36px;">
+      <p style="margin:0;font-size:11px;font-weight:700;letter-spacing:0.14em;text-transform:uppercase;color:rgba(255,255,255,0.45);">ZionShift — Billing Alert</p>
+      <h1 style="margin:10px 0 0;font-size:24px;font-weight:800;color:#fff;letter-spacing:-0.03em;">⚠️ Payment failed.</h1>
+    </div>
+    <div style="padding:32px 36px;">
+      <div style="background:#FFF5F5;border:1px solid #FECACA;border-radius:10px;padding:18px 20px;margin-bottom:24px;">
+        <table style="width:100%;border-collapse:collapse;">
+          <tr><td style="padding:4px 0;font-size:12px;font-weight:600;color:#6B7280;width:40%;">Client</td><td style="padding:4px 0;font-size:14px;color:#1A1715;">${client.name}</td></tr>
+          <tr><td style="padding:4px 0;font-size:12px;font-weight:600;color:#6B7280;">Email</td><td style="padding:4px 0;font-size:14px;color:#1A1715;">${client.email}</td></tr>
+          <tr><td style="padding:4px 0;font-size:12px;font-weight:600;color:#6B7280;">Amount</td><td style="padding:4px 0;font-size:14px;color:#1A1715;">${failedAmount}</td></tr>
+          <tr><td style="padding:4px 0;font-size:12px;font-weight:600;color:#6B7280;">Date</td><td style="padding:4px 0;font-size:14px;color:#1A1715;">${failedDate}</td></tr>
+        </table>
+      </div>
+      <p style="margin:0;font-size:14px;line-height:1.6;color:#374151;">
+        Their account has been flagged as past due. If they don't resolve payment within <strong>3 days</strong>, their campaign will be automatically paused. Keep an eye on your admin dashboard.
+      </p>
+    </div>
+    <div style="padding:16px 36px 24px;border-top:1px solid #F0EDE8;">
+      <p style="margin:0;font-size:12px;color:#C8C4BC;">ZionShift · Automated billing notification</p>
+    </div>
+  </div>
+</body>
+</html>
+          `.trim(),
+        });
+      } catch (emailErr) {
+        console.error('[stripe-webhook] Ryan payment failed email error:', emailErr);
+      }
+
+      // ── Email client — warm but clear ───────────────────────────
+      try {
+        await resendClient().emails.send({
+          from: 'ZionShift <hello@zionshift.com>',
+          to: client.email,
+          replyTo: 'ryan@zionshift.com',
+          subject: 'Action needed — payment issue with your ZionShift account.',
+          html: `
+<!DOCTYPE html>
+<html lang="en">
+<head><meta charset="UTF-8" /><title>Payment Issue</title></head>
+<body style="margin:0;padding:40px 0;background:#F0EDE8;font-family:'Helvetica Neue',Helvetica,Arial,sans-serif;">
+  <div style="max-width:560px;margin:0 auto;background:#fff;border-radius:16px;overflow:hidden;box-shadow:0 4px 24px rgba(0,0,0,0.07);">
+    <div style="background:#1A1715;padding:28px 36px;">
+      <p style="margin:0;font-size:11px;font-weight:700;letter-spacing:0.14em;text-transform:uppercase;color:rgba(255,255,255,0.45);">ZionShift</p>
+      <h1 style="margin:10px 0 0;font-size:24px;font-weight:800;color:#fff;letter-spacing:-0.03em;">There was an issue with your payment, ${clientFirstName}.</h1>
+    </div>
+    <div style="padding:32px 36px;">
+      <p style="margin:0 0 20px;font-size:15px;line-height:1.6;color:#374151;">
+        We weren't able to process your <strong>${failedAmount}</strong> retainer payment on <strong>${failedDate}</strong>. Don't worry — this happens sometimes and it's easy to fix.
+      </p>
+      <p style="margin:0 0 28px;font-size:15px;line-height:1.6;color:#374151;">
+        Please update your payment method as soon as possible to keep your campaign running without interruption. Your campaign will be paused if payment isn't resolved within 3 days.
+      </p>
+      <a href="${portalUrl}" style="display:inline-block;background:#1A1715;color:#fff;font-size:14px;font-weight:600;text-decoration:none;border-radius:10px;padding:13px 24px;letter-spacing:-0.01em;">
+        Update Payment Method →
+      </a>
+      <p style="margin:24px 0 0;font-size:13px;line-height:1.6;color:#9CA3AF;">
+        Questions? Just reply to this email and we'll get you sorted out right away.
+      </p>
+    </div>
+    <div style="padding:16px 36px 24px;border-top:1px solid #F0EDE8;">
+      <p style="margin:0;font-size:12px;color:#C8C4BC;">ZionShift · Questions? Reply to this email and we'll get right back to you.</p>
+    </div>
+  </div>
+</body>
+</html>
+          `.trim(),
+        });
+      } catch (emailErr) {
+        console.error('[stripe-webhook] Client payment failed email error:', emailErr);
+      }
+
+      return NextResponse.json({ received: true });
+
+    } catch (err) {
+      console.error('[stripe-webhook] invoice.payment_failed error:', err);
       return NextResponse.json({ error: 'Internal server error.' }, { status: 500 });
     }
   }
