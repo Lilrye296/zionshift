@@ -163,71 +163,82 @@ export async function POST(req: NextRequest) {
       console.error('[complete-onboarding] Client update error:', clientErr);
     }
 
-    // ── 8. Send build brief email to zionshiftai@gmail.com ─────────
+    // ── 8. Send build brief email to ryan@zionshift.com ───────────
     try {
       const industryList = Array.isArray(industries) ? industries.join(', ') : industries;
       const empList = Array.isArray(employeeCount) ? employeeCount.join(', ') : employeeCount;
+      const submittedDate = new Date().toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric' });
 
       await resendClient().emails.send({
         from: 'ZionShift <hello@zionshift.com>',
-        to: 'zionshiftai@gmail.com',
+        to: 'ryan@zionshift.com',
         replyTo: 'ryan@zionshift.com',
-        subject: `New Client Onboarded — ${businessName}`,
+        subject: `🔥 New client just onboarded — ${businessName} is ready to build`,
         html: `
 <!DOCTYPE html>
 <html lang="en">
 <head><meta charset="UTF-8" /><title>New Client Onboarded</title></head>
 <body style="margin:0;padding:40px 0;background:#F0EDE8;font-family:'Helvetica Neue',Helvetica,Arial,sans-serif;">
-  <div style="max-width:600px;margin:0 auto;background:#fff;border-radius:16px;overflow:hidden;box-shadow:0 4px 24px rgba(0,0,0,0.07);">
-    <div style="background:#1A1715;padding:24px 36px;">
-      <p style="margin:0;font-size:11px;font-weight:700;letter-spacing:0.14em;text-transform:uppercase;color:rgba(255,255,255,0.5);">ZionShift &mdash; Build Brief</p>
-      <h1 style="margin:8px 0 0;font-size:26px;font-weight:800;color:#fff;letter-spacing:-0.03em;">${businessName}</h1>
-      <p style="margin:4px 0 0;font-size:14px;color:rgba(255,255,255,0.6);">${email}</p>
+  <div style="max-width:560px;margin:0 auto;background:#fff;border-radius:16px;overflow:hidden;box-shadow:0 4px 24px rgba(0,0,0,0.07);">
+
+    <div style="background:#1A1715;padding:28px 36px;">
+      <p style="margin:0;font-size:11px;font-weight:700;letter-spacing:0.14em;text-transform:uppercase;color:rgba(255,255,255,0.45);">ZionShift — Build Brief</p>
+      <h1 style="margin:10px 0 0;font-size:24px;font-weight:800;color:#fff;letter-spacing:-0.03em;">${businessName} just onboarded.</h1>
+      <p style="margin:6px 0 0;font-size:13px;color:rgba(255,255,255,0.5);">${email} · ${submittedDate}</p>
     </div>
+
     <div style="padding:32px 36px;">
+      <p style="margin:0 0 28px;font-size:15px;line-height:1.6;color:#374151;">
+        Their onboarding form is complete. Time to buy their domain, spin up their mailboxes, start the warmup, and build their Clay table. Everything you need is below.
+      </p>
 
-      <table style="width:100%;border-collapse:collapse;margin-bottom:28px;">
-        <tr><td colspan="2" style="padding:0 0 12px;font-size:11px;font-weight:700;letter-spacing:0.14em;text-transform:uppercase;color:#9CA3AF;border-bottom:1px solid #F0EDE8;">Screen 1 &mdash; About You</td></tr>
-        <tr><td style="padding:10px 0 4px;font-size:12px;font-weight:600;color:#6B7280;width:40%;">Name</td><td style="padding:10px 0 4px;font-size:14px;color:#1A1715;">${firstName} ${lastName}</td></tr>
-        <tr><td style="padding:4px 0;font-size:12px;font-weight:600;color:#6B7280;">Business</td><td style="padding:4px 0;font-size:14px;color:#1A1715;">${businessName}</td></tr>
-        <tr><td style="padding:4px 0;font-size:12px;font-weight:600;color:#6B7280;">Location</td><td style="padding:4px 0;font-size:14px;color:#1A1715;">${cityState}</td></tr>
-        <tr><td style="padding:4px 0;font-size:12px;font-weight:600;color:#6B7280;">Years in Business</td><td style="padding:4px 0;font-size:14px;color:#1A1715;">${yearsInBusiness}</td></tr>
-        <tr><td style="padding:4px 0 10px;font-size:12px;font-weight:600;color:#6B7280;">Website</td><td style="padding:4px 0 10px;font-size:14px;color:#1A1715;">${websiteUrl || '&mdash;'}</td></tr>
-      </table>
+      <p style="margin:0 0 10px;font-size:11px;font-weight:700;letter-spacing:0.12em;text-transform:uppercase;color:#9CA3AF;">About Them</p>
+      <div style="background:#F9FAFB;border-radius:10px;padding:18px 20px;margin-bottom:20px;">
+        <table style="width:100%;border-collapse:collapse;">
+          <tr><td style="padding:4px 0;font-size:12px;font-weight:600;color:#6B7280;width:42%;">Name</td><td style="padding:4px 0;font-size:14px;color:#1A1715;">${firstName} ${lastName}</td></tr>
+          <tr><td style="padding:4px 0;font-size:12px;font-weight:600;color:#6B7280;">Business</td><td style="padding:4px 0;font-size:14px;color:#1A1715;">${businessName}</td></tr>
+          <tr><td style="padding:4px 0;font-size:12px;font-weight:600;color:#6B7280;">Location</td><td style="padding:4px 0;font-size:14px;color:#1A1715;">${cityState}</td></tr>
+          <tr><td style="padding:4px 0;font-size:12px;font-weight:600;color:#6B7280;">Years in Business</td><td style="padding:4px 0;font-size:14px;color:#1A1715;">${yearsInBusiness}</td></tr>
+          <tr><td style="padding:4px 0;font-size:12px;font-weight:600;color:#6B7280;">Website</td><td style="padding:4px 0;font-size:14px;color:#1A1715;">${websiteUrl || '—'}</td></tr>
+          <tr><td style="padding:4px 0;font-size:12px;font-weight:600;color:#6B7280;">Booking Link</td><td style="padding:4px 0;font-size:14px;color:#1A1715;"><a href="${bookingLink}" style="color:#1A1715;">${bookingLink || '—'}</a></td></tr>
+        </table>
+      </div>
 
-      <table style="width:100%;border-collapse:collapse;margin-bottom:28px;">
-        <tr><td colspan="2" style="padding:0 0 12px;font-size:11px;font-weight:700;letter-spacing:0.14em;text-transform:uppercase;color:#9CA3AF;border-bottom:1px solid #F0EDE8;">Screen 2 &mdash; Ideal Client</td></tr>
-        <tr><td style="padding:10px 0 4px;font-size:12px;font-weight:600;color:#6B7280;width:40%;">Industries</td><td style="padding:10px 0 4px;font-size:14px;color:#1A1715;">${industryList}${otherIndustry ? ` (Other: ${otherIndustry})` : ''}</td></tr>
-        <tr><td style="padding:4px 0;font-size:12px;font-weight:600;color:#6B7280;">Employee Count</td><td style="padding:4px 0;font-size:14px;color:#1A1715;">${empList}</td></tr>
-        <tr><td style="padding:4px 0;font-size:12px;font-weight:600;color:#6B7280;">Revenue Range</td><td style="padding:4px 0;font-size:14px;color:#1A1715;">${revenueRange}</td></tr>
-        <tr><td style="padding:4px 0 10px;font-size:12px;font-weight:600;color:#6B7280;">Geo Focus</td><td style="padding:4px 0 10px;font-size:14px;color:#1A1715;">${geoFocus}</td></tr>
-      </table>
+      <p style="margin:0 0 10px;font-size:11px;font-weight:700;letter-spacing:0.12em;text-transform:uppercase;color:#9CA3AF;">Ideal Client</p>
+      <div style="background:#F9FAFB;border-radius:10px;padding:18px 20px;margin-bottom:20px;">
+        <table style="width:100%;border-collapse:collapse;">
+          <tr><td style="padding:4px 0;font-size:12px;font-weight:600;color:#6B7280;width:42%;">Industries</td><td style="padding:4px 0;font-size:14px;color:#1A1715;">${industryList}${otherIndustry ? ` (Other: ${otherIndustry})` : ''}</td></tr>
+          <tr><td style="padding:4px 0;font-size:12px;font-weight:600;color:#6B7280;">Employee Count</td><td style="padding:4px 0;font-size:14px;color:#1A1715;">${empList}</td></tr>
+          <tr><td style="padding:4px 0;font-size:12px;font-weight:600;color:#6B7280;">Revenue Range</td><td style="padding:4px 0;font-size:14px;color:#1A1715;">${revenueRange}</td></tr>
+          <tr><td style="padding:4px 0;font-size:12px;font-weight:600;color:#6B7280;">Geo Focus</td><td style="padding:4px 0;font-size:14px;color:#1A1715;">${geoFocus}</td></tr>
+          <tr><td style="padding:4px 0;font-size:12px;font-weight:600;color:#6B7280;">Exclusions</td><td style="padding:4px 0;font-size:14px;color:#1A1715;">${exclusions || '—'}</td></tr>
+          <tr><td style="padding:4px 0;font-size:12px;font-weight:600;color:#6B7280;">Prospect Note</td><td style="padding:4px 0;font-size:14px;color:#1A1715;">${prospectNote || '—'}</td></tr>
+        </table>
+      </div>
 
-      <table style="width:100%;border-collapse:collapse;margin-bottom:28px;">
-        <tr><td colspan="2" style="padding:0 0 12px;font-size:11px;font-weight:700;letter-spacing:0.14em;text-transform:uppercase;color:#9CA3AF;border-bottom:1px solid #F0EDE8;">Screen 3 &mdash; Voice &amp; Messaging</td></tr>
-        <tr><td style="padding:10px 0 4px;font-size:12px;font-weight:600;color:#6B7280;width:40%;">Differentiator</td><td style="padding:10px 0 4px;font-size:14px;color:#1A1715;">${differentiator}</td></tr>
-        <tr><td style="padding:4px 0;font-size:12px;font-weight:600;color:#6B7280;">Pain Point</td><td style="padding:4px 0;font-size:14px;color:#1A1715;">${painPoint}</td></tr>
-        <tr><td style="padding:4px 0;font-size:12px;font-weight:600;color:#6B7280;">Transformation</td><td style="padding:4px 0;font-size:14px;color:#1A1715;">${transformation}</td></tr>
-        <tr><td style="padding:4px 0;font-size:12px;font-weight:600;color:#6B7280;">Tone</td><td style="padding:4px 0;font-size:14px;color:#1A1715;">${tone}</td></tr>
-        <tr><td style="padding:4px 0 10px;font-size:12px;font-weight:600;color:#6B7280;">Avoid</td><td style="padding:4px 0 10px;font-size:14px;color:#1A1715;">${avoidances || '&mdash;'}</td></tr>
-      </table>
+      <p style="margin:0 0 10px;font-size:11px;font-weight:700;letter-spacing:0.12em;text-transform:uppercase;color:#9CA3AF;">Voice &amp; Messaging</p>
+      <div style="background:#F9FAFB;border-radius:10px;padding:18px 20px;margin-bottom:20px;">
+        <table style="width:100%;border-collapse:collapse;">
+          <tr><td style="padding:4px 0;font-size:12px;font-weight:600;color:#6B7280;width:42%;">Differentiator</td><td style="padding:4px 0;font-size:14px;color:#1A1715;">${differentiator}</td></tr>
+          <tr><td style="padding:4px 0;font-size:12px;font-weight:600;color:#6B7280;">Pain Point</td><td style="padding:4px 0;font-size:14px;color:#1A1715;">${painPoint}</td></tr>
+          <tr><td style="padding:4px 0;font-size:12px;font-weight:600;color:#6B7280;">Transformation</td><td style="padding:4px 0;font-size:14px;color:#1A1715;">${transformation}</td></tr>
+          <tr><td style="padding:4px 0;font-size:12px;font-weight:600;color:#6B7280;">Tone</td><td style="padding:4px 0;font-size:14px;color:#1A1715;">${tone}</td></tr>
+          <tr><td style="padding:4px 0;font-size:12px;font-weight:600;color:#6B7280;">Avoid</td><td style="padding:4px 0;font-size:14px;color:#1A1715;">${avoidances || '—'}</td></tr>
+        </table>
+      </div>
 
-      <table style="width:100%;border-collapse:collapse;margin-bottom:28px;">
-        <tr><td colspan="2" style="padding:0 0 12px;font-size:11px;font-weight:700;letter-spacing:0.14em;text-transform:uppercase;color:#9CA3AF;border-bottom:1px solid #F0EDE8;">Screen 4 &mdash; Booking</td></tr>
-        <tr><td style="padding:10px 0 10px;font-size:12px;font-weight:600;color:#6B7280;width:40%;">Booking Link</td><td style="padding:10px 0 10px;font-size:14px;color:#1A1715;"><a href="${bookingLink}" style="color:#1A1715;">${bookingLink || '&mdash;'}</a></td></tr>
-      </table>
-
-      <table style="width:100%;border-collapse:collapse;">
-        <tr><td colspan="2" style="padding:0 0 12px;font-size:11px;font-weight:700;letter-spacing:0.14em;text-transform:uppercase;color:#9CA3AF;border-bottom:1px solid #F0EDE8;">Screen 5 &mdash; Final Details</td></tr>
-        <tr><td style="padding:10px 0 4px;font-size:12px;font-weight:600;color:#6B7280;width:40%;">Exclusions</td><td style="padding:10px 0 4px;font-size:14px;color:#1A1715;">${exclusions || '&mdash;'}</td></tr>
-        <tr><td style="padding:4px 0;font-size:12px;font-weight:600;color:#6B7280;">Prospect Note</td><td style="padding:4px 0;font-size:14px;color:#1A1715;">${prospectNote || '&mdash;'}</td></tr>
-        <tr><td style="padding:4px 0;font-size:12px;font-weight:600;color:#6B7280;">Referral Source</td><td style="padding:4px 0;font-size:14px;color:#1A1715;">${referralSource || '&mdash;'}</td></tr>
-      </table>
+      <div style="background:#F9FAFB;border-radius:10px;padding:18px 20px;">
+        <table style="width:100%;border-collapse:collapse;">
+          <tr><td style="padding:4px 0;font-size:12px;font-weight:600;color:#6B7280;width:42%;">Referral Source</td><td style="padding:4px 0;font-size:14px;color:#1A1715;">${referralSource || '—'}</td></tr>
+        </table>
+      </div>
 
     </div>
+
     <div style="padding:16px 36px 24px;border-top:1px solid #F0EDE8;">
-      <p style="margin:0;font-size:12px;color:#C8C4BC;">ZionShift &mdash; submitted ${new Date().toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric' })}</p>
+      <p style="margin:0;font-size:12px;color:#C8C4BC;">ZionShift · Go build their machine — the clock is ticking.</p>
     </div>
+
   </div>
 </body>
 </html>
