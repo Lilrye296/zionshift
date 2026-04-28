@@ -608,37 +608,77 @@ export default function ClientPage() {
             {/* ── Billing ── */}
             {activeTab === 'billing' && (
               <>
-                {/* ── Single billing card ── */}
-                <div className="cd-card bl-card">
 
-                  {/* Header */}
-                  <div className="bl-plan-header">
-                    <div>
-                      <div className="bl-plan-name">ZionShift</div>
-                      <div className="bl-plan-desc">AI-powered outreach</div>
+                {/* Payment alert — only when past_due or paused */}
+                {(billingRecord?.billing_status === 'past_due' || billingRecord?.billing_status === 'paused') && (
+                  <div className="bl-alert-banner" style={{ marginBottom: 24 }}>
+                    <div className="bl-alert-top">
+                      <span className="bl-alert-icon">⚠</span>
+                      <div>
+                        <div className="bl-alert-title">
+                          {billingRecord.billing_status === 'paused' ? 'Campaign paused — payment required' : 'Payment issue — action needed'}
+                        </div>
+                        <div className="bl-alert-msg">
+                          {billingRecord.billing_status === 'paused'
+                            ? 'Your campaign has been paused due to an unresolved payment. Update your card to get back up and running.'
+                            : 'We weren\'t able to process your last payment. Please update your card within 3 days to avoid your campaign being paused.'}
+                        </div>
+                      </div>
                     </div>
+                    <button className="bl-alert-btn" onClick={handleOpenBillingPortal} disabled={portalLoading}>
+                      {portalLoading ? 'Loading…' : 'Update Payment Method →'}
+                    </button>
                   </div>
+                )}
 
-                  <div className="bl-divider" />
+                {/* ── Card 1: Manage ── */}
+                <p className="bl-section-label">Manage</p>
+                <div className="cd-card bl-list-card">
+                  <button className="bl-list-row bl-list-row--action" onClick={handleOpenBillingPortal} disabled={portalLoading}>
+                    <span className="bl-list-row-main">
+                      <span className="bl-list-row-icon">💳</span>
+                      <span className="bl-list-row-label">Update Payment Method</span>
+                    </span>
+                    <span className="bl-list-chevron">{portalLoading ? '…' : '›'}</span>
+                  </button>
+                  <div className="bl-list-sep" />
+                  <a className="bl-list-row bl-list-row--action" href="mailto:ryan@zionshift.com">
+                    <span className="bl-list-row-main">
+                      <span className="bl-list-row-icon">✉️</span>
+                      <span className="bl-list-row-label">Contact Support</span>
+                    </span>
+                    <span className="bl-list-chevron">›</span>
+                  </a>
+                </div>
+
+                {/* ── Card 2: Subscription ── */}
+                <p className="bl-section-label">Subscription</p>
+                <div className="cd-card bl-list-card">
+
+                  <div className="bl-list-row bl-list-row--static">
+                    <span className="bl-list-row-label">Plan</span>
+                    <span className="bl-list-row-value">ZionShift Outreach</span>
+                  </div>
 
                   {/* Trial */}
                   {(!billingRecord?.billing_status || billingRecord.billing_status === 'not_started' || billingRecord.billing_status === 'trial') && (<>
-                    <div className="bl-stat-row">
-                      <span className="bl-stat-label">Free Period</span>
-                      <div className="bl-stat-right">
-                        <span className="bl-stat-value">45 days</span>
+                    <div className="bl-list-sep" />
+                    <div className="bl-list-row bl-list-row--static">
+                      <span className="bl-list-row-label">Free Period</span>
+                      <div className="bl-list-row-right">
+                        <span className="bl-list-row-value">45 days</span>
                         {billingRecord?.trial_ends_at && (
-                          <span className="bl-stat-sub">Ends {fmtBillingDate(billingRecord.trial_ends_at)}</span>
+                          <span className="bl-list-row-sub">Ends {fmtBillingDate(billingRecord.trial_ends_at)}</span>
                         )}
                       </div>
                     </div>
-                    <div className="bl-divider" />
-                    <div className="bl-stat-row">
-                      <span className="bl-stat-label">Next Charge</span>
-                      <div className="bl-stat-right">
-                        <span className="bl-stat-value">$2,000</span>
+                    <div className="bl-list-sep" />
+                    <div className="bl-list-row bl-list-row--static">
+                      <span className="bl-list-row-label">Next Charge</span>
+                      <div className="bl-list-row-right">
+                        <span className="bl-list-row-value">$2,000</span>
                         {billingRecord?.trial_ends_at && (
-                          <span className="bl-stat-sub">{fmtBillingDate(billingRecord.trial_ends_at)}</span>
+                          <span className="bl-list-row-sub">{fmtBillingDate(billingRecord.trial_ends_at)}</span>
                         )}
                       </div>
                     </div>
@@ -646,93 +686,52 @@ export default function ClientPage() {
 
                   {/* Active */}
                   {billingRecord?.billing_status === 'active' && (<>
-                    <div className="bl-stat-row">
-                      <span className="bl-stat-label">Monthly Retainer</span>
-                      <div className="bl-stat-right">
-                        <span className="bl-stat-value">$2,000</span>
-                        <span className="bl-stat-sub">per month</span>
+                    <div className="bl-list-sep" />
+                    <div className="bl-list-row bl-list-row--static">
+                      <span className="bl-list-row-label">Monthly Retainer</span>
+                      <div className="bl-list-row-right">
+                        <span className="bl-list-row-value">$2,000</span>
+                        <span className="bl-list-row-sub">per month</span>
                       </div>
                     </div>
-                    <div className="bl-divider" />
-                    <div className="bl-stat-row">
-                      <span className="bl-stat-label">Next Charge</span>
-                      <div className="bl-stat-right">
-                        <span className="bl-stat-value">$2,000</span>
+                    <div className="bl-list-sep" />
+                    <div className="bl-list-row bl-list-row--static">
+                      <span className="bl-list-row-label">Next Charge</span>
+                      <div className="bl-list-row-right">
+                        <span className="bl-list-row-value">$2,000</span>
                         {billingRecord.billing_started_at && (
-                          <span className="bl-stat-sub">{fmtBillingDate(getNextBillingDate(billingRecord.billing_started_at).toISOString())}</span>
+                          <span className="bl-list-row-sub">{fmtBillingDate(getNextBillingDate(billingRecord.billing_started_at).toISOString())}</span>
                         )}
                       </div>
                     </div>
                   </>)}
 
-                  {/* Payment issue — past_due or paused */}
-                  {(billingRecord?.billing_status === 'past_due' || billingRecord?.billing_status === 'paused') && (
-                    <div className="bl-alert-banner">
-                      <div className="bl-alert-top">
-                        <span className="bl-alert-icon">⚠</span>
-                        <div>
-                          <div className="bl-alert-title">
-                            {billingRecord.billing_status === 'paused' ? 'Campaign paused — payment required' : 'Payment issue — action needed'}
-                          </div>
-                          <div className="bl-alert-msg">
-                            {billingRecord.billing_status === 'paused'
-                              ? 'Your campaign has been paused due to an unresolved payment. Update your card to get back up and running.'
-                              : 'We weren\'t able to process your last payment. Please update your card within 3 days to avoid your campaign being paused.'}
-                          </div>
-                        </div>
-                      </div>
-                      <button
-                        className="bl-alert-btn"
-                        onClick={handleOpenBillingPortal}
-                        disabled={portalLoading}
-                      >
-                        {portalLoading ? 'Loading…' : 'Update Payment Method →'}
-                      </button>
-                    </div>
-                  )}
+                </div>
 
-                  <div className="bl-divider" style={{ marginTop: 8 }} />
-
-                  {/* Invoice History */}
-                  <div style={{ marginTop: 20, marginBottom: 12, textAlign: 'center', font: '600 14px var(--zs-sans)', color: 'var(--zs-ink)', letterSpacing: '-0.01em' }}>Invoice History</div>
+                {/* ── Card 3: Invoice History ── */}
+                <p className="bl-section-label">Invoice History</p>
+                <div className="cd-card bl-list-card">
                   {!billingData || billingData.invoices.length === 0 ? (
-                    <p className="bl-inv-empty" style={{ textAlign: 'center' }}>No invoices on record yet.</p>
+                    <div className="bl-list-row bl-list-row--static">
+                      <span className="bl-list-row-label" style={{ color: '#9ca3af' }}>No invoices on record yet.</span>
+                    </div>
                   ) : billingData.invoices.map((inv, i) => (
                     <Fragment key={i}>
-                      {i > 0 && <div className="bl-divider" />}
-                      <div className="bl-invoice-row">
-                        <span className="bl-inv-date">{inv.date}</span>
-                        <span className="bl-inv-desc">{inv.description}</span>
-                        <span className="bl-inv-amount">${inv.amount.toLocaleString('en-US')}</span>
-                        <span className={`bl-inv-status bl-inv-${inv.status}`}>
-                          {inv.status.charAt(0).toUpperCase() + inv.status.slice(1)}
-                        </span>
+                      {i > 0 && <div className="bl-list-sep" />}
+                      <div className="bl-list-row bl-list-row--static">
+                        <div className="bl-list-row-main">
+                          <span className="bl-list-row-label">{inv.description}</span>
+                          <span className="bl-list-row-sub" style={{ marginTop: 2 }}>{inv.date}</span>
+                        </div>
+                        <div className="bl-list-row-right" style={{ gap: 8 }}>
+                          <span className="bl-list-row-value">${inv.amount.toLocaleString('en-US')}</span>
+                          <span className={`bl-inv-status bl-inv-${inv.status}`}>
+                            {inv.status.charAt(0).toUpperCase() + inv.status.slice(1)}
+                          </span>
+                        </div>
                       </div>
                     </Fragment>
                   ))}
-
-                  {/* Update Payment Method — always available */}
-                  <div className="bl-divider" style={{ marginTop: 16 }} />
-                  <button
-                    className="bl-portal-row"
-                    onClick={handleOpenBillingPortal}
-                    disabled={portalLoading}
-                  >
-                    <span className="bl-portal-row-label">
-                      <span className="bl-portal-row-icon">💳</span>
-                      Update Payment Method
-                    </span>
-                    <span className="bl-portal-row-chevron">{portalLoading ? '…' : '›'}</span>
-                  </button>
-
-                </div>
-
-                {/* ── Need to make a change — plain text footer ── */}
-                <div className="bl-plain-footer">
-                  <span className="bl-plain-footer-title">Need to make a change?</span>
-                  {' '}Contact us at{' '}
-                  <a href="mailto:ryan@zionshift.com" className="bl-changes-link">ryan@zionshift.com</a>
-                  {' '}and we&apos;ll take care of it within one business day.
                 </div>
 
               </>
