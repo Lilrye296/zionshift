@@ -34,35 +34,35 @@ function mapStatus(status: string): 'paid' | 'open' | 'failed' {
 }
 
 export async function GET(req: NextRequest) {
+  const clientId = req.nextUrl.searchParams.get('clientId');
+
+  if (!clientId) {
+    return NextResponse.json({ error: 'Missing clientId.' }, { status: 400 });
+  }
+
+  const supabase = supabaseAdmin();
+
+  // ── 1. Fetch client row — logo always returned regardless of Stripe ──
+  const { data: clientRow } = await supabase
+    .from('clients')
+    .select('stripe_customer_id, logo_url')
+    .eq('id', clientId)
+    .single();
+
+  const logoUrl = clientRow?.logo_url ?? null;
+
+  if (!clientRow?.stripe_customer_id) {
+    return NextResponse.json({ invoices: [], logoUrl });
+  }
+
+  // ── 2. Fetch Stripe charges — failures return empty invoices but still send logo ──
   try {
-    const clientId = req.nextUrl.searchParams.get('clientId');
-
-    if (!clientId) {
-      return NextResponse.json({ error: 'Missing clientId.' }, { status: 400 });
-    }
-
-    const supabase = supabaseAdmin();
-
-    // ── 1. Look up Stripe customer ID + logo for this client ─────────
-    const { data: clientRow } = await supabase
-      .from('clients')
-      .select('stripe_customer_id, logo_url')
-      .eq('id', clientId)
-      .single();
-
-    if (!clientRow?.stripe_customer_id) {
-      return NextResponse.json({ invoices: [], logoUrl: clientRow?.logo_url ?? null });
-    }
-
-    const stripe = stripeClient();
-
-    // ── 2. Fetch all charges for this customer ─────────────────────
+    const stripe  = stripeClient();
     const charges = await stripe.charges.list({
       customer: clientRow.stripe_customer_id,
       limit: 20,
     });
 
-    // ── 3. Format into clean invoice rows ─────────────────────────
     const invoices = charges.data.map(charge => ({
       date:        fmtInvoiceDate(charge.created),
       description: describeCharge(charge.amount, charge.description),
@@ -70,10 +70,10 @@ export async function GET(req: NextRequest) {
       status:      mapStatus(charge.status),
     }));
 
-    return NextResponse.json({ invoices, logoUrl: clientRow.logo_url ?? null });
+    return NextResponse.json({ invoices, logoUrl });
 
   } catch (err) {
-    console.error('[get-invoices] Error:', err);
-    return NextResponse.json({ error: 'Failed to fetch invoices.' }, { status: 500 });
+    console.error('[get-invoices] Stripe error:', err);
+    return NextResponse.json({ invoices: [], logoUrl });
   }
 }
