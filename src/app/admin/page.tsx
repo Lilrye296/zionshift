@@ -111,11 +111,15 @@ export default function AdminPage() {
             };
           });
 
-          // Persist any warming→active flips to DB
+          // Persist any warming→active flips to DB + send activation email
           mapped.forEach(async (client) => {
             const raw = clientsData.find((c: { id: string; campaign_status: string | null }) => c.id === client.id);
             if (raw && raw.campaign_status === 'warming' && client.campaignStatus === 'active') {
-              await supabase.from('clients').update({ campaign_status: 'active' }).eq('id', client.id);
+              await fetch('/api/activate-campaign', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ clientId: client.id }),
+              });
             }
           });
 
