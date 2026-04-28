@@ -639,10 +639,11 @@ export default function ClientPage() {
                     <span className="bl-list-chevron">{portalLoading ? '…' : '›'}</span>
                   </button>
                   <div className="bl-list-sep" />
-                  <a className="bl-list-row bl-list-row--action" href="mailto:ryan@zionshift.com">
-                    <span className="bl-list-row-label">Contact Support</span>
-                    <span className="bl-list-chevron">›</span>
-                  </a>
+                  <div className="bl-list-note">
+                    Questions about your billing? Email us at{' '}
+                    <a href="mailto:ryan@zionshift.com" className="bl-list-note-link">ryan@zionshift.com</a>
+                    {' '}and we&apos;ll take care of it within one business day.
+                  </div>
                 </div>
 
                 {/* ── Card 2: Subscription ── */}

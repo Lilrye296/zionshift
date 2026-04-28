@@ -762,6 +762,9 @@ body { font-family: var(--zs-sans); color: var(--zs-ink-2); overflow-x: hidden; 
 .bl-list-row-right { display: flex; flex-direction: column; align-items: flex-end; gap: 2px; flex-shrink: 0; }
 .bl-list-chevron { font-size: 20px; color: #d1d5db; line-height: 1; flex-shrink: 0; margin-left: 8px; }
 .bl-list-sep { height: 1px; background: #f3f4f6; margin-left: 18px; }
+.bl-list-note { padding: 12px 18px; font: 400 13px var(--zs-sans); color: #9ca3af; line-height: 1.6; }
+.bl-list-note-link { color: #6b7280; font-weight: 500; text-decoration: none; border-bottom: 1px solid #d1d5db; }
+.bl-list-note-link:hover { color: var(--zs-ink); border-color: var(--zs-ink); }
 
 .bl-changes-title { font: 700 16px var(--zs-sans); letter-spacing: -0.02em; color: var(--zs-ink); margin-bottom: 10px; }
 .bl-plain-footer { font: 400 13px var(--zs-sans); color: var(--zs-ink-4); margin-top: 16px; padding: 0 4px; line-height: 1.6; }
