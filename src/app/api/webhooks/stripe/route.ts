@@ -324,9 +324,6 @@ export async function POST(req: NextRequest) {
           </p>
         </div>
 
-        <p style="margin:0;font-size:14px;color:#9CA3AF;line-height:1.7;">
-          Questions about your billing? Just reply to this email and we&apos;ll take care of you.
-        </p>
       </div>
 
       <!-- Footer -->
@@ -395,26 +392,27 @@ export async function POST(req: NextRequest) {
             html: `
 <!DOCTYPE html>
 <html lang="en">
-<head><meta charset="UTF-8" /><title>Payment Resolved</title></head>
-<body style="margin:0;padding:40px 0;background:#F0EDE8;font-family:'Helvetica Neue',Helvetica,Arial,sans-serif;">
-  <div style="max-width:560px;margin:0 auto;background:#fff;border-radius:16px;overflow:hidden;box-shadow:0 4px 24px rgba(0,0,0,0.07);">
-    <div style="background:#1A1715;padding:28px 36px;">
-      <p style="margin:0;font-size:11px;font-weight:700;letter-spacing:0.14em;text-transform:uppercase;color:rgba(255,255,255,0.45);">ZionShift — Billing</p>
-      <h1 style="margin:10px 0 0;font-size:24px;font-weight:800;color:#fff;letter-spacing:-0.03em;">✅ Payment resolved.</h1>
+  <head><meta charset="UTF-8" /><title>Payment Resolved</title></head>
+  <body style="margin:0;padding:48px 0;background:#F0EDE8;font-family:'Helvetica Neue',Helvetica,Arial,sans-serif;">
+    <div style="max-width:540px;margin:0 auto;background:#ffffff;border-radius:16px;overflow:hidden;box-shadow:0 4px 24px rgba(0,0,0,0.07);">
+      <div style="background:#ffffff;padding:24px 36px;border-bottom:1px solid #F0EDE8;">
+        <img src="https://www.zionshift.com/logo.png" alt="ZionShift" width="140" style="display:block;" />
+      </div>
+      <div style="padding:44px 36px 36px;">
+        <p style="margin:0 0 12px;font-size:11px;font-weight:700;letter-spacing:0.12em;text-transform:uppercase;color:#9CA3AF;">Billing Update</p>
+        <h1 style="margin:0 0 20px;font-size:30px;font-weight:800;color:#1A1715;letter-spacing:-0.04em;line-height:1.1;">✅ Payment resolved.</h1>
+        <div style="padding:20px 24px;background:#FAFAF9;border-radius:10px;border:1px solid #EEEBE6;margin-bottom:24px;">
+          <p style="margin:0 0 8px;font-size:11px;font-weight:700;letter-spacing:0.1em;text-transform:uppercase;color:#9CA3AF;">Client Details</p>
+          <p style="margin:0 0 6px;font-size:14px;color:#4B5563;line-height:1.6;"><span style="font-weight:700;color:#1A1715;">Client:</span>&nbsp; ${existingClient.name}</p>
+          <p style="margin:0;font-size:14px;color:#4B5563;line-height:1.6;"><span style="font-weight:700;color:#1A1715;">Email:</span>&nbsp; ${existingClient.email}</p>
+        </div>
+        <p style="margin:0;font-size:14px;color:#6B7280;line-height:1.6;">Their $2,000 retainer has been successfully paid and their account is back in good standing. If their campaign was paused, go into Smartlead and turn it back on now.</p>
+      </div>
+      <div style="padding:20px 36px 28px;border-top:1px solid #F0EDE8;">
+        <p style="margin:0;font-size:12px;color:#C8C4BC;">ZionShift &middot; Automated billing notification</p>
+      </div>
     </div>
-    <div style="padding:32px 36px;">
-      <p style="margin:0 0 16px;font-size:15px;line-height:1.6;color:#374151;">
-        <strong>${existingClient.name}</strong> (${existingClient.email}) just successfully paid their $2,000 retainer. Their account is back in good standing.
-      </p>
-      <p style="margin:0;font-size:15px;line-height:1.6;color:#374151;">
-        If their campaign was paused, go into Smartlead and turn it back on now.
-      </p>
-    </div>
-    <div style="padding:16px 36px 24px;border-top:1px solid #F0EDE8;">
-      <p style="margin:0;font-size:12px;color:#C8C4BC;">ZionShift · Automated billing notification</p>
-    </div>
-  </div>
-</body>
+  </body>
 </html>
             `.trim(),
           });
@@ -519,31 +517,29 @@ export async function POST(req: NextRequest) {
           html: `
 <!DOCTYPE html>
 <html lang="en">
-<head><meta charset="UTF-8" /><title>Payment Failed</title></head>
-<body style="margin:0;padding:40px 0;background:#F0EDE8;font-family:'Helvetica Neue',Helvetica,Arial,sans-serif;">
-  <div style="max-width:560px;margin:0 auto;background:#fff;border-radius:16px;overflow:hidden;box-shadow:0 4px 24px rgba(0,0,0,0.07);">
-    <div style="background:#1A1715;padding:28px 36px;">
-      <p style="margin:0;font-size:11px;font-weight:700;letter-spacing:0.14em;text-transform:uppercase;color:rgba(255,255,255,0.45);">ZionShift — Billing Alert</p>
-      <h1 style="margin:10px 0 0;font-size:24px;font-weight:800;color:#fff;letter-spacing:-0.03em;">⚠️ Payment failed.</h1>
-    </div>
-    <div style="padding:32px 36px;">
-      <div style="background:#FFF5F5;border:1px solid #FECACA;border-radius:10px;padding:18px 20px;margin-bottom:24px;">
-        <table style="width:100%;border-collapse:collapse;">
-          <tr><td style="padding:4px 0;font-size:12px;font-weight:600;color:#6B7280;width:40%;">Client</td><td style="padding:4px 0;font-size:14px;color:#1A1715;">${client.name}</td></tr>
-          <tr><td style="padding:4px 0;font-size:12px;font-weight:600;color:#6B7280;">Email</td><td style="padding:4px 0;font-size:14px;color:#1A1715;">${client.email}</td></tr>
-          <tr><td style="padding:4px 0;font-size:12px;font-weight:600;color:#6B7280;">Amount</td><td style="padding:4px 0;font-size:14px;color:#1A1715;">${failedAmount}</td></tr>
-          <tr><td style="padding:4px 0;font-size:12px;font-weight:600;color:#6B7280;">Date</td><td style="padding:4px 0;font-size:14px;color:#1A1715;">${failedDate}</td></tr>
-        </table>
+  <head><meta charset="UTF-8" /><title>Payment Failed</title></head>
+  <body style="margin:0;padding:48px 0;background:#F0EDE8;font-family:'Helvetica Neue',Helvetica,Arial,sans-serif;">
+    <div style="max-width:540px;margin:0 auto;background:#ffffff;border-radius:16px;overflow:hidden;box-shadow:0 4px 24px rgba(0,0,0,0.07);">
+      <div style="background:#ffffff;padding:24px 36px;border-bottom:1px solid #F0EDE8;">
+        <img src="https://www.zionshift.com/logo.png" alt="ZionShift" width="140" style="display:block;" />
       </div>
-      <p style="margin:0;font-size:14px;line-height:1.6;color:#374151;">
-        Their account has been flagged as past due. If they don't resolve payment within <strong>3 days</strong>, their campaign will be automatically paused. Keep an eye on your admin dashboard.
-      </p>
+      <div style="padding:44px 36px 36px;">
+        <p style="margin:0 0 12px;font-size:11px;font-weight:700;letter-spacing:0.12em;text-transform:uppercase;color:#9CA3AF;">Billing Alert</p>
+        <h1 style="margin:0 0 20px;font-size:30px;font-weight:800;color:#1A1715;letter-spacing:-0.04em;line-height:1.1;">⚠️ Payment failed.</h1>
+        <div style="padding:20px 24px;background:#FAFAF9;border-radius:10px;border:1px solid #EEEBE6;margin-bottom:24px;">
+          <p style="margin:0 0 8px;font-size:11px;font-weight:700;letter-spacing:0.1em;text-transform:uppercase;color:#9CA3AF;">Client Details</p>
+          <p style="margin:0 0 6px;font-size:14px;color:#4B5563;line-height:1.6;"><span style="font-weight:700;color:#1A1715;">Client:</span>&nbsp; ${client.name}</p>
+          <p style="margin:0 0 6px;font-size:14px;color:#4B5563;line-height:1.6;"><span style="font-weight:700;color:#1A1715;">Email:</span>&nbsp; ${client.email}</p>
+          <p style="margin:0 0 6px;font-size:14px;color:#4B5563;line-height:1.6;"><span style="font-weight:700;color:#1A1715;">Amount:</span>&nbsp; ${failedAmount}</p>
+          <p style="margin:0;font-size:14px;color:#4B5563;line-height:1.6;"><span style="font-weight:700;color:#1A1715;">Date:</span>&nbsp; ${failedDate}</p>
+        </div>
+        <p style="margin:0;font-size:14px;color:#6B7280;line-height:1.6;">Their account has been flagged as past due. If they don&apos;t resolve payment within <strong style="color:#1A1715;">3 days</strong>, their campaign may be paused. Keep an eye on your admin dashboard.</p>
+      </div>
+      <div style="padding:20px 36px 28px;border-top:1px solid #F0EDE8;">
+        <p style="margin:0;font-size:12px;color:#C8C4BC;">ZionShift &middot; Automated billing notification</p>
+      </div>
     </div>
-    <div style="padding:16px 36px 24px;border-top:1px solid #F0EDE8;">
-      <p style="margin:0;font-size:12px;color:#C8C4BC;">ZionShift · Automated billing notification</p>
-    </div>
-  </div>
-</body>
+  </body>
 </html>
           `.trim(),
         });
@@ -561,32 +557,34 @@ export async function POST(req: NextRequest) {
           html: `
 <!DOCTYPE html>
 <html lang="en">
-<head><meta charset="UTF-8" /><title>Payment Issue</title></head>
-<body style="margin:0;padding:40px 0;background:#F0EDE8;font-family:'Helvetica Neue',Helvetica,Arial,sans-serif;">
-  <div style="max-width:560px;margin:0 auto;background:#fff;border-radius:16px;overflow:hidden;box-shadow:0 4px 24px rgba(0,0,0,0.07);">
-    <div style="background:#1A1715;padding:28px 36px;">
-      <p style="margin:0;font-size:11px;font-weight:700;letter-spacing:0.14em;text-transform:uppercase;color:rgba(255,255,255,0.45);">ZionShift</p>
-      <h1 style="margin:10px 0 0;font-size:24px;font-weight:800;color:#fff;letter-spacing:-0.03em;">There was an issue with your payment, ${clientFirstName}.</h1>
+  <head><meta charset="UTF-8" /><title>Payment Issue</title></head>
+  <body style="margin:0;padding:48px 0;background:#F0EDE8;font-family:'Helvetica Neue',Helvetica,Arial,sans-serif;">
+    <div style="max-width:540px;margin:0 auto;background:#ffffff;border-radius:16px;overflow:hidden;box-shadow:0 4px 24px rgba(0,0,0,0.07);">
+      <div style="background:#ffffff;padding:24px 36px;border-bottom:1px solid #F0EDE8;">
+        <img src="https://www.zionshift.com/logo.png" alt="ZionShift" width="140" style="display:block;" />
+      </div>
+      <div style="padding:44px 36px 36px;">
+        <p style="margin:0 0 12px;font-size:11px;font-weight:700;letter-spacing:0.12em;text-transform:uppercase;color:#9CA3AF;">Action Required</p>
+        <h1 style="margin:0 0 20px;font-size:30px;font-weight:800;color:#1A1715;letter-spacing:-0.04em;line-height:1.1;">
+          There was an issue with your payment, ${clientFirstName}.
+        </h1>
+        <p style="margin:0 0 24px;font-size:15px;color:#6B7280;line-height:1.75;">
+          We weren&apos;t able to process your <strong style="color:#1A1715;">${failedAmount}</strong> retainer payment on <strong style="color:#1A1715;">${failedDate}</strong>. Don&apos;t worry &mdash; this happens sometimes and it&apos;s easy to fix.
+        </p>
+        <div style="padding:20px 24px;background:#FAFAF9;border-radius:10px;border:1px solid #EEEBE6;margin-bottom:24px;">
+          <p style="margin:0 0 8px;font-size:11px;font-weight:700;letter-spacing:0.1em;text-transform:uppercase;color:#9CA3AF;">What to do</p>
+          <p style="margin:0 0 8px;font-size:14px;color:#4B5563;line-height:1.6;"><span style="font-weight:700;color:#1A1715;">1 &nbsp;&mdash;</span>&nbsp; Click the button below to update your payment method</p>
+          <p style="margin:0 0 8px;font-size:14px;color:#4B5563;line-height:1.6;"><span style="font-weight:700;color:#1A1715;">2 &nbsp;&mdash;</span>&nbsp; Your payment will retry automatically once updated</p>
+          <p style="margin:0;font-size:14px;color:#4B5563;line-height:1.6;"><span style="font-weight:700;color:#1A1715;">3 &nbsp;&mdash;</span>&nbsp; Your campaign continues without interruption</p>
+        </div>
+        <p style="margin:0 0 24px;font-size:14px;color:#6B7280;line-height:1.6;">Please resolve this within 3 days to avoid any interruption to your campaign.</p>
+        <a href="${portalUrl}" style="display:inline-block;background:#1A1715;color:#ffffff;text-decoration:none;font-size:15px;font-weight:700;padding:16px 32px;border-radius:8px;letter-spacing:-0.01em;">Update Payment Method &rarr;</a>
+      </div>
+      <div style="padding:20px 36px 28px;border-top:1px solid #F0EDE8;">
+        <p style="margin:0;font-size:12px;color:#C8C4BC;">Questions? Reply to this email or reach us at <a href="mailto:ryan@zionshift.com" style="color:#C8C4BC;">ryan@zionshift.com</a></p>
+      </div>
     </div>
-    <div style="padding:32px 36px;">
-      <p style="margin:0 0 20px;font-size:15px;line-height:1.6;color:#374151;">
-        We weren't able to process your <strong>${failedAmount}</strong> retainer payment on <strong>${failedDate}</strong>. Don't worry — this happens sometimes and it's easy to fix.
-      </p>
-      <p style="margin:0 0 28px;font-size:15px;line-height:1.6;color:#374151;">
-        Please update your payment method as soon as possible to keep your campaign running without interruption. Your campaign will be paused if payment isn't resolved within 3 days.
-      </p>
-      <a href="${portalUrl}" style="display:inline-block;background:#1A1715;color:#fff;font-size:14px;font-weight:600;text-decoration:none;border-radius:10px;padding:13px 24px;letter-spacing:-0.01em;">
-        Update Payment Method →
-      </a>
-      <p style="margin:24px 0 0;font-size:13px;line-height:1.6;color:#9CA3AF;">
-        Questions? Just reply to this email and we'll get you sorted out right away.
-      </p>
-    </div>
-    <div style="padding:16px 36px 24px;border-top:1px solid #F0EDE8;">
-      <p style="margin:0;font-size:12px;color:#C8C4BC;">ZionShift · Questions? Reply to this email and we'll get right back to you.</p>
-    </div>
-  </div>
-</body>
+  </body>
 </html>
           `.trim(),
         });

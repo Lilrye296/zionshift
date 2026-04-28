@@ -2,7 +2,7 @@
 
 import { useEffect, useRef, useState, useCallback, ReactNode, RefObject } from 'react';
 
-const CALENDLY_URL = '#'; // TODO: replace with your Calendly link
+const CALENDLY_URL = 'https://cal.com/zionshift/call';
 
 /* ─── HOOKS ─────────────────────────────────────────────────── */
 function useReveal() {

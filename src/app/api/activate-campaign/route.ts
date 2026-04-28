@@ -57,42 +57,43 @@ export async function POST(req: NextRequest) {
         html: `
 <!DOCTYPE html>
 <html lang="en">
-<head><meta charset="UTF-8" /><title>Your Campaign is Live</title></head>
-<body style="margin:0;padding:40px 0;background:#F0EDE8;font-family:'Helvetica Neue',Helvetica,Arial,sans-serif;">
-  <div style="max-width:560px;margin:0 auto;background:#fff;border-radius:16px;overflow:hidden;box-shadow:0 4px 24px rgba(0,0,0,0.07);">
+  <head><meta charset="UTF-8" /><title>Your Campaign is Live</title></head>
+  <body style="margin:0;padding:48px 0;background:#F0EDE8;font-family:'Helvetica Neue',Helvetica,Arial,sans-serif;">
+    <div style="max-width:540px;margin:0 auto;background:#ffffff;border-radius:16px;overflow:hidden;box-shadow:0 4px 24px rgba(0,0,0,0.07);">
 
-    <div style="background:#1A1715;padding:28px 36px;">
-      <p style="margin:0;font-size:11px;font-weight:700;letter-spacing:0.14em;text-transform:uppercase;color:rgba(255,255,255,0.45);">ZionShift</p>
-      <h1 style="margin:10px 0 0;font-size:24px;font-weight:800;color:#fff;letter-spacing:-0.03em;">Your campaign is live, ${firstName}.</h1>
+      <div style="background:#ffffff;padding:24px 36px;border-bottom:1px solid #F0EDE8;">
+        <img src="https://www.zionshift.com/logo.png" alt="ZionShift" width="140" style="display:block;" />
+      </div>
+
+      <div style="padding:44px 36px 36px;">
+        <p style="margin:0 0 12px;font-size:11px;font-weight:700;letter-spacing:0.12em;text-transform:uppercase;color:#9CA3AF;">Campaign Update</p>
+        <h1 style="margin:0 0 20px;font-size:30px;font-weight:800;color:#1A1715;letter-spacing:-0.04em;line-height:1.1;">
+          Your campaign is live, ${firstName}.
+        </h1>
+
+        <p style="margin:0 0 24px;font-size:15px;color:#6B7280;line-height:1.75;">
+          Your 14-day warm-up period is complete. We&apos;ve finished building your email reputation and your outreach campaign is now officially active &mdash; meaning we&apos;re starting to put <strong style="color:#1A1715;">${client.firm}</strong> in front of your ideal prospects today.
+        </p>
+
+        <div style="padding:20px 24px;background:#FAFAF9;border-radius:10px;border:1px solid #EEEBE6;margin-bottom:24px;">
+          <p style="margin:0 0 8px;font-size:11px;font-weight:700;letter-spacing:0.1em;text-transform:uppercase;color:#9CA3AF;">What happens next</p>
+          <p style="margin:0 0 8px;font-size:14px;color:#4B5563;line-height:1.6;"><span style="font-weight:700;color:#1A1715;">1 &nbsp;&mdash;</span>&nbsp; Personalized outreach emails go out to qualified prospects on your behalf</p>
+          <p style="margin:0 0 8px;font-size:14px;color:#4B5563;line-height:1.6;"><span style="font-weight:700;color:#1A1715;">2 &nbsp;&mdash;</span>&nbsp; Replies and interest get routed directly to you</p>
+          <p style="margin:0;font-size:14px;color:#4B5563;line-height:1.6;"><span style="font-weight:700;color:#1A1715;">3 &nbsp;&mdash;</span>&nbsp; Meetings start booking &mdash; track them live in your dashboard</p>
+        </div>
+
+        <a href="https://zionshift.com/client" style="display:inline-block;background:#1A1715;color:#ffffff;text-decoration:none;font-size:15px;font-weight:700;padding:16px 32px;border-radius:8px;letter-spacing:-0.01em;">
+          View My Dashboard &rarr;
+        </a>
+
+      </div>
+
+      <div style="padding:20px 36px 28px;border-top:1px solid #F0EDE8;">
+        <p style="margin:0;font-size:12px;color:#C8C4BC;">Questions? Reply to this email or reach us at <a href="mailto:ryan@zionshift.com" style="color:#C8C4BC;">ryan@zionshift.com</a></p>
+      </div>
+
     </div>
-
-    <div style="padding:32px 36px;">
-      <p style="margin:0 0 20px;font-size:15px;line-height:1.6;color:#374151;">
-        Your 14-day warm-up period is complete. We've finished building your email reputation and your outreach campaign is now officially active — meaning we're starting to put <strong>${client.firm}</strong> in front of your ideal prospects today.
-      </p>
-      <p style="margin:0 0 20px;font-size:15px;line-height:1.6;color:#374151;">
-        Here's what happens from here:
-      </p>
-      <ul style="margin:0 0 24px;padding-left:20px;font-size:15px;line-height:1.8;color:#374151;">
-        <li>Personalized outreach emails go out to qualified prospects on your behalf</li>
-        <li>Replies and interest get routed directly to you</li>
-        <li>Meetings start booking — you'll see them appear in your dashboard</li>
-      </ul>
-      <p style="margin:0 0 28px;font-size:15px;line-height:1.6;color:#374151;">
-        You can track everything in real time from your client portal.
-      </p>
-
-      <a href="https://zionshift.com/client" style="display:inline-block;background:#1A1715;color:#fff;font-size:14px;font-weight:600;text-decoration:none;border-radius:10px;padding:13px 24px;letter-spacing:-0.01em;">
-        View My Dashboard →
-      </a>
-    </div>
-
-    <div style="padding:16px 36px 24px;border-top:1px solid #F0EDE8;">
-      <p style="margin:0;font-size:12px;color:#C8C4BC;">ZionShift · Questions? Reply to this email and we'll get right back to you.</p>
-    </div>
-
-  </div>
-</body>
+  </body>
 </html>
         `.trim(),
       });
