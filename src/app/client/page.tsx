@@ -702,19 +702,6 @@ export default function ClientPage() {
 
                       <div className="bl-divider" />
 
-                      {/* Setup Fee */}
-                      <div className="bl-stat-row">
-                        <span className="bl-stat-label">Setup Fee</span>
-                        <div className="bl-stat-right">
-                          <span className="bl-stat-value">$1,000</span>
-                          <span className="bl-stat-sub">
-                            Paid{billingRecord?.trial_started_at ? ` · ${fmtBillingDate(billingRecord.trial_started_at)}` : ''}
-                          </span>
-                        </div>
-                      </div>
-
-                      <div className="bl-divider" />
-
                       {/* Trial */}
                       {(!billingRecord?.billing_status || billingRecord.billing_status === 'not_started' || billingRecord.billing_status === 'trial') && (<>
                         <div className="bl-stat-row">
