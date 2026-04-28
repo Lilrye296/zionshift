@@ -652,7 +652,7 @@ export default function ClientPage() {
 
                   <div className="bl-list-row bl-list-row--static">
                     <span className="bl-list-row-label">Plan</span>
-                    <span className="bl-list-row-value">ZionShift Outreach</span>
+                    <span className="bl-list-row-value">ZionShift</span>
                   </div>
 
                   {/* Trial */}
