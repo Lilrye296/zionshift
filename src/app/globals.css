@@ -943,7 +943,7 @@ footer.zs-footer { padding: 40px 0; border-top: 1px solid var(--zs-border); }
 .adm-billing-pill--failed { background: #fff1f2; color: #dc2626; border: 1px solid #fecaca; }
 
 /* Start Warmup button */
-.adm-warmup-btn { display: inline-block; margin-top: 6px; font: 600 11px var(--zs-sans); color: #fff; background: #1A1715; border: none; border-radius: 999px; padding: 4px 12px; cursor: pointer; letter-spacing: 0.01em; transition: opacity 0.15s; }
+.adm-warmup-btn { display: block; width: fit-content; margin-top: 8px; font: 600 11px var(--zs-sans); color: #fff; background: #1A1715; border: none; border-radius: 999px; padding: 4px 12px; cursor: pointer; letter-spacing: 0.01em; transition: opacity 0.15s; }
 .adm-warmup-btn:hover { opacity: 0.75; }
 
 /* Client actions dropdown */
