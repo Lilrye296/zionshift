@@ -679,21 +679,13 @@ export default function ClientPage() {
             {/* ── Billing ── */}
             {activeTab === 'billing' && (
               <>
-                <div className="bl-heading-row">
-                  <h2 className="bl-heading">Billing</h2>
-                  <p className="bl-sub">Your plan details and payment information.</p>
-                </div>
-
                 {/* ── Need to pause or cancel ── */}
                 <div className="cd-card bl-card" style={{ marginBottom: 16 }}>
-                  <div className="bl-changes-title">Need to pause or cancel?</div>
+                  <div className="bl-changes-title">Need to make a change?</div>
                   <p className="bl-changes-body">
-                    Just reach out directly to{' '}
+                    Contact us at{' '}
                     <a href="mailto:ryan@zionshift.com" className="bl-changes-link">ryan@zionshift.com</a>
-                    {' '}and we&apos;ll handle it within one business day — whether you need a short break or want to cancel entirely.
-                  </p>
-                  <p className="bl-changes-note">
-                    No contracts. No penalties. Your campaign continues only as long as you want it to.
+                    {' '}and we&apos;ll take care of it within one business day.
                   </p>
                 </div>
 
@@ -784,9 +776,6 @@ export default function ClientPage() {
 
                 </div>
 
-                <div className="cd-support-footer">
-                  Questions? Reach out anytime at <a href="mailto:ryan@zionshift.com">ryan@zionshift.com</a>
-                </div>
               </>
             )}
 
