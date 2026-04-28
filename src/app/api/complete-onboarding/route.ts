@@ -250,6 +250,8 @@ export async function POST(req: NextRequest) {
     // ── 9. Create Supabase auth user ───────────────────────────────
     const tempPass = crypto.randomUUID().replace(/-/g, '').slice(0, 16) + 'Zs1!';
 
+    let userId: string | undefined;
+
     const { data: authData, error: authError } = await supabase.auth.admin.createUser({
       email,
       password: tempPass,
@@ -257,30 +259,40 @@ export async function POST(req: NextRequest) {
     });
 
     if (authError) {
-      // User might already exist — try to get them instead
+      // User already exists — look them up so we can still set their profile
       console.error('[complete-onboarding] Auth createUser error:', authError);
-      return NextResponse.json({ success: true, tempPass: null });
+      try {
+        const { data: listData } = await supabase.auth.admin.listUsers();
+        userId = listData?.users?.find(
+          (u: { email?: string; id: string }) => u.email?.toLowerCase() === email.toLowerCase()
+        )?.id;
+      } catch {
+        return NextResponse.json({ success: true, tempPass: null });
+      }
+      if (!userId) {
+        return NextResponse.json({ success: true, tempPass: null });
+      }
+    } else {
+      userId = authData.user?.id;
     }
 
-    const userId = authData.user?.id;
-
-    // ── 10. Insert profile row with client_id ─────────────────────
+    // ── 10. Upsert profile row with client_id ─────────────────────
     if (userId) {
       try {
         // Look up the clients row to get its id so the dashboard can load their data
         const { data: clientRecord } = await supabase
           .from('clients')
           .select('id')
-          .eq('email', email)
+          .ilike('email', email)
           .single();
 
-        await supabase.from('profiles').insert({
+        await supabase.from('profiles').upsert({
           id: userId,
           role: 'client',
           client_id: clientRecord?.id ?? null,
         });
       } catch (e) {
-        console.error('[complete-onboarding] Profile insert failed:', e);
+        console.error('[complete-onboarding] Profile upsert failed:', e);
       }
     }
 
