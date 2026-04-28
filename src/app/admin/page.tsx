@@ -207,6 +207,23 @@ export default function AdminPage() {
     }
   }
 
+  async function handleStartWarmup(client: ActiveClient) {
+    try {
+      const supabase = createClient();
+      const now = new Date().toISOString();
+      await supabase
+        .from('clients')
+        .update({ campaign_status: 'warming', warmup_started_at: now })
+        .eq('id', client.id);
+      setClients(prev => prev.map(c =>
+        c.id === client.id
+          ? { ...c, campaignStatus: 'warming', warmupStartedAt: now }
+          : c
+      ));
+      showToast(`Warmup started for ${client.name} — Day 1 of 14 begins now.`);
+    } catch { /* silently fail */ }
+  }
+
   async function handlePauseClient(client: ActiveClient) {
     setOpenDropdownId(null);
     try {
@@ -372,6 +389,14 @@ export default function AdminPage() {
                             }
                             {c.status === 'live' && !c.firstMonthPaid && (
                               <span className="adm-billing-pill adm-billing-pill--trial">Trial</span>
+                            )}
+                            {c.status === 'live' && c.campaignStatus === 'pending' && (
+                              <button
+                                className="adm-warmup-btn"
+                                onClick={() => handleStartWarmup(c)}
+                              >
+                                Start Warmup
+                              </button>
                             )}
                           </div>
 

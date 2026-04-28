@@ -152,8 +152,7 @@ export async function POST(req: NextRequest) {
         firm: businessName,
         status: 'live',
         since: new Date().toISOString(),
-        campaign_status: 'warming',
-        warmup_started_at: new Date().toISOString(),
+        campaign_status: 'pending',
         ...(logoUrl ? { logo_url: logoUrl } : {}),
         ...(headshotUrl ? { headshot_url: headshotUrl } : {}),
       })
