@@ -236,6 +236,7 @@ export default function ClientPage() {
   const [billingRecord, setBillingRecord]       = useState<ClientBillingRecord | null>(null);
   const [resolvedClientId, setResolvedClientId] = useState<string | null>(null);
   const [showChargeBanner, setShowChargeBanner] = useState(false);
+  const [portalLoading, setPortalLoading]       = useState(false);
   const [nextChargeDate, setNextChargeDate]     = useState<Date | null>(null);
   const periodRef                               = useRef<HTMLDivElement>(null);
   // Load profile + meetings + activity from Supabase
@@ -393,6 +394,26 @@ export default function ClientPage() {
       })
       .catch(() => { /* silently fail — invoice section shows empty state */ });
   }, [resolvedClientId]);
+
+  async function handleOpenBillingPortal() {
+    if (!resolvedClientId || portalLoading) return;
+    setPortalLoading(true);
+    try {
+      const res = await fetch('/api/billing-portal', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ clientId: resolvedClientId }),
+      });
+      const json = await res.json();
+      if (json.url) {
+        window.open(json.url, '_blank', 'noopener,noreferrer');
+      }
+    } catch {
+      /* silently fail */
+    } finally {
+      setPortalLoading(false);
+    }
+  }
 
   async function handleSignOut() {
     if (process.env.NEXT_PUBLIC_SUPABASE_URL && process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY) {
@@ -640,11 +661,29 @@ export default function ClientPage() {
                     </div>
                   </>)}
 
-                  {/* Paused */}
-                  {billingRecord?.billing_status === 'paused' && (
-                    <div className="bl-payment-issue">
-                      There was an issue with your last payment. Please contact{' '}
-                      <a href="mailto:ryan@zionshift.com">ryan@zionshift.com</a>
+                  {/* Payment issue — past_due or paused */}
+                  {(billingRecord?.billing_status === 'past_due' || billingRecord?.billing_status === 'paused') && (
+                    <div className="bl-alert-banner">
+                      <div className="bl-alert-top">
+                        <span className="bl-alert-icon">⚠</span>
+                        <div>
+                          <div className="bl-alert-title">
+                            {billingRecord.billing_status === 'paused' ? 'Campaign paused — payment required' : 'Payment issue — action needed'}
+                          </div>
+                          <div className="bl-alert-msg">
+                            {billingRecord.billing_status === 'paused'
+                              ? 'Your campaign has been paused due to an unresolved payment. Update your card to get back up and running.'
+                              : 'We weren\'t able to process your last payment. Please update your card within 3 days to avoid your campaign being paused.'}
+                          </div>
+                        </div>
+                      </div>
+                      <button
+                        className="bl-alert-btn"
+                        onClick={handleOpenBillingPortal}
+                        disabled={portalLoading}
+                      >
+                        {portalLoading ? 'Loading…' : 'Update Payment Method →'}
+                      </button>
                     </div>
                   )}
 
@@ -667,6 +706,20 @@ export default function ClientPage() {
                       </div>
                     </Fragment>
                   ))}
+
+                  {/* Update Payment Method — always available */}
+                  <div className="bl-divider" style={{ marginTop: 16 }} />
+                  <button
+                    className="bl-portal-row"
+                    onClick={handleOpenBillingPortal}
+                    disabled={portalLoading}
+                  >
+                    <span className="bl-portal-row-label">
+                      <span className="bl-portal-row-icon">💳</span>
+                      Update Payment Method
+                    </span>
+                    <span className="bl-portal-row-chevron">{portalLoading ? '…' : '›'}</span>
+                  </button>
 
                 </div>
 
