@@ -741,6 +741,8 @@ body { font-family: var(--zs-sans); color: var(--zs-ink-2); overflow-x: hidden; 
 .bl-payment-issue a { color: #DC2626; text-decoration: underline; }
 
 .bl-changes-title { font: 700 16px var(--zs-sans); letter-spacing: -0.02em; color: var(--zs-ink); margin-bottom: 10px; }
+.bl-plain-footer { font: 400 13px var(--zs-sans); color: var(--zs-ink-4); margin-top: 16px; padding: 0 4px; line-height: 1.6; }
+.bl-plain-footer-title { font-weight: 600; color: var(--zs-ink-3); }
 .bl-changes-body { font: 400 14px var(--zs-sans); color: var(--zs-ink-3); line-height: 1.6; margin: 0 0 16px; }
 .bl-changes-link { color: var(--zs-ink); font-weight: 600; text-decoration: none; border-bottom: 1px solid var(--zs-ink); transition: opacity 160ms; }
 .bl-changes-link:hover { opacity: 0.6; }

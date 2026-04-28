@@ -679,16 +679,6 @@ export default function ClientPage() {
             {/* ── Billing ── */}
             {activeTab === 'billing' && (
               <>
-                {/* ── Need to pause or cancel ── */}
-                <div className="cd-card bl-card" style={{ marginBottom: 16 }}>
-                  <div className="bl-changes-title">Need to make a change?</div>
-                  <p className="bl-changes-body">
-                    Contact us at{' '}
-                    <a href="mailto:ryan@zionshift.com" className="bl-changes-link">ryan@zionshift.com</a>
-                    {' '}and we&apos;ll take care of it within one business day.
-                  </p>
-                </div>
-
                 {/* ── Single billing card ── */}
                 <div className="cd-card bl-card">
 
@@ -774,6 +764,14 @@ export default function ClientPage() {
                     </Fragment>
                   ))}
 
+                </div>
+
+                {/* ── Need to make a change — plain text footer ── */}
+                <div className="bl-plain-footer">
+                  <span className="bl-plain-footer-title">Need to make a change?</span>
+                  {' '}Contact us at{' '}
+                  <a href="mailto:ryan@zionshift.com" className="bl-changes-link">ryan@zionshift.com</a>
+                  {' '}and we&apos;ll take care of it within one business day.
                 </div>
 
               </>
