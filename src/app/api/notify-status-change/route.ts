@@ -7,7 +7,7 @@ function resendClient() {
 
 export async function POST(req: NextRequest) {
   try {
-    const { clientName, action } = await req.json();
+    const { clientName } = await req.json();
 
     const subject  = `Action Required — ${clientName}'s campaign has been paused`;
     const bodyLine = `You just paused <strong>${clientName}</strong>'s campaign in ZionShift. Go into Smartlead and pause their active sequence so emails stop immediately.`;
