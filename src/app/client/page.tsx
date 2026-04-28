@@ -695,7 +695,7 @@ export default function ClientPage() {
                       {/* Header */}
                       <div className="bl-plan-header">
                         <div>
-                          <div className="bl-plan-name">ZionShift Pro</div>
+                          <div className="bl-plan-name">ZionShift</div>
                           <div className="bl-plan-desc">AI-powered outreach for bookkeepers</div>
                         </div>
                         {billingRecord?.billing_status === 'active'
