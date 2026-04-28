@@ -684,117 +684,91 @@ export default function ClientPage() {
                   <p className="bl-sub">Your plan details and payment information.</p>
                 </div>
 
-                <div className="bl-grid">
+                {/* ── Single billing card ── */}
+                <div className="cd-card bl-card">
 
-                  {/* ── Left column ── */}
-                  <div className="bl-col">
+                  {/* Header */}
+                  <div className="bl-plan-header">
+                    <div>
+                      <div className="bl-plan-name">ZionShift</div>
+                      <div className="bl-plan-desc">AI-powered outreach for bookkeepers</div>
+                    </div>
+                  </div>
 
-                    {/* Plan Details */}
-                    <div className="cd-card bl-card">
+                  <div className="bl-divider" />
 
-                      {/* Header */}
-                      <div className="bl-plan-header">
-                        <div>
-                          <div className="bl-plan-name">ZionShift</div>
-                          <div className="bl-plan-desc">AI-powered outreach for bookkeepers</div>
-                        </div>
+                  {/* Trial */}
+                  {(!billingRecord?.billing_status || billingRecord.billing_status === 'not_started' || billingRecord.billing_status === 'trial') && (<>
+                    <div className="bl-stat-row">
+                      <span className="bl-stat-label">Free Period</span>
+                      <div className="bl-stat-right">
+                        <span className="bl-stat-value">45 days</span>
+                        {billingRecord?.trial_ends_at && (
+                          <span className="bl-stat-sub">Ends {fmtBillingDate(billingRecord.trial_ends_at)}</span>
+                        )}
                       </div>
-
-                      <div className="bl-divider" />
-
-                      {/* Trial */}
-                      {(!billingRecord?.billing_status || billingRecord.billing_status === 'not_started' || billingRecord.billing_status === 'trial') && (<>
-                        <div className="bl-stat-row">
-                          <span className="bl-stat-label">Free Period</span>
-                          <div className="bl-stat-right">
-                            <span className="bl-stat-value">45 days</span>
-                            {billingRecord?.trial_ends_at && (
-                              <span className="bl-stat-sub">Ends {fmtBillingDate(billingRecord.trial_ends_at)}</span>
-                            )}
-                          </div>
-                        </div>
-                        <div className="bl-divider" />
-                        <div className="bl-stat-row">
-                          <span className="bl-stat-label">Next Charge</span>
-                          <div className="bl-stat-right">
-                            <span className="bl-stat-value">$2,000</span>
-                            {billingRecord?.trial_ends_at && (
-                              <span className="bl-stat-sub">{fmtBillingDate(billingRecord.trial_ends_at)}</span>
-                            )}
-                          </div>
-                        </div>
-                      </>)}
-
-                      {/* Active */}
-                      {billingRecord?.billing_status === 'active' && (<>
-                        <div className="bl-stat-row">
-                          <span className="bl-stat-label">Monthly Retainer</span>
-                          <div className="bl-stat-right">
-                            <span className="bl-stat-value">$2,000</span>
-                            <span className="bl-stat-sub">per month</span>
-                          </div>
-                        </div>
-                        <div className="bl-divider" />
-                        <div className="bl-stat-row">
-                          <span className="bl-stat-label">Next Charge</span>
-                          <div className="bl-stat-right">
-                            <span className="bl-stat-value">$2,000</span>
-                            {billingRecord.billing_started_at && (
-                              <span className="bl-stat-sub">{fmtBillingDate(getNextBillingDate(billingRecord.billing_started_at).toISOString())}</span>
-                            )}
-                          </div>
-                        </div>
-                      </>)}
-
-                      {/* Paused */}
-                      {billingRecord?.billing_status === 'paused' && (
-                        <div className="bl-payment-issue">
-                          There was an issue with your last payment. Please contact{' '}
-                          <a href="mailto:ryan@zionshift.com">ryan@zionshift.com</a>
-                        </div>
-                      )}
-
                     </div>
-
-                  </div>
-
-                  {/* ── Right column ── */}
-                  <div className="bl-col">
-
-                    {/* Invoice History */}
-                    <div className="cd-card bl-card">
-                      <div className="bl-section-label">Invoice History</div>
-                      {!billingData || billingData.invoices.length === 0 ? (
-                        <p className="bl-inv-empty">No invoices on record yet.</p>
-                      ) : billingData.invoices.map((inv, i) => (
-                        <Fragment key={i}>
-                          {i > 0 && <div className="bl-divider" />}
-                          <div className="bl-invoice-row">
-                            <span className="bl-inv-date">{inv.date}</span>
-                            <span className="bl-inv-desc">{inv.description}</span>
-                            <span className="bl-inv-amount">${inv.amount.toLocaleString('en-US')}</span>
-                            <span className={`bl-inv-status bl-inv-${inv.status}`}>
-                              {inv.status.charAt(0).toUpperCase() + inv.status.slice(1)}
-                            </span>
-                          </div>
-                        </Fragment>
-                      ))}
+                    <div className="bl-divider" />
+                    <div className="bl-stat-row">
+                      <span className="bl-stat-label">Next Charge</span>
+                      <div className="bl-stat-right">
+                        <span className="bl-stat-value">$2,000</span>
+                        {billingRecord?.trial_ends_at && (
+                          <span className="bl-stat-sub">{fmtBillingDate(billingRecord.trial_ends_at)}</span>
+                        )}
+                      </div>
                     </div>
+                  </>)}
 
-                    {/* Need to make changes */}
-                    <div className="cd-card bl-card" style={{ marginTop: 16 }}>
-                      <div className="bl-changes-title">Need to pause or cancel?</div>
-                      <p className="bl-changes-body">
-                        Just reach out directly at{' '}
-                        <a href="mailto:ryan@zionshift.com" className="bl-changes-link">ryan@zionshift.com</a>
-                        {' '}and we&apos;ll handle it within one business day — whether you need a short break or want to cancel entirely.
-                      </p>
-                      <p className="bl-changes-note">
-                        No contracts. No penalties. Your campaign continues only as long as you want it to.
-                      </p>
+                  {/* Active */}
+                  {billingRecord?.billing_status === 'active' && (<>
+                    <div className="bl-stat-row">
+                      <span className="bl-stat-label">Monthly Retainer</span>
+                      <div className="bl-stat-right">
+                        <span className="bl-stat-value">$2,000</span>
+                        <span className="bl-stat-sub">per month</span>
+                      </div>
                     </div>
+                    <div className="bl-divider" />
+                    <div className="bl-stat-row">
+                      <span className="bl-stat-label">Next Charge</span>
+                      <div className="bl-stat-right">
+                        <span className="bl-stat-value">$2,000</span>
+                        {billingRecord.billing_started_at && (
+                          <span className="bl-stat-sub">{fmtBillingDate(getNextBillingDate(billingRecord.billing_started_at).toISOString())}</span>
+                        )}
+                      </div>
+                    </div>
+                  </>)}
 
-                  </div>
+                  {/* Paused */}
+                  {billingRecord?.billing_status === 'paused' && (
+                    <div className="bl-payment-issue">
+                      There was an issue with your last payment. Please contact{' '}
+                      <a href="mailto:ryan@zionshift.com">ryan@zionshift.com</a>
+                    </div>
+                  )}
+
+                  <div className="bl-divider" style={{ marginTop: 8 }} />
+
+                  {/* Invoice History */}
+                  <div className="bl-section-label" style={{ marginTop: 20, marginBottom: 12 }}>Invoice History</div>
+                  {!billingData || billingData.invoices.length === 0 ? (
+                    <p className="bl-inv-empty">No invoices on record yet.</p>
+                  ) : billingData.invoices.map((inv, i) => (
+                    <Fragment key={i}>
+                      {i > 0 && <div className="bl-divider" />}
+                      <div className="bl-invoice-row">
+                        <span className="bl-inv-date">{inv.date}</span>
+                        <span className="bl-inv-desc">{inv.description}</span>
+                        <span className="bl-inv-amount">${inv.amount.toLocaleString('en-US')}</span>
+                        <span className={`bl-inv-status bl-inv-${inv.status}`}>
+                          {inv.status.charAt(0).toUpperCase() + inv.status.slice(1)}
+                        </span>
+                      </div>
+                    </Fragment>
+                  ))}
+
                 </div>
 
                 <div className="cd-support-footer">
