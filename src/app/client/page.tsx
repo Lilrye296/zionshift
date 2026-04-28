@@ -670,9 +670,6 @@ export default function ClientPage() {
               </div>
             </div>
 
-            <div className="cd-support-footer">
-              Questions? Reach out anytime at <a href="mailto:ryan@zionshift.com">ryan@zionshift.com</a>
-            </div>
 
             </>)}
 
@@ -747,7 +744,7 @@ export default function ClientPage() {
                   <div className="bl-divider" style={{ marginTop: 8 }} />
 
                   {/* Invoice History */}
-                  <div className="bl-section-label" style={{ marginTop: 20, marginBottom: 12, textAlign: 'center', color: 'var(--zs-ink)' }}>Invoice History</div>
+                  <div style={{ marginTop: 20, marginBottom: 12, textAlign: 'center', font: '600 14px var(--zs-sans)', color: 'var(--zs-ink)', letterSpacing: '-0.01em' }}>Invoice History</div>
                   {!billingData || billingData.invoices.length === 0 ? (
                     <p className="bl-inv-empty" style={{ textAlign: 'center' }}>No invoices on record yet.</p>
                   ) : billingData.invoices.map((inv, i) => (
