@@ -635,18 +635,12 @@ export default function ClientPage() {
                 <p className="bl-section-label">Manage</p>
                 <div className="cd-card bl-list-card">
                   <button className="bl-list-row bl-list-row--action" onClick={handleOpenBillingPortal} disabled={portalLoading}>
-                    <span className="bl-list-row-main">
-                      <span className="bl-list-row-icon">💳</span>
-                      <span className="bl-list-row-label">Update Payment Method</span>
-                    </span>
+                    <span className="bl-list-row-label">Update Payment Method</span>
                     <span className="bl-list-chevron">{portalLoading ? '…' : '›'}</span>
                   </button>
                   <div className="bl-list-sep" />
                   <a className="bl-list-row bl-list-row--action" href="mailto:ryan@zionshift.com">
-                    <span className="bl-list-row-main">
-                      <span className="bl-list-row-icon">✉️</span>
-                      <span className="bl-list-row-label">Contact Support</span>
-                    </span>
+                    <span className="bl-list-row-label">Contact Support</span>
                     <span className="bl-list-chevron">›</span>
                   </a>
                 </div>
