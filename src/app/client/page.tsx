@@ -691,74 +691,88 @@ export default function ClientPage() {
 
                     {/* Plan Details */}
                     <div className="cd-card bl-card">
-                      <div className="bl-section-label">Plan &amp; Billing</div>
 
-                      {/* Setup Fee — always shown */}
-                      <div className="bl-row">
-                        <span className="bl-row-key">Setup Fee</span>
-                        <span className="bl-row-val">
-                          $1,000 ✅{billingRecord?.trial_started_at
-                            ? ` Paid ${fmtBillingDate(billingRecord.trial_started_at)}`
-                            : ' Paid'}
-                        </span>
+                      {/* Header */}
+                      <div className="bl-plan-header">
+                        <div>
+                          <div className="bl-plan-name">ZionShift Pro</div>
+                          <div className="bl-plan-desc">AI-powered outreach for bookkeepers</div>
+                        </div>
+                        {billingRecord?.billing_status === 'active'
+                          ? <span className="bl-status-pill">● Active</span>
+                          : billingRecord?.billing_status === 'paused'
+                          ? <span className="bl-status-pill bl-status-paused">● Paused</span>
+                          : <span className="bl-status-pill bl-status-paused">Trial</span>
+                        }
                       </div>
 
-                      {/* Trial / not_started */}
-                      {(!billingRecord?.billing_status || billingRecord.billing_status === 'not_started' || billingRecord.billing_status === 'trial') && (
-                        <>
-                          <div className="bl-divider" />
-                          <div className="bl-row">
-                            <span className="bl-row-key">Free Period</span>
-                            <span className="bl-row-val">
-                              45 days{billingRecord?.trial_ends_at
-                                ? ` — ends ${fmtBillingDate(billingRecord.trial_ends_at)}`
-                                : ''}
-                            </span>
+                      <div className="bl-divider" />
+
+                      {/* Setup Fee */}
+                      <div className="bl-stat-row">
+                        <span className="bl-stat-label">Setup Fee</span>
+                        <div className="bl-stat-right">
+                          <span className="bl-stat-value">$1,000</span>
+                          <span className="bl-stat-sub">
+                            Paid{billingRecord?.trial_started_at ? ` · ${fmtBillingDate(billingRecord.trial_started_at)}` : ''}
+                          </span>
+                        </div>
+                      </div>
+
+                      <div className="bl-divider" />
+
+                      {/* Trial */}
+                      {(!billingRecord?.billing_status || billingRecord.billing_status === 'not_started' || billingRecord.billing_status === 'trial') && (<>
+                        <div className="bl-stat-row">
+                          <span className="bl-stat-label">Free Period</span>
+                          <div className="bl-stat-right">
+                            <span className="bl-stat-value">45 days</span>
+                            {billingRecord?.trial_ends_at && (
+                              <span className="bl-stat-sub">Ends {fmtBillingDate(billingRecord.trial_ends_at)}</span>
+                            )}
                           </div>
-                          <div className="bl-divider" />
-                          <div className="bl-row">
-                            <span className="bl-row-key">Next Charge</span>
-                            <span className="bl-row-mono">
-                              {billingRecord?.trial_ends_at
-                                ? `$2,000 on ${fmtBillingDate(billingRecord.trial_ends_at)}`
-                                : '—'}
-                            </span>
+                        </div>
+                        <div className="bl-divider" />
+                        <div className="bl-stat-row">
+                          <span className="bl-stat-label">Next Charge</span>
+                          <div className="bl-stat-right">
+                            <span className="bl-stat-value">$2,000</span>
+                            {billingRecord?.trial_ends_at && (
+                              <span className="bl-stat-sub">{fmtBillingDate(billingRecord.trial_ends_at)}</span>
+                            )}
                           </div>
-                        </>
-                      )}
+                        </div>
+                      </>)}
 
                       {/* Active */}
-                      {billingRecord?.billing_status === 'active' && (
-                        <>
-                          <div className="bl-divider" />
-                          <div className="bl-row">
-                            <span className="bl-row-key">Retainer</span>
-                            <span className="bl-row-val">
-                              $2,000/mo <span className="bl-status-pill">● Active</span>
-                            </span>
+                      {billingRecord?.billing_status === 'active' && (<>
+                        <div className="bl-stat-row">
+                          <span className="bl-stat-label">Monthly Retainer</span>
+                          <div className="bl-stat-right">
+                            <span className="bl-stat-value">$2,000</span>
+                            <span className="bl-stat-sub">per month</span>
                           </div>
-                          <div className="bl-divider" />
-                          <div className="bl-row">
-                            <span className="bl-row-key">Next Charge</span>
-                            <span className="bl-row-mono">
-                              {billingRecord.billing_started_at
-                                ? `$2,000 on ${fmtBillingDate(getNextBillingDate(billingRecord.billing_started_at).toISOString())}`
-                                : '—'}
-                            </span>
+                        </div>
+                        <div className="bl-divider" />
+                        <div className="bl-stat-row">
+                          <span className="bl-stat-label">Next Charge</span>
+                          <div className="bl-stat-right">
+                            <span className="bl-stat-value">$2,000</span>
+                            {billingRecord.billing_started_at && (
+                              <span className="bl-stat-sub">{fmtBillingDate(getNextBillingDate(billingRecord.billing_started_at).toISOString())}</span>
+                            )}
                           </div>
-                        </>
-                      )}
+                        </div>
+                      </>)}
 
                       {/* Paused */}
                       {billingRecord?.billing_status === 'paused' && (
-                        <>
-                          <div className="bl-divider" />
-                          <div className="bl-payment-issue">
-                            There was an issue with your last payment. Please contact{' '}
-                            <a href="mailto:ryan@zionshift.com">ryan@zionshift.com</a>
-                          </div>
-                        </>
+                        <div className="bl-payment-issue">
+                          There was an issue with your last payment. Please contact{' '}
+                          <a href="mailto:ryan@zionshift.com">ryan@zionshift.com</a>
+                        </div>
                       )}
+
                     </div>
 
                   </div>
