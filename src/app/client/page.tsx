@@ -684,6 +684,19 @@ export default function ClientPage() {
                   <p className="bl-sub">Your plan details and payment information.</p>
                 </div>
 
+                {/* ── Need to pause or cancel ── */}
+                <div className="cd-card bl-card" style={{ marginBottom: 16 }}>
+                  <div className="bl-changes-title">Need to pause or cancel?</div>
+                  <p className="bl-changes-body">
+                    Just reach out directly at{' '}
+                    <a href="mailto:ryan@zionshift.com" className="bl-changes-link">ryan@zionshift.com</a>
+                    {' '}and we&apos;ll handle it within one business day — whether you need a short break or want to cancel entirely.
+                  </p>
+                  <p className="bl-changes-note">
+                    No contracts. No penalties. Your campaign continues only as long as you want it to.
+                  </p>
+                </div>
+
                 {/* ── Single billing card ── */}
                 <div className="cd-card bl-card">
 
@@ -752,9 +765,9 @@ export default function ClientPage() {
                   <div className="bl-divider" style={{ marginTop: 8 }} />
 
                   {/* Invoice History */}
-                  <div className="bl-section-label" style={{ marginTop: 20, marginBottom: 12 }}>Invoice History</div>
+                  <div className="bl-section-label" style={{ marginTop: 20, marginBottom: 12, textAlign: 'center', color: 'var(--zs-ink)' }}>Invoice History</div>
                   {!billingData || billingData.invoices.length === 0 ? (
-                    <p className="bl-inv-empty">No invoices on record yet.</p>
+                    <p className="bl-inv-empty" style={{ textAlign: 'center' }}>No invoices on record yet.</p>
                   ) : billingData.invoices.map((inv, i) => (
                     <Fragment key={i}>
                       {i > 0 && <div className="bl-divider" />}
