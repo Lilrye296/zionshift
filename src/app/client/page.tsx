@@ -15,16 +15,6 @@ interface ClientProfile {
   campaign_status: string;
 }
 
-interface CalMeeting {
-  day: number;
-  month: number; // 0-indexed (0 = Jan, 3 = Apr)
-  prospect: string;
-  firm: string;
-  time: string;
-  zoomUrl?: string;
-}
-
-
 /* ── Helpers ── */
 function getGreeting() {
   const h = new Date().getHours();
@@ -33,8 +23,6 @@ function getGreeting() {
   return 'Good evening';
 }
 
-
-const MONTH_SHORT = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
 
 function fmtBillingDate(iso: string): string {
   return new Date(iso).toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric' });
@@ -48,27 +36,6 @@ function getNextBillingDate(billingStartedAt: string): Date {
   return new Date(start.getTime() + (periods + 1) * 30 * 24 * 60 * 60 * 1000);
 }
 
-// Converts a time string like "2:00 PM EST" to total minutes
-function parseTime(t: string): number {
-  const [timePart, pd] = t.split(' ');
-  const [h, m] = timePart.split(':').map(Number);
-  const hour = pd === 'PM' && h !== 12 ? h + 12 : pd === 'AM' && h === 12 ? 0 : h;
-  return hour * 60 + m;
-}
-
-// Returns true if the meeting month/day/time has already passed
-function isMeetingPast(day: number, time: string, month?: number): boolean {
-  const now = new Date();
-  const totalMinutes = parseTime(time);
-  const meetingDate = new Date(
-    now.getFullYear(),
-    month ?? now.getMonth(),
-    day,
-    Math.floor(totalMinutes / 60),
-    totalMinutes % 60,
-  );
-  return now > meetingDate;
-}
 
 /* ── Logo Upload Modal ── */
 const LOGO_ACCEPTED_TYPES = ['image/png', 'image/svg+xml', 'image/jpeg'];
@@ -255,7 +222,6 @@ export default function ClientPage() {
   const [profile, setProfile]           = useState<ClientProfile | null>(null);
   const [loading, setLoading]           = useState(true);
   const [isAdminView, setIsAdminView]   = useState(false);
-  const [calMeetings, setCalMeetings]   = useState<CalMeeting[]>([]);
   const router = useRouter();
 
   const [activeTab, setActiveTab]               = useState<'overview' | 'billing'>('overview');
@@ -347,25 +313,6 @@ export default function ClientPage() {
           }));
         }
 
-        // Fetch meetings for this client
-        const { data: meetingsData } = await supabase
-          .from('meetings')
-          .select('prospect, firm, day, month, meeting_time, zoom_url')
-          .eq('client_id', targetClientId)
-          .order('year',  { ascending: false })
-          .order('month', { ascending: false })
-          .order('day',   { ascending: false });
-
-        if (meetingsData) {
-          setCalMeetings(meetingsData.map(m => ({
-            day:     m.day,
-            month:   m.month,
-            prospect: m.prospect ?? '',
-            firm:    m.firm ?? '',
-            time:    m.meeting_time ?? '',
-            zoomUrl: m.zoom_url ?? undefined,
-          })));
-        }
 
         // Fetch billing + campaign data from clients table
         const { data: billingRow } = await supabase
@@ -465,19 +412,6 @@ export default function ClientPage() {
   const statusProps = getStatusProps(
     billingRecord?.campaign_status ?? p?.campaign_status ?? null,
     billingRecord?.warmup_started_at,
-  );
-
-  // Filter meetings by selected period, then sort descending
-  const now = new Date();
-  const todayNum = now.getDate();
-  const curMonth = now.getMonth();
-  const filteredMeetings = [...calMeetings].filter(m => {
-    if (period === 'alltime') return true;
-    if (period === 'month')   return m.month === curMonth;
-    if (period === 'week')    return m.month === curMonth && m.day >= todayNum - 7;
-    return true;
-  }).sort(
-    (a, b) => b.month - a.month || b.day - a.day || parseTime(b.time) - parseTime(a.time),
   );
 
   return (
@@ -631,44 +565,6 @@ export default function ClientPage() {
               </div>
             </div>
 
-            {/* ── Meetings Log ── */}
-            <div className="cd-card" style={{ padding: 0, overflow: 'hidden', display: 'flex', flexDirection: 'column', marginBottom: 20 }}>
-              <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '24px 20px 0', marginBottom: 16, flexShrink: 0 }}>
-                <div>
-                  <span className="adm-biz-card-title">Meetings Log</span>
-                  <div className="cd-metric-period" style={{ marginTop: 2 }}>{PERIOD_LABEL[period]}</div>
-                </div>
-                <span className="adm-count-chip">{filteredMeetings.length} Total</span>
-              </div>
-              <div className="cd-meet-log">
-                {filteredMeetings.length === 0 ? (
-                  <p className="adm-empty-text" style={{ padding: '0 20px 24px' }}>No meetings booked yet.</p>
-                ) : filteredMeetings.map((m, i) => {
-                  const isPast = isMeetingPast(m.day, m.time, m.month);
-                  return (
-                    <Fragment key={i}>
-                      {i > 0 && <div className="adm-divider" style={{ margin: '0 20px' }} />}
-                      <div className="adm-meet-row">
-                        <div className="adm-meet-row-avatar">
-                          {m.prospect.split(' ').map(w => w[0]).join('')}
-                        </div>
-                        <div className="adm-meet-row-info">
-                          <span className="adm-meet-row-name">{m.prospect}</span>
-                          <span className="adm-meet-row-firm">{m.firm}</span>
-                        </div>
-                        <div className="adm-meet-row-right">
-                          <span className="adm-meet-row-date">{MONTH_SHORT[m.month]} {m.day}</span>
-                          <span className="adm-meet-row-time">{m.time}</span>
-                          <span className={`adm-meet-pill adm-meet-pill--${isPast ? 'completed' : 'upcoming'}`}>
-                            {isPast ? 'Completed' : 'Upcoming'}
-                          </span>
-                        </div>
-                      </div>
-                    </Fragment>
-                  );
-                })}
-              </div>
-            </div>
 
 
             </>)}
