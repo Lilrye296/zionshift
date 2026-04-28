@@ -234,6 +234,7 @@ export default function ClientPage() {
   const [periodStats, setPeriodStats]           = useState<PeriodStats | null>(null);
   const [billingData, setBillingData]           = useState<BillingData | null>(null);
   const [billingRecord, setBillingRecord]       = useState<ClientBillingRecord | null>(null);
+  const [resolvedClientId, setResolvedClientId] = useState<string | null>(null);
   const [showChargeBanner, setShowChargeBanner] = useState(false);
   const [nextChargeDate, setNextChargeDate]     = useState<Date | null>(null);
   const periodRef                               = useRef<HTMLDivElement>(null);
@@ -271,6 +272,8 @@ export default function ClientPage() {
           setLoading(false);
           return;
         }
+
+        setResolvedClientId(targetClientId);
 
         // Fetch core fields directly from clients table (source of truth from onboarding)
         const { data: clientRow } = await supabase
@@ -378,10 +381,18 @@ export default function ClientPage() {
     });
   }, [period, profile]);
 
-  // Billing placeholder — replaced when Stripe is wired
+  // Fetch invoice history from Stripe via our API route
   useEffect(() => {
-    setBillingData(null);
-  }, []);
+    if (!resolvedClientId) return;
+    fetch(`/api/get-invoices?clientId=${resolvedClientId}`)
+      .then(r => r.json())
+      .then(data => {
+        if (data.invoices) {
+          setBillingData({ invoices: data.invoices } as BillingData);
+        }
+      })
+      .catch(() => { /* silently fail — invoice section shows empty state */ });
+  }, [resolvedClientId]);
 
   async function handleSignOut() {
     if (process.env.NEXT_PUBLIC_SUPABASE_URL && process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY) {
