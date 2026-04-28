@@ -958,6 +958,9 @@ footer.zs-footer { padding: 40px 0; border-top: 1px solid var(--zs-border); }
 .adm-warmup-btn { display: inline-block; margin-top: 3px; margin-left: 8px; font: 600 11px var(--zs-sans); color: #fff; background: #1A1715; border: none; border-radius: 999px; padding: 4px 12px; cursor: pointer; letter-spacing: 0.01em; transition: opacity 0.15s; }
 .adm-warmup-btn:hover { opacity: 0.75; }
 
+/* Mobile-only client card rows (pills + quick actions) — hidden on desktop */
+.adm-mobile-rows { display: none; }
+
 /* Client actions dropdown */
 .adm-actions-wrap { position: relative; }
 .adm-menu-btn { background: var(--zs-paper); border: 1px solid var(--zs-border); border-radius: 8px; padding: 5px 10px; font: 500 13px var(--zs-sans); color: var(--zs-ink-3); cursor: pointer; letter-spacing: 0.06em; transition: background 140ms, border-color 140ms; }
@@ -1237,8 +1240,22 @@ footer.zs-footer { padding: 40px 0; border-top: 1px solid var(--zs-border); }
   /* Allow name + firm text to wrap on mobile so nothing is hidden behind ellipsis */
   .adm-client-name { white-space: normal; }
   .adm-client-firm { white-space: normal; word-break: break-all; }
-  /* Second line: full width, indented to align with text (avatar 36px + gap 14px) */
-  .adm-client-right { width: 100%; flex-direction: row; align-items: center; justify-content: space-between; padding-left: 50px; gap: 8px; margin-top: 6px; }
+  /* Right column shrinks to just the ••• button — no longer full-width second row */
+  .adm-client-right { width: auto; padding-left: 0; margin-top: 0; align-self: flex-start; }
+  /* Hide the campaign status pill from adm-client-right on mobile (shown in adm-mobile-pills instead) */
+  .adm-client-right > .adm-client-pill { display: none; }
+  /* Hide billing pills from adm-client-info on mobile (shown in adm-mobile-pills instead) */
+  .adm-client-info .adm-billing-pill { display: none; }
+
+  /* Mobile rows: pills + quick-action buttons (indented to align with text) */
+  .adm-mobile-rows { display: block; width: 100%; padding-left: 50px; margin-top: 6px; }
+  .adm-mobile-pills { display: flex; align-items: center; gap: 6px; flex-wrap: wrap; margin-bottom: 6px; }
+  .adm-mobile-pills .adm-billing-pill { margin: 0; }
+  .adm-mobile-pills .adm-client-pill { font-size: 10px; padding: 2px 8px; }
+  .adm-mobile-actions { display: flex; gap: 6px; flex-wrap: wrap; }
+  .adm-mobile-action-btn { font: 500 11px var(--zs-sans); color: var(--zs-ink-3); background: var(--zs-paper); border: 1px solid var(--zs-border); border-radius: 6px; padding: 4px 10px; cursor: pointer; white-space: nowrap; transition: background 140ms; }
+  .adm-mobile-action-btn:hover { background: var(--zs-mist); }
+  .adm-mobile-action-btn.disabled { opacity: 0.4; cursor: default; }
   /* Cap scroll container on mobile and always scroll — overrides the ≤4 client inline style
      that removes the cap on desktop. Rows are taller on mobile due to wrapping so we need
      a reliable cap to keep the tile a sensible height. */

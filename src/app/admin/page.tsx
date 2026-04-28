@@ -461,6 +461,41 @@ export default function AdminPage() {
                             )}
                           </div>
 
+                          {/* Mobile-only: pills row + quick-action buttons */}
+                          {c.status !== 'pending' && (
+                            <div className="adm-mobile-rows">
+                              <div className="adm-mobile-pills">
+                                {c.status === 'live' && !c.firstMonthPaid && (c.billingStatus === 'trial' || !c.billingStatus) && (
+                                  <span className="adm-billing-pill adm-billing-pill--trial">Trial</span>
+                                )}
+                                {(c.billingStatus === 'past_due' || c.billingStatus === 'paused') && (
+                                  <span className="adm-billing-pill adm-billing-pill--failed">Payment Failed</span>
+                                )}
+                                {(() => {
+                                  const cs = c.campaignStatus;
+                                  if (cs === 'warming' && c.warmupStartedAt) {
+                                    const day = Math.floor((Date.now() - new Date(c.warmupStartedAt).getTime()) / 86400000) + 1;
+                                    if (day > 14) return <span className="adm-client-pill adm-client-pill--live">● Active</span>;
+                                    return <span className="adm-client-pill adm-client-pill--warming"><span style={{ color: '#f59e0b' }}>●</span> Warming — Day {day} of 14</span>;
+                                  }
+                                  if (cs === 'active')    return <span className="adm-client-pill adm-client-pill--live">● Active</span>;
+                                  if (cs === 'paused')    return <span className="adm-client-pill adm-client-pill--paused">● Paused</span>;
+                                  if (cs === 'cancelled') return <span className="adm-client-pill adm-client-pill--cancelled">● Cancelled</span>;
+                                  return <span className="adm-client-pill adm-client-pill--pending">● Pending</span>;
+                                })()}
+                              </div>
+                              <div className="adm-mobile-actions">
+                                <button className="adm-mobile-action-btn" onClick={() => router.push(`/client?view=${c.id}`)}>Dashboard →</button>
+                                <button
+                                  className={`adm-mobile-action-btn${!c.logoUrl && !c.headshotUrl ? ' disabled' : ''}`}
+                                  disabled={!c.logoUrl && !c.headshotUrl}
+                                  onClick={() => handleDownloadAssets(c)}
+                                >Assets</button>
+                                <button className="adm-mobile-action-btn" onClick={() => handleViewIntake(c)}>Intake Form</button>
+                              </div>
+                            </div>
+                          )}
+
                           {/* Campaign status pill + actions */}
                           <div className="adm-client-right">
                             {(() => {
