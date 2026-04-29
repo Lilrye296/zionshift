@@ -176,70 +176,71 @@ export async function POST(req: NextRequest) {
         html: `
 <!DOCTYPE html>
 <html lang="en">
-<head><meta charset="UTF-8" /><title>New Client Onboarded</title></head>
-<body style="margin:0;padding:40px 0;background:#F0EDE8;font-family:'Helvetica Neue',Helvetica,Arial,sans-serif;">
-  <div style="max-width:560px;margin:0 auto;background:#fff;border-radius:16px;overflow:hidden;box-shadow:0 4px 24px rgba(0,0,0,0.07);">
+  <head><meta charset="UTF-8" /><title>New Client Onboarded</title></head>
+  <body style="margin:0;padding:48px 0;background:#F0EDE8;font-family:'Helvetica Neue',Helvetica,Arial,sans-serif;">
+    <div style="max-width:560px;margin:0 auto;background:#ffffff;border-radius:16px;overflow:hidden;box-shadow:0 4px 24px rgba(0,0,0,0.07);">
 
-    <div style="background:#1A1715;padding:28px 36px;">
-      <p style="margin:0;font-size:11px;font-weight:700;letter-spacing:0.14em;text-transform:uppercase;color:rgba(255,255,255,0.45);">ZionShift — Build Brief</p>
-      <h1 style="margin:10px 0 0;font-size:24px;font-weight:800;color:#fff;letter-spacing:-0.03em;">${businessName} just onboarded.</h1>
-      <p style="margin:6px 0 0;font-size:13px;color:rgba(255,255,255,0.5);">${email} · ${submittedDate}</p>
+      <div style="background:#ffffff;padding:24px 36px;border-bottom:1px solid #F0EDE8;">
+        <img src="https://www.zionshift.com/logo.png" alt="ZionShift" width="140" style="display:block;" />
+      </div>
+
+      <div style="padding:44px 36px 36px;">
+        <p style="margin:0 0 12px;font-size:11px;font-weight:700;letter-spacing:0.12em;text-transform:uppercase;color:#9CA3AF;">Build Brief</p>
+        <h1 style="margin:0 0 6px;font-size:30px;font-weight:800;color:#1A1715;letter-spacing:-0.04em;line-height:1.1;">${businessName} just onboarded.</h1>
+        <p style="margin:0 0 28px;font-size:13px;color:#9CA3AF;">${email} &middot; ${submittedDate}</p>
+        <p style="margin:0 0 28px;font-size:15px;line-height:1.75;color:#6B7280;">
+          Their onboarding form is complete. Time to buy their domain, spin up their mailboxes, start the warmup, and build their Clay table. Everything you need is below.
+        </p>
+
+        <p style="margin:0 0 10px;font-size:11px;font-weight:700;letter-spacing:0.12em;text-transform:uppercase;color:#9CA3AF;">About Them</p>
+        <div style="padding:20px 24px;background:#FAFAF9;border-radius:10px;border:1px solid #EEEBE6;margin-bottom:20px;">
+          <table style="width:100%;border-collapse:collapse;">
+            <tr><td style="padding:5px 0;font-size:12px;font-weight:600;color:#9CA3AF;width:42%;">Name</td><td style="padding:5px 0;font-size:14px;color:#1A1715;">${firstName} ${lastName}</td></tr>
+            <tr><td style="padding:5px 0;font-size:12px;font-weight:600;color:#9CA3AF;">Business</td><td style="padding:5px 0;font-size:14px;color:#1A1715;">${businessName}</td></tr>
+            <tr><td style="padding:5px 0;font-size:12px;font-weight:600;color:#9CA3AF;">Location</td><td style="padding:5px 0;font-size:14px;color:#1A1715;">${cityState}</td></tr>
+            <tr><td style="padding:5px 0;font-size:12px;font-weight:600;color:#9CA3AF;">Years in Business</td><td style="padding:5px 0;font-size:14px;color:#1A1715;">${yearsInBusiness}</td></tr>
+            <tr><td style="padding:5px 0;font-size:12px;font-weight:600;color:#9CA3AF;">Website</td><td style="padding:5px 0;font-size:14px;color:#1A1715;">${websiteUrl || '—'}</td></tr>
+            <tr><td style="padding:5px 0;font-size:12px;font-weight:600;color:#9CA3AF;">Booking Link</td><td style="padding:5px 0;font-size:14px;color:#1A1715;"><a href="${bookingLink}" style="color:#1A1715;">${bookingLink || '—'}</a></td></tr>
+          </table>
+        </div>
+
+        <p style="margin:0 0 10px;font-size:11px;font-weight:700;letter-spacing:0.12em;text-transform:uppercase;color:#9CA3AF;">Ideal Client</p>
+        <div style="padding:20px 24px;background:#FAFAF9;border-radius:10px;border:1px solid #EEEBE6;margin-bottom:20px;">
+          <table style="width:100%;border-collapse:collapse;">
+            <tr><td style="padding:5px 0;font-size:12px;font-weight:600;color:#9CA3AF;width:42%;">Industries</td><td style="padding:5px 0;font-size:14px;color:#1A1715;">${industryList}${otherIndustry ? ` (Other: ${otherIndustry})` : ''}</td></tr>
+            <tr><td style="padding:5px 0;font-size:12px;font-weight:600;color:#9CA3AF;">Employee Count</td><td style="padding:5px 0;font-size:14px;color:#1A1715;">${empList}</td></tr>
+            <tr><td style="padding:5px 0;font-size:12px;font-weight:600;color:#9CA3AF;">Revenue Range</td><td style="padding:5px 0;font-size:14px;color:#1A1715;">${revenueRange}</td></tr>
+            <tr><td style="padding:5px 0;font-size:12px;font-weight:600;color:#9CA3AF;">Geo Focus</td><td style="padding:5px 0;font-size:14px;color:#1A1715;">${geoFocus}</td></tr>
+            <tr><td style="padding:5px 0;font-size:12px;font-weight:600;color:#9CA3AF;">Exclusions</td><td style="padding:5px 0;font-size:14px;color:#1A1715;">${exclusions || '—'}</td></tr>
+            <tr><td style="padding:5px 0;font-size:12px;font-weight:600;color:#9CA3AF;">Prospect Note</td><td style="padding:5px 0;font-size:14px;color:#1A1715;">${prospectNote || '—'}</td></tr>
+          </table>
+        </div>
+
+        <p style="margin:0 0 10px;font-size:11px;font-weight:700;letter-spacing:0.12em;text-transform:uppercase;color:#9CA3AF;">Voice &amp; Messaging</p>
+        <div style="padding:20px 24px;background:#FAFAF9;border-radius:10px;border:1px solid #EEEBE6;margin-bottom:20px;">
+          <table style="width:100%;border-collapse:collapse;">
+            <tr><td style="padding:5px 0;font-size:12px;font-weight:600;color:#9CA3AF;width:42%;">Differentiator</td><td style="padding:5px 0;font-size:14px;color:#1A1715;">${differentiator}</td></tr>
+            <tr><td style="padding:5px 0;font-size:12px;font-weight:600;color:#9CA3AF;">Pain Point</td><td style="padding:5px 0;font-size:14px;color:#1A1715;">${painPoint}</td></tr>
+            <tr><td style="padding:5px 0;font-size:12px;font-weight:600;color:#9CA3AF;">Transformation</td><td style="padding:5px 0;font-size:14px;color:#1A1715;">${transformation}</td></tr>
+            <tr><td style="padding:5px 0;font-size:12px;font-weight:600;color:#9CA3AF;">Tone</td><td style="padding:5px 0;font-size:14px;color:#1A1715;">${tone}</td></tr>
+            <tr><td style="padding:5px 0;font-size:12px;font-weight:600;color:#9CA3AF;">Avoid</td><td style="padding:5px 0;font-size:14px;color:#1A1715;">${avoidances || '—'}</td></tr>
+          </table>
+        </div>
+
+        <p style="margin:0 0 10px;font-size:11px;font-weight:700;letter-spacing:0.12em;text-transform:uppercase;color:#9CA3AF;">Other</p>
+        <div style="padding:20px 24px;background:#FAFAF9;border-radius:10px;border:1px solid #EEEBE6;">
+          <table style="width:100%;border-collapse:collapse;">
+            <tr><td style="padding:5px 0;font-size:12px;font-weight:600;color:#9CA3AF;width:42%;">Referral Source</td><td style="padding:5px 0;font-size:14px;color:#1A1715;">${referralSource || '—'}</td></tr>
+          </table>
+        </div>
+      </div>
+
+      <div style="padding:20px 36px 28px;border-top:1px solid #F0EDE8;">
+        <p style="margin:0;font-size:12px;color:#C8C4BC;">ZionShift &middot; Go build their machine — the clock is ticking.</p>
+      </div>
+
     </div>
-
-    <div style="padding:32px 36px;">
-      <p style="margin:0 0 28px;font-size:15px;line-height:1.6;color:#374151;">
-        Their onboarding form is complete. Time to buy their domain, spin up their mailboxes, start the warmup, and build their Clay table. Everything you need is below.
-      </p>
-
-      <p style="margin:0 0 10px;font-size:11px;font-weight:700;letter-spacing:0.12em;text-transform:uppercase;color:#9CA3AF;">About Them</p>
-      <div style="background:#F9FAFB;border-radius:10px;padding:18px 20px;margin-bottom:20px;">
-        <table style="width:100%;border-collapse:collapse;">
-          <tr><td style="padding:4px 0;font-size:12px;font-weight:600;color:#6B7280;width:42%;">Name</td><td style="padding:4px 0;font-size:14px;color:#1A1715;">${firstName} ${lastName}</td></tr>
-          <tr><td style="padding:4px 0;font-size:12px;font-weight:600;color:#6B7280;">Business</td><td style="padding:4px 0;font-size:14px;color:#1A1715;">${businessName}</td></tr>
-          <tr><td style="padding:4px 0;font-size:12px;font-weight:600;color:#6B7280;">Location</td><td style="padding:4px 0;font-size:14px;color:#1A1715;">${cityState}</td></tr>
-          <tr><td style="padding:4px 0;font-size:12px;font-weight:600;color:#6B7280;">Years in Business</td><td style="padding:4px 0;font-size:14px;color:#1A1715;">${yearsInBusiness}</td></tr>
-          <tr><td style="padding:4px 0;font-size:12px;font-weight:600;color:#6B7280;">Website</td><td style="padding:4px 0;font-size:14px;color:#1A1715;">${websiteUrl || '—'}</td></tr>
-          <tr><td style="padding:4px 0;font-size:12px;font-weight:600;color:#6B7280;">Booking Link</td><td style="padding:4px 0;font-size:14px;color:#1A1715;"><a href="${bookingLink}" style="color:#1A1715;">${bookingLink || '—'}</a></td></tr>
-        </table>
-      </div>
-
-      <p style="margin:0 0 10px;font-size:11px;font-weight:700;letter-spacing:0.12em;text-transform:uppercase;color:#9CA3AF;">Ideal Client</p>
-      <div style="background:#F9FAFB;border-radius:10px;padding:18px 20px;margin-bottom:20px;">
-        <table style="width:100%;border-collapse:collapse;">
-          <tr><td style="padding:4px 0;font-size:12px;font-weight:600;color:#6B7280;width:42%;">Industries</td><td style="padding:4px 0;font-size:14px;color:#1A1715;">${industryList}${otherIndustry ? ` (Other: ${otherIndustry})` : ''}</td></tr>
-          <tr><td style="padding:4px 0;font-size:12px;font-weight:600;color:#6B7280;">Employee Count</td><td style="padding:4px 0;font-size:14px;color:#1A1715;">${empList}</td></tr>
-          <tr><td style="padding:4px 0;font-size:12px;font-weight:600;color:#6B7280;">Revenue Range</td><td style="padding:4px 0;font-size:14px;color:#1A1715;">${revenueRange}</td></tr>
-          <tr><td style="padding:4px 0;font-size:12px;font-weight:600;color:#6B7280;">Geo Focus</td><td style="padding:4px 0;font-size:14px;color:#1A1715;">${geoFocus}</td></tr>
-          <tr><td style="padding:4px 0;font-size:12px;font-weight:600;color:#6B7280;">Exclusions</td><td style="padding:4px 0;font-size:14px;color:#1A1715;">${exclusions || '—'}</td></tr>
-          <tr><td style="padding:4px 0;font-size:12px;font-weight:600;color:#6B7280;">Prospect Note</td><td style="padding:4px 0;font-size:14px;color:#1A1715;">${prospectNote || '—'}</td></tr>
-        </table>
-      </div>
-
-      <p style="margin:0 0 10px;font-size:11px;font-weight:700;letter-spacing:0.12em;text-transform:uppercase;color:#9CA3AF;">Voice &amp; Messaging</p>
-      <div style="background:#F9FAFB;border-radius:10px;padding:18px 20px;margin-bottom:20px;">
-        <table style="width:100%;border-collapse:collapse;">
-          <tr><td style="padding:4px 0;font-size:12px;font-weight:600;color:#6B7280;width:42%;">Differentiator</td><td style="padding:4px 0;font-size:14px;color:#1A1715;">${differentiator}</td></tr>
-          <tr><td style="padding:4px 0;font-size:12px;font-weight:600;color:#6B7280;">Pain Point</td><td style="padding:4px 0;font-size:14px;color:#1A1715;">${painPoint}</td></tr>
-          <tr><td style="padding:4px 0;font-size:12px;font-weight:600;color:#6B7280;">Transformation</td><td style="padding:4px 0;font-size:14px;color:#1A1715;">${transformation}</td></tr>
-          <tr><td style="padding:4px 0;font-size:12px;font-weight:600;color:#6B7280;">Tone</td><td style="padding:4px 0;font-size:14px;color:#1A1715;">${tone}</td></tr>
-          <tr><td style="padding:4px 0;font-size:12px;font-weight:600;color:#6B7280;">Avoid</td><td style="padding:4px 0;font-size:14px;color:#1A1715;">${avoidances || '—'}</td></tr>
-        </table>
-      </div>
-
-      <div style="background:#F9FAFB;border-radius:10px;padding:18px 20px;">
-        <table style="width:100%;border-collapse:collapse;">
-          <tr><td style="padding:4px 0;font-size:12px;font-weight:600;color:#6B7280;width:42%;">Referral Source</td><td style="padding:4px 0;font-size:14px;color:#1A1715;">${referralSource || '—'}</td></tr>
-        </table>
-      </div>
-
-    </div>
-
-    <div style="padding:16px 36px 24px;border-top:1px solid #F0EDE8;">
-      <p style="margin:0;font-size:12px;color:#C8C4BC;">ZionShift · Go build their machine — the clock is ticking.</p>
-    </div>
-
-  </div>
-</body>
+  </body>
 </html>
         `.trim(),
       });
