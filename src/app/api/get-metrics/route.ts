@@ -118,11 +118,30 @@ export async function GET(req: NextRequest) {
     const replyRate  = sent > 0 ? parseFloat(((replies / sent) * 100).toFixed(2)) : 0;
     const bounceRate = sent > 0 ? parseFloat(((bounces / sent) * 100).toFixed(2)) : 0;
 
+    // ── 4. Hot leads count from Supabase (period-filtered) ────────
+    let hotLeads = 0;
+    try {
+      let query = supabase
+        .from('hot_leads')
+        .select('*', { count: 'exact', head: true })
+        .eq('client_id', clientId);
+
+      if (dateRange) {
+        query = query.gte('created_at', `${dateRange.start}T00:00:00.000Z`);
+      }
+
+      const { count } = await query;
+      hotLeads = count ?? 0;
+    } catch (hlErr) {
+      console.error('[get-metrics] Hot leads query error:', hlErr);
+    }
+
     return NextResponse.json({
       metrics: {
         emails_sent:  sent,
         replies,
         reply_rate:   replyRate,
+        hot_leads:    hotLeads,
         bounces,
         bounce_rate:  bounceRate,
         opt_outs:     optOuts,

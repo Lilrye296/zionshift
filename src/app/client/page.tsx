@@ -396,7 +396,7 @@ export default function ClientPage() {
             emails_sent: data.metrics.emails_sent,
             replies:     data.metrics.replies,
             reply_rate:  data.metrics.reply_rate,
-            hot_leads:   0, // wired separately via AI reply pipeline
+            hot_leads:   data.metrics.hot_leads ?? 0,
             bounces:     data.metrics.bounces,
             bounce_rate: data.metrics.bounce_rate,
             opt_outs:    data.metrics.opt_outs,
