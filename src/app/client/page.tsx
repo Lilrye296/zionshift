@@ -750,7 +750,7 @@ export default function ClientPage() {
 
 
             {/* ── Hot Leads Viewer ── */}
-            <p className="cd-health-label" style={{ marginTop: 32 }}>Hot Leads</p>
+            <p className="cd-health-label" style={{ marginTop: 32 }}>Hot Lead Conversations</p>
             <div className="cd-card hl-card">
 
               {/* Search bar */}
