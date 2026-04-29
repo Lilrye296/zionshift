@@ -201,6 +201,25 @@ interface BillingData {
 
 const PERIOD_LABEL = { week: 'This Week', month: 'This Month', alltime: 'All Time' };
 
+interface ConversationMessage {
+  id: number;
+  type: 'outbound' | 'inbound';
+  sender: string;
+  body: string;
+  time?: string;
+  subject?: string;
+}
+
+interface HotLead {
+  id: string;
+  lead_name: string | null;
+  lead_company: string | null;
+  lead_email: string;
+  status: string;
+  booking_link: string | null;
+  created_at: string;
+}
+
 function getStatusProps(status: string | null, warmupStartedAt?: string | null) {
   switch (status) {
     case 'pending':
@@ -242,6 +261,16 @@ export default function ClientPage() {
   const [portalLoading, setPortalLoading]       = useState(false);
   const [nextChargeDate, setNextChargeDate]     = useState<Date | null>(null);
   const periodRef                               = useRef<HTMLDivElement>(null);
+
+  // Hot leads viewer state
+  const [hotLeads, setHotLeads]               = useState<HotLead[]>([]);
+  const [hlSearch, setHlSearch]               = useState('');
+  const [hlMenuId, setHlMenuId]               = useState<string | null>(null);
+  const [hlOpenLead, setHlOpenLead]           = useState<HotLead | null>(null);
+  const [hlConversation, setHlConversation]   = useState<ConversationMessage[] | null>(null);
+  const [hlConvLoading, setHlConvLoading]     = useState(false);
+  const [hlConvPartial, setHlConvPartial]     = useState(false);
+  const hlMenuRef                             = useRef<HTMLDivElement>(null);
   // Load profile + meetings + activity from Supabase
   useEffect(() => {
     async function load() {
@@ -447,6 +476,63 @@ export default function ClientPage() {
     }
   }
 
+  // ── Hot leads: fetch when client ID is resolved ───────────────
+  useEffect(() => {
+    if (!resolvedClientId) return;
+    fetch(`/api/get-hot-leads?clientId=${resolvedClientId}`)
+      .then(r => r.json())
+      .then(data => setHotLeads(data.hotLeads ?? []))
+      .catch(() => setHotLeads([]));
+  }, [resolvedClientId]);
+
+  // ── Hot leads: close ••• menu on outside click ────────────────
+  useEffect(() => {
+    function handleClick(e: MouseEvent) {
+      if (hlMenuRef.current && !hlMenuRef.current.contains(e.target as Node)) {
+        setHlMenuId(null);
+      }
+    }
+    document.addEventListener('mousedown', handleClick);
+    return () => document.removeEventListener('mousedown', handleClick);
+  }, []);
+
+  async function handleHlFollowedUp(id: string) {
+    await fetch('/api/update-hot-lead', {
+      method: 'PATCH',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ id, action: 'followed_up' }),
+    });
+    setHotLeads(prev => prev.map(l => l.id === id ? { ...l, status: 'followed_up' } : l));
+    setHlMenuId(null);
+  }
+
+  async function handleHlRemove(id: string) {
+    await fetch('/api/update-hot-lead', {
+      method: 'PATCH',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ id, action: 'delete' }),
+    });
+    setHotLeads(prev => prev.filter(l => l.id !== id));
+    if (hlOpenLead?.id === id) setHlOpenLead(null);
+    setHlMenuId(null);
+  }
+
+  async function handleHlOpen(lead: HotLead) {
+    setHlOpenLead(lead);
+    setHlConvLoading(true);
+    setHlConversation(null);
+    setHlConvPartial(false);
+    try {
+      const res  = await fetch(`/api/get-lead-conversation?hotLeadId=${lead.id}`);
+      const data = await res.json();
+      setHlConversation(data.messages ?? null);
+      setHlConvPartial(data.partial === true);
+    } catch {
+      setHlConversation(null);
+    }
+    setHlConvLoading(false);
+  }
+
   async function handleSignOut() {
     if (process.env.NEXT_PUBLIC_SUPABASE_URL && process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY) {
       try {
@@ -473,6 +559,16 @@ export default function ClientPage() {
   const p = profile;
   const greeting  = getGreeting();
   const firstName = p?.client_name?.split(' ')[0] ?? null;
+
+  const filteredHotLeads = hotLeads.filter(lead => {
+    if (!hlSearch) return true;
+    const q = hlSearch.toLowerCase();
+    return (
+      (lead.lead_name    ?? '').toLowerCase().includes(q) ||
+      (lead.lead_company ?? '').toLowerCase().includes(q) ||
+      lead.lead_email.toLowerCase().includes(q)
+    );
+  });
   const statusProps = getStatusProps(
     billingRecord?.campaign_status ?? p?.campaign_status ?? null,
     billingRecord?.warmup_started_at,
@@ -624,7 +720,7 @@ export default function ClientPage() {
               </div>
               <div className="cd-metric-card">
                 <div className="cd-metric-label">Hot Leads</div>
-                <div className="cd-metric-value">—</div>
+                <div className="cd-metric-value">{periodStats?.hot_leads ?? '—'}</div>
                 <div className="cd-metric-period">{PERIOD_LABEL[period]}</div>
               </div>
             </div>
@@ -652,6 +748,131 @@ export default function ClientPage() {
             </div>
 
 
+
+            {/* ── Hot Leads Viewer ── */}
+            <p className="cd-health-label" style={{ marginTop: 32 }}>Hot Leads</p>
+            <div className="cd-card hl-card">
+
+              {/* Search bar */}
+              <div className="hl-search-wrap">
+                <input
+                  className="hl-search"
+                  placeholder="Search by name, company, or email..."
+                  value={hlSearch}
+                  onChange={e => setHlSearch(e.target.value)}
+                />
+              </div>
+
+              {/* List */}
+              {filteredHotLeads.length === 0 ? (
+                <div className="hl-empty">
+                  {hotLeads.length === 0
+                    ? 'No hot leads yet — they\'ll appear here when your AI drops a booking link.'
+                    : 'No results match your search.'}
+                </div>
+              ) : (
+                <div ref={hlMenuRef}>
+                  {filteredHotLeads.map((lead, i) => (
+                    <div key={lead.id}>
+                      {i > 0 && <div className="hl-divider" />}
+                      <div className="hl-row" onClick={() => handleHlOpen(lead)}>
+                        <div className="hl-row-info">
+                          <div className="hl-row-top">
+                            <span className="hl-row-name">
+                              {lead.lead_name || lead.lead_email}
+                            </span>
+                            {lead.status === 'followed_up' && (
+                              <span className="hl-pill-followed">Followed Up</span>
+                            )}
+                          </div>
+                          {lead.lead_company && (
+                            <div className="hl-row-company">{lead.lead_company}</div>
+                          )}
+                          <div className="hl-row-email">{lead.lead_email}</div>
+                        </div>
+                        <div className="hl-menu-wrap" onClick={e => e.stopPropagation()}>
+                          <button
+                            className="hl-menu-btn"
+                            onClick={() => setHlMenuId(hlMenuId === lead.id ? null : lead.id)}
+                          >
+                            •••
+                          </button>
+                          {hlMenuId === lead.id && (
+                            <div className="hl-menu">
+                              <button
+                                className="hl-menu-item"
+                                onClick={() => handleHlFollowedUp(lead.id)}
+                              >
+                                {lead.status === 'followed_up' ? '✓ Followed Up' : 'Mark as Followed Up'}
+                              </button>
+                              <button
+                                className="hl-menu-item hl-menu-item--danger"
+                                onClick={() => handleHlRemove(lead.id)}
+                              >
+                                Remove
+                              </button>
+                            </div>
+                          )}
+                        </div>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              )}
+            </div>
+
+            {/* ── Conversation Modal ── */}
+            {hlOpenLead && (
+              <div className="hl-modal-overlay" onClick={() => setHlOpenLead(null)}>
+                <div className="hl-modal" onClick={e => e.stopPropagation()}>
+                  <div className="hl-modal-header">
+                    <div>
+                      <div className="hl-modal-lead-name">
+                        {hlOpenLead.lead_name || hlOpenLead.lead_email}
+                      </div>
+                      <div className="hl-modal-lead-meta">
+                        {[hlOpenLead.lead_company, hlOpenLead.lead_email]
+                          .filter(Boolean).join(' · ')}
+                      </div>
+                    </div>
+                    <button className="hl-modal-close" onClick={() => setHlOpenLead(null)}>✕</button>
+                  </div>
+
+                  <div className="hl-modal-body">
+                    {hlConvLoading && (
+                      <div className="hl-modal-loading">Loading conversation…</div>
+                    )}
+
+                    {!hlConvLoading && hlConvPartial && (
+                      <div className="hl-modal-partial-note">
+                        Full conversation thread not yet available — showing the AI reply that triggered this hot lead.
+                      </div>
+                    )}
+
+                    {!hlConvLoading && hlConversation && hlConversation.map(msg => (
+                      <div key={msg.id} className={`hl-msg hl-msg--${msg.type}`}>
+                        <div className="hl-msg-sender">{msg.sender}</div>
+                        {msg.subject && (
+                          <div className="hl-msg-subject">Re: {msg.subject}</div>
+                        )}
+                        <div className="hl-msg-body">{msg.body}</div>
+                        {msg.time && (
+                          <div className="hl-msg-time">
+                            {new Date(msg.time).toLocaleDateString('en-US', {
+                              month: 'short', day: 'numeric', year: 'numeric',
+                            })}
+                          </div>
+                        )}
+                      </div>
+                    ))}
+
+                    {!hlConvLoading && (!hlConversation || hlConversation.length === 0) && (
+                      <div className="hl-modal-loading">No conversation data available yet.</div>
+                    )}
+                  </div>
+                </div>
+              </div>
+            )}
 
             </>)}
 

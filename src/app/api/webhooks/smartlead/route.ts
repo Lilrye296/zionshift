@@ -74,6 +74,24 @@ export async function POST(req: NextRequest) {
       ''
     ).toUpperCase();
 
+    // Extra enrichment fields — used for conversation viewer
+    const leadId = payload.lead_id ?? payload.leadId ?? payload.lead?.id ?? null;
+    const leadName = String(
+      payload.lead_name   ??
+      payload.leadName    ??
+      payload.lead?.name  ??
+      payload.name        ??
+      ''
+    ) || null;
+    const leadCompany = String(
+      payload.lead_company      ??
+      payload.leadCompany       ??
+      payload.company_name      ??
+      payload.lead?.company     ??
+      payload.organization      ??
+      ''
+    ) || null;
+
     // ── 2. Log full payload on first use so we can verify field names ──
     console.log('[smartlead-webhook] Event received:', {
       eventType,
@@ -134,14 +152,24 @@ export async function POST(req: NextRequest) {
     }
 
     // ── 8. Write hot lead to Supabase ─────────────────────────────
+    // Store lead_id in conversation._meta so get-lead-conversation
+    // can use it to fetch the full thread from Smartlead's API.
+    const conversationMeta = leadId
+      ? { _meta: { lead_id: leadId, lead_name: leadName, lead_company: leadCompany } }
+      : null;
+
     const { error } = await supabase
       .from('hot_leads')
       .insert({
         client_id:    client.id,
         campaign_id:  campaignId,
         lead_email:   leadEmail,
+        lead_name:    leadName,
+        lead_company: leadCompany,
         email_body:   emailBody,
         booking_link: bookingLink,
+        conversation: conversationMeta,
+        status:       'new',
       });
 
     if (error) {
