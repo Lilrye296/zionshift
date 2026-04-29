@@ -373,21 +373,42 @@ export default function ClientPage() {
     load();
   }, [router, isAdminView]); // eslint-disable-line react-hooks/exhaustive-deps
 
-  // Period-scoped metrics — update whenever period or profile changes
+  // Period-scoped metrics — fetch from Smartlead via API whenever period or client changes
   useEffect(() => {
-    if (!profile) return;
-    // All periods show lifetime totals until period-scoped view is wired to Smartlead
-    // Smartlead metrics show — until API is wired; hot_leads shows 0 until AI Reply Pipeline is built
+    if (!resolvedClientId) return;
+
+    // Reset to dashes while loading
     setPeriodStats({
-      emails_sent:  null,
-      replies:      null,
-      reply_rate:   null,
-      hot_leads:    0,
-      bounces:      null,
-      bounce_rate:  null,
-      opt_outs:     null,
+      emails_sent: null,
+      replies:     null,
+      reply_rate:  null,
+      hot_leads:   0,
+      bounces:     null,
+      bounce_rate: null,
+      opt_outs:    null,
     });
-  }, [period, profile]);
+
+    fetch(`/api/get-metrics?clientId=${resolvedClientId}&period=${period}`)
+      .then(r => r.json())
+      .then(data => {
+        if (data.metrics) {
+          setPeriodStats({
+            emails_sent: data.metrics.emails_sent,
+            replies:     data.metrics.replies,
+            reply_rate:  data.metrics.reply_rate,
+            hot_leads:   0, // wired separately via AI reply pipeline
+            bounces:     data.metrics.bounces,
+            bounce_rate: data.metrics.bounce_rate,
+            opt_outs:    data.metrics.opt_outs,
+          });
+        }
+        // If metrics is null (no campaign ID set yet), leave as dashes — already set above
+      })
+      .catch(err => {
+        console.error('[get-metrics] fetch failed:', err);
+        // Leave as dashes on error
+      });
+  }, [period, resolvedClientId]);
 
   // Fetch invoice history from Stripe via our API route
   useEffect(() => {
