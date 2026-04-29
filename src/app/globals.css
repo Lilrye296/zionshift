@@ -1143,14 +1143,14 @@ footer.zs-footer { padding: 40px 0; border-top: 1px solid var(--zs-border); }
 @media (max-width: 900px) {
   /* Use minmax(0,1fr) everywhere — plain 1fr = minmax(auto,1fr) which lets cells
      grow past their track, causing cards to bleed off-screen on mobile */
-  /* Show line break in "Reply Rate" label so it stacks like "Meetings Booked" */
-  .cd-label-break { display: inline; }
-  /* Tighten label letter-spacing on mobile so long words like "Unsubscribes" fit inside tiles */
-  .cd-metric-label { letter-spacing: 0.03em; }
+  /* Keep all metric labels on one line — no wrapping, no explicit breaks */
+  .cd-label-break { display: none; }
+  .cd-metric-label { letter-spacing: 0.03em; white-space: nowrap; overflow: hidden; }
   .portal-metrics { grid-template-columns: repeat(2, minmax(0,1fr)); }
   .adm-biz-grid   { grid-template-columns: minmax(0,1fr); }
   .cd-metrics       { grid-template-columns: repeat(2, minmax(0,1fr)); }
-  .cd-health-metrics { grid-template-columns: repeat(3, minmax(0,1fr)); }
+  /* Campaign Health stacks vertically on mobile for breathing room */
+  .cd-health-metrics { grid-template-columns: 1fr; }
   /* Contain overflow at both portal levels */
   .portal-main { overflow-x: hidden; }
 
