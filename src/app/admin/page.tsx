@@ -461,7 +461,7 @@ export default function AdminPage() {
                               </button>
                             )}
 
-                            {/* Mobile-only: pill row — only renders when there's at least one pill to show */}
+                            {/* Mobile-only: pill row — only renders when there's at least one item to show */}
                             {c.status !== 'pending' && (() => {
                               const showTrial = c.status === 'live' && !c.firstMonthPaid && (c.billingStatus === 'trial' || !c.billingStatus);
                               const showPayFailed = c.billingStatus === 'past_due' || c.billingStatus === 'paused';
@@ -469,17 +469,21 @@ export default function AdminPage() {
                               const warmDay = cs === 'warming' && c.warmupStartedAt
                                 ? Math.floor((Date.now() - new Date(c.warmupStartedAt).getTime()) / 86400000) + 1
                                 : 0;
-                              const showWarming = cs === 'warming' && warmDay >= 1 && warmDay <= 14;
-                              const showPaused    = cs === 'paused';
-                              const showCancelled = cs === 'cancelled';
-                              if (!showTrial && !showPayFailed && !showWarming && !showPaused && !showCancelled) return null;
+                              const showWarming    = cs === 'warming' && warmDay >= 1 && warmDay <= 14;
+                              const showPaused     = cs === 'paused';
+                              const showCancelled  = cs === 'cancelled';
+                              const showStartWarmup = c.status === 'live' && cs === 'pending';
+                              if (!showTrial && !showPayFailed && !showWarming && !showPaused && !showCancelled && !showStartWarmup) return null;
                               return (
                                 <div className="adm-mobile-pill-row">
-                                  {showTrial    && <span className="adm-billing-pill adm-billing-pill--trial">Trial</span>}
+                                  {showTrial     && <span className="adm-billing-pill adm-billing-pill--trial">Trial</span>}
                                   {showPayFailed && <span className="adm-billing-pill adm-billing-pill--failed">Payment Failed</span>}
-                                  {showWarming  && <span className="adm-client-pill adm-client-pill--warming"><span style={{ color: '#f59e0b' }}>●</span> Warming — Day {warmDay} of 14</span>}
-                                  {showPaused   && <span className="adm-client-pill adm-client-pill--paused">● Paused</span>}
+                                  {showWarming   && <span className="adm-client-pill adm-client-pill--warming"><span style={{ color: '#f59e0b' }}>●</span> Warming — Day {warmDay} of 14</span>}
+                                  {showPaused    && <span className="adm-client-pill adm-client-pill--paused">● Paused</span>}
                                   {showCancelled && <span className="adm-client-pill adm-client-pill--cancelled">● Cancelled</span>}
+                                  {showStartWarmup && (
+                                    <button className="adm-warmup-btn" onClick={() => handleStartWarmup(c)}>Start Warmup</button>
+                                  )}
                                 </div>
                               );
                             })()}

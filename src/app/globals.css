@@ -1248,6 +1248,8 @@ footer.zs-footer { padding: 40px 0; border-top: 1px solid var(--zs-border); }
   .adm-client-right > .adm-client-pill { display: none; }
   /* Hide desktop billing pills (direct children of adm-client-info) — pill row shows them */
   .adm-client-info > .adm-billing-pill { display: none; }
+  /* Hide Start Warmup button from adm-client-info on mobile — pill row shows it instead */
+  .adm-client-info > .adm-warmup-btn { display: none; }
 
   /* Mobile pill row: only renders when Trial / Warming / Paused pills are present */
   .adm-mobile-pill-row { display: flex; flex-direction: row; align-items: center; gap: 6px; flex-wrap: nowrap; margin-top: 5px; overflow: hidden; }
