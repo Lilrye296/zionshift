@@ -654,7 +654,7 @@ export default function ClientPage() {
                 className={`cd-tab${activeTab === 'overview' ? ' active' : ''}`}
                 onClick={() => setActiveTab('overview')}
               >
-                Overview
+                Campaign
               </button>
               <button
                 className={`cd-tab${activeTab === 'billing' ? ' active' : ''}`}
