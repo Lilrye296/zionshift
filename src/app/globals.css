@@ -1143,6 +1143,8 @@ footer.zs-footer { padding: 40px 0; border-top: 1px solid var(--zs-border); }
      grow past their track, causing cards to bleed off-screen on mobile */
   /* Show line break in "Reply Rate" label so it stacks like "Meetings Booked" */
   .cd-label-break { display: inline; }
+  /* Tighten label letter-spacing on mobile so long words like "Unsubscribes" fit inside tiles */
+  .cd-metric-label { letter-spacing: 0.03em; }
   .portal-metrics { grid-template-columns: repeat(2, minmax(0,1fr)); }
   .adm-biz-grid   { grid-template-columns: minmax(0,1fr); }
   .cd-metrics     { grid-template-columns: repeat(2, minmax(0,1fr)); }
