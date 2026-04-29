@@ -98,27 +98,54 @@ export async function POST(req: NextRequest) {
       const trialStartedAt = new Date(paymentIntent.created * 1000);
       const trialEndsAt    = new Date(trialStartedAt.getTime() + 45 * 24 * 60 * 60 * 1000);
 
-      // ── 6. Insert pending client row ───────────────────────────
-      const { error: clientError } = await supabase
+      // ── 6. Upsert client row — update existing or insert new ──────
+      // If client was pre-created by admin, update with Stripe IDs.
+      // If brand new, insert the full row.
+      const { data: existingClient } = await supabase
         .from('clients')
-        .insert({
-          name,
-          email,
-          firm: '',
-          status: 'pending',
-          mrr: 0,
-          setup_fee_paid: true,
-          first_month_paid: false,
-          stripe_customer_id:     customerId,
-          trial_started_at:       trialStartedAt.toISOString(),
-          trial_ends_at:          trialEndsAt.toISOString(),
-          billing_status:         'trial',
-          campaign_status:        'pending',
-        });
+        .select('id')
+        .eq('email', email)
+        .maybeSingle();
 
-      if (clientError) {
-        console.error('[stripe-webhook] Client insert error:', clientError);
-        // Non-fatal — token already saved, continue.
+      if (existingClient?.id) {
+        // Update existing row — always save the Stripe customer ID
+        const { error: updateError } = await supabase
+          .from('clients')
+          .update({
+            setup_fee_paid:     true,
+            stripe_customer_id: customerId,
+            trial_started_at:   trialStartedAt.toISOString(),
+            trial_ends_at:      trialEndsAt.toISOString(),
+            billing_status:     'trial',
+          })
+          .eq('id', existingClient.id);
+
+        if (updateError) {
+          console.error('[stripe-webhook] Client update error:', updateError);
+        }
+      } else {
+        // Insert brand-new client row
+        const { error: clientError } = await supabase
+          .from('clients')
+          .insert({
+            name,
+            email,
+            firm: '',
+            status: 'pending',
+            mrr: 0,
+            setup_fee_paid: true,
+            first_month_paid: false,
+            stripe_customer_id:  customerId,
+            trial_started_at:    trialStartedAt.toISOString(),
+            trial_ends_at:       trialEndsAt.toISOString(),
+            billing_status:      'trial',
+            campaign_status:     'pending',
+          });
+
+        if (clientError) {
+          console.error('[stripe-webhook] Client insert error:', clientError);
+          // Non-fatal — token already saved, continue.
+        }
       }
 
       // ── 7. Create Stripe subscription with 45-day trial ────────
