@@ -603,7 +603,7 @@ export default function ClientPage() {
               </div>
               <div className="cd-metric-card">
                 <div className="cd-metric-label">Hot Leads</div>
-                <div className="cd-metric-value">{periodStats?.hot_leads ?? 0}</div>
+                <div className="cd-metric-value">—</div>
                 <div className="cd-metric-period">{PERIOD_LABEL[period]}</div>
               </div>
             </div>
