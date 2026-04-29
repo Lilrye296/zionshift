@@ -379,10 +379,11 @@ export default function ClientPage() {
   useEffect(() => {
     if (!profile) return;
     // All periods show lifetime totals until period-scoped view is wired to Smartlead
+    // All metrics show — until Smartlead API is wired up
     setPeriodStats({
-      emails_sent:  profile.emails_sent  ?? null,
-      replies:      profile.replies      ?? null,
-      reply_rate:   profile.reply_rate   ?? null,
+      emails_sent:  null,
+      replies:      null,
+      reply_rate:   null,
       opens:        null,
       open_rate:    null,
       bounces:      null,
