@@ -588,7 +588,7 @@ export default function ClientPage() {
                 <div className="cd-metric-period">{PERIOD_LABEL[period]}</div>
               </div>
               <div className="cd-metric-card">
-                <div className="cd-metric-label">Reply Rate</div>
+                <div className="cd-metric-label">Reply<br className="cd-label-break" /> Rate</div>
                 <div className="cd-metric-value">
                   {periodStats?.reply_rate != null ? `${Number(periodStats.reply_rate).toFixed(1)}%` : '—'}
                 </div>

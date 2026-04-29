@@ -960,6 +960,8 @@ footer.zs-footer { padding: 40px 0; border-top: 1px solid var(--zs-border); }
 
 /* Mobile-only pill row (billing + campaign status + •••) — hidden on desktop */
 .adm-mobile-pill-row { display: none; }
+/* Mobile-only line break inside "Reply Rate" label — hidden on desktop */
+.cd-label-break { display: none; }
 /* Smaller ••• button variant used inside the mobile pill row */
 .adm-menu-btn--sm { padding: 3px 8px; font-size: 12px; }
 
@@ -1223,6 +1225,8 @@ footer.zs-footer { padding: 40px 0; border-top: 1px solid var(--zs-border); }
 @media (max-width: 900px) {
   /* Use minmax(0,1fr) everywhere — plain 1fr = minmax(auto,1fr) which lets cells
      grow past their track, causing cards to bleed off-screen on mobile */
+  /* Show line break in "Reply Rate" label so it stacks like "Meetings Booked" */
+  .cd-label-break { display: inline; }
   .portal-metrics { grid-template-columns: repeat(2, minmax(0,1fr)); }
   .adm-meet-grid  { grid-template-columns: minmax(0,1fr); }
   .adm-biz-grid   { grid-template-columns: minmax(0,1fr); }
