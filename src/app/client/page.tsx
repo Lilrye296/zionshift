@@ -380,9 +380,9 @@ export default function ClientPage() {
     if (!profile) return;
     // All periods show lifetime totals until period-scoped view is wired to Smartlead
     setPeriodStats({
-      emails_sent:  profile.emails_sent,
-      replies:      profile.replies,
-      reply_rate:   profile.reply_rate,
+      emails_sent:  profile.emails_sent  ?? null,
+      replies:      profile.replies      ?? null,
+      reply_rate:   profile.reply_rate   ?? null,
       opens:        null,
       open_rate:    null,
       bounces:      null,
