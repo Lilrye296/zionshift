@@ -571,24 +571,7 @@ body { font-family: var(--zs-sans); color: var(--zs-ink-2); overflow-x: hidden; 
 .cd-metric-value { font: 700 clamp(30px,3.5vw,44px) var(--zs-sans); letter-spacing: -0.04em; color: var(--zs-ink); line-height: 1; margin-bottom: 6px; }
 .cd-metric-period { font: 400 11px var(--zs-mono); color: var(--zs-ink-5); margin-top: 6px; }
 
-.cd-meet-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; align-items: stretch; margin: 24px 0 20px; }
-.cd-meet-log { overflow-y: auto; overflow-x: hidden; flex: 1; scrollbar-width: thin; scrollbar-color: var(--zs-line) transparent; }
-.cd-meet-log::-webkit-scrollbar { width: 4px; }
-.cd-meet-log::-webkit-scrollbar-track { background: transparent; }
-.cd-meet-log::-webkit-scrollbar-thumb { background: var(--zs-line); border-radius: 999px; }
 .cd-card { background: #fff; border: 1px solid var(--zs-border); border-radius: 18px; padding: 28px; }
-.cd-card-label { font: 500 11px var(--zs-mono); letter-spacing: 0.08em; text-transform: uppercase; color: var(--zs-ink-5); margin-bottom: 20px; }
-
-.cd-activity-scroll { max-height: 260px; overflow-y: auto; padding-right: 4px; }
-.cd-activity-scroll::-webkit-scrollbar { width: 4px; }
-.cd-activity-scroll::-webkit-scrollbar-track { background: transparent; }
-.cd-activity-scroll::-webkit-scrollbar-thumb { background: var(--zs-border); border-radius: 999px; }
-.cd-activity-scroll::-webkit-scrollbar-thumb:hover { background: var(--zs-ink-5); }
-.cd-activity-list { list-style: none; padding: 0; margin: 0; display: flex; flex-direction: column; gap: 20px; }
-.cd-activity-item { display: flex; flex-direction: column; gap: 3px; padding-left: 18px; position: relative; }
-.cd-activity-item::before { content: ''; position: absolute; left: 0; top: 5px; width: 7px; height: 7px; border-radius: 50%; background: var(--zs-border); }
-.cd-activity-text { font: 400 14px var(--zs-sans); color: var(--zs-ink); line-height: 1.4; }
-.cd-activity-sub { font: 400 12px var(--zs-mono); color: var(--zs-ink-5); }
 
 /* Client calendar month nav */
 .mini-cal-nav { display: flex; align-items: center; justify-content: space-between; margin-bottom: 16px; }
@@ -619,20 +602,6 @@ body { font-family: var(--zs-sans); color: var(--zs-ink-2); overflow-x: hidden; 
 .mdm-zoom-btn:hover { background: #1a7aef; }
 .mdm-zoom-pending { font: 400 13px var(--zs-sans); color: var(--zs-ink-5); font-style: italic; }
 
-.cd-empty-state { font: 400 13px var(--zs-sans); color: var(--zs-ink-5); font-style: italic; padding: 8px 0; }
-
-.cd-cal-sync-top { margin-bottom: 18px; }
-.cd-cal-sync-title { font: 600 16px var(--zs-sans); letter-spacing: -0.02em; color: var(--zs-ink); margin-bottom: 4px; }
-.cd-cal-sync-sub { font: 400 13px var(--zs-sans); color: var(--zs-ink-4); }
-.cd-cal-options { display: grid; grid-template-columns: repeat(3,1fr); gap: 14px; }
-.cd-cal-option { border: 1px solid var(--zs-border); border-radius: 14px; padding: 18px 16px; display: flex; flex-direction: column; align-items: center; gap: 8px; }
-.cd-cal-option-btn { cursor: pointer; transition: border-color 160ms, background 160ms; }
-.cd-cal-option-btn:hover { border-color: var(--zs-ink); background: var(--zs-mist); }
-.cd-cal-option-active { border-color: #16a34a; background: #f0fdf4; }
-.cd-cal-option-name { font: 500 14px var(--zs-sans); color: var(--zs-ink); letter-spacing: -0.01em; text-align: center; }
-.cd-cal-connected { font: 500 12px var(--zs-sans); color: #16a34a; }
-.cd-cal-tap { font: 400 12px var(--zs-sans); color: var(--zs-ink-5); }
-
 /* ─── CALENDAR CONNECT MODAL ──────────────────────── */
 .ccm-header { display: flex; align-items: center; gap: 14px; margin-bottom: 24px; }
 .ccm-title { font: 700 18px var(--zs-sans); letter-spacing: -0.02em; color: var(--zs-ink); }
@@ -648,10 +617,6 @@ body { font-family: var(--zs-sans); color: var(--zs-ink-2); overflow-x: hidden; 
 .ccm-btn-disconnect:hover { opacity: 0.8; }
 .ccm-btn-cancel { padding: 11px 20px; border-radius: 10px; border: 1px solid var(--zs-border); background: transparent; color: var(--zs-ink-4); font: 500 14px var(--zs-sans); cursor: pointer; transition: border-color 160ms; }
 .ccm-btn-cancel:hover { border-color: var(--zs-ink); }
-.cd-support-footer { text-align: center; font: 400 13px var(--zs-sans); color: var(--zs-ink-5); margin-top: 32px; padding-bottom: 8px; }
-.cd-support-footer a { color: var(--zs-ink-4); text-decoration: none; border-bottom: 1px solid var(--zs-border); transition: color 160ms, border-color 160ms; }
-.cd-support-footer a:hover { color: var(--zs-ink); border-color: var(--zs-ink); }
-
 /* ─── LOGO UPLOAD MODAL ───────────────────────────── */
 .lu-heading { font: 700 22px var(--zs-sans); letter-spacing: -0.03em; color: var(--zs-ink); margin: 0 0 6px; }
 .lu-sub { font: 400 14px var(--zs-sans); color: var(--zs-ink-4); margin: 0 0 24px; }
@@ -692,49 +657,12 @@ body { font-family: var(--zs-sans); color: var(--zs-ink-2); overflow-x: hidden; 
 .modal-divider span { font: 400 12px var(--zs-mono); color: var(--zs-ink-5); white-space: nowrap; letter-spacing: 0.04em; text-transform: uppercase; }
 
 /* ─── BILLING TAB ─────────────────────────────────── */
-.bl-heading-row { margin-bottom: 28px; }
-.bl-heading { font: 700 28px var(--zs-sans); letter-spacing: -0.03em; color: var(--zs-ink); margin: 0 0 5px; }
-.bl-sub { font: 400 14px var(--zs-sans); color: var(--zs-ink-4); margin: 0; }
-
-.bl-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; margin-bottom: 8px; }
-.bl-col { display: flex; flex-direction: column; }
-.bl-card { padding: 24px 28px; }
-
 .bl-section-label { font: 700 11px var(--zs-mono); letter-spacing: 0.1em; text-transform: uppercase; color: var(--zs-ink-4); margin-bottom: 20px; }
 
-.bl-row { display: flex; align-items: center; justify-content: space-between; padding: 10px 0; }
-.bl-row-key { font: 400 14px var(--zs-sans); color: var(--zs-ink-4); }
-.bl-row-val { font: 500 14px var(--zs-sans); color: var(--zs-ink); }
-.bl-row-mono { font: 500 13px var(--zs-mono); color: var(--zs-ink); letter-spacing: 0.02em; }
-
-/* Plan & Billing redesign */
-.bl-plan-header { display: flex; align-items: flex-start; justify-content: space-between; gap: 12px; margin-bottom: 20px; }
-.bl-plan-name { font: 700 18px var(--zs-sans); color: var(--zs-ink); letter-spacing: -0.02em; }
-.bl-plan-desc { font: 400 13px var(--zs-sans); color: var(--zs-ink-4); margin-top: 3px; }
-.bl-stat-row { display: flex; align-items: center; justify-content: space-between; padding: 14px 0; }
-.bl-stat-label { font: 400 13px var(--zs-sans); color: var(--zs-ink-4); }
-.bl-stat-right { display: flex; flex-direction: column; align-items: flex-end; gap: 2px; }
-.bl-stat-value { font: 600 15px var(--zs-sans); color: var(--zs-ink); letter-spacing: -0.01em; }
-.bl-stat-sub { font: 400 12px var(--zs-sans); color: var(--zs-ink-4); }
-.bl-divider { height: 1px; background: var(--zs-border); }
-
-.bl-status-pill { font: 600 12px var(--zs-sans); color: #16a34a; background: #f0fdf4; border: 1px solid #bbf7d0; border-radius: 999px; padding: 4px 12px; }
-.bl-status-pill.bl-status-paused    { color: #1A1715; background: #fffbeb; border-color: #fde68a; }
-.bl-status-pill.bl-status-cancelled { color: #dc2626; background: #fff1f2; border-color: #fecaca; }
-
-.bl-stripe-btn { display: flex; align-items: center; gap: 8px; margin-top: 20px; padding: 12px 16px; border: 1px solid var(--zs-border); border-radius: 10px; font: 500 14px var(--zs-sans); color: var(--zs-ink); text-decoration: none; transition: border-color 160ms, background 160ms; background: var(--zs-paper); }
-.bl-stripe-btn:hover { border-color: var(--zs-ink); background: var(--zs-mist); }
-.bl-stripe-via { margin-left: auto; font: 400 13px var(--zs-sans); color: var(--zs-ink-4); }
-
-.bl-invoice-row { display: grid; grid-template-columns: 110px 1fr auto auto; align-items: center; gap: 12px; padding: 10px 0; }
-.bl-inv-date { font: 500 12px var(--zs-mono); color: var(--zs-ink-4); letter-spacing: 0.02em; white-space: nowrap; }
-.bl-inv-desc { font: 500 14px var(--zs-sans); color: var(--zs-ink); }
-.bl-inv-amount { font: 600 14px var(--zs-sans); color: var(--zs-ink); }
 .bl-inv-status  { font: 600 12px var(--zs-sans); border-radius: 999px; padding: 3px 10px; white-space: nowrap; }
 .bl-inv-paid    { color: #16a34a; background: #f0fdf4; border: 1px solid #bbf7d0; }
 .bl-inv-open    { color: #1A1715; background: #fffbeb; border: 1px solid #fde68a; }
 .bl-inv-failed  { color: #dc2626; background: #fff1f2; border: 1px solid #fecaca; }
-.bl-inv-empty   { font: 400 13px var(--zs-sans); color: var(--zs-ink-5); margin: 12px 0 4px; }
 
 /* Billing payment alert banner (past_due / paused) */
 .bl-alert-banner { background: #FFF5F5; border: 1px solid #FECACA; border-radius: 12px; padding: 16px 18px; margin: 8px 0 4px; }
@@ -755,7 +683,6 @@ body { font-family: var(--zs-sans); color: var(--zs-ink-2); overflow-x: hidden; 
 .bl-list-row--action:disabled { opacity: 0.5; cursor: default; }
 .bl-list-row--static { cursor: default; }
 .bl-list-row-main { display: flex; flex-direction: column; align-items: flex-start; gap: 2px; }
-.bl-list-row-icon { font-size: 15px; margin-right: 12px; flex-shrink: 0; }
 .bl-list-row-label { font: 500 15px var(--zs-sans); color: var(--zs-ink); }
 .bl-list-row-value { font: 500 15px var(--zs-sans); color: var(--zs-ink); }
 .bl-list-row-sub { font: 400 12px var(--zs-sans); color: #9ca3af; display: block; }
@@ -765,14 +692,6 @@ body { font-family: var(--zs-sans); color: var(--zs-ink-2); overflow-x: hidden; 
 .bl-list-note { padding: 12px 18px; font: 400 13px var(--zs-sans); color: #9ca3af; line-height: 1.6; }
 .bl-list-note-link { color: #6b7280; font-weight: 500; text-decoration: none; border-bottom: 1px solid #d1d5db; }
 .bl-list-note-link:hover { color: var(--zs-ink); border-color: var(--zs-ink); }
-
-.bl-changes-title { font: 700 16px var(--zs-sans); letter-spacing: -0.02em; color: var(--zs-ink); margin-bottom: 10px; }
-.bl-plain-footer { font: 400 13px var(--zs-sans); color: var(--zs-ink-4); margin-top: 16px; padding: 0 4px; line-height: 1.6; }
-.bl-plain-footer-title { font-weight: 600; color: var(--zs-ink-3); }
-.bl-changes-body { font: 400 14px var(--zs-sans); color: var(--zs-ink-3); line-height: 1.6; margin: 0 0 16px; }
-.bl-changes-link { color: var(--zs-ink); font-weight: 600; text-decoration: none; border-bottom: 1px solid var(--zs-ink); transition: opacity 160ms; }
-.bl-changes-link:hover { opacity: 0.6; }
-.bl-changes-note { font: 400 13px var(--zs-sans); color: var(--zs-ink-4); line-height: 1.6; margin: 0; padding-top: 14px; border-top: 1px solid var(--zs-border); }
 
 /* ─── FIELDS ──────────────────────────────────────── */
 .field + .field { margin-top: 14px; }
@@ -962,9 +881,6 @@ footer.zs-footer { padding: 40px 0; border-top: 1px solid var(--zs-border); }
 .adm-mobile-pill-row { display: none; }
 /* Mobile-only line break inside "Reply Rate" label — hidden on desktop */
 .cd-label-break { display: none; }
-/* Smaller ••• button variant used inside the mobile pill row */
-.adm-menu-btn--sm { padding: 3px 8px; font-size: 12px; }
-
 /* Client actions dropdown */
 .adm-actions-wrap { position: relative; }
 .adm-menu-btn { background: var(--zs-paper); border: 1px solid var(--zs-border); border-radius: 8px; padding: 5px 10px; font: 500 13px var(--zs-sans); color: var(--zs-ink-3); cursor: pointer; letter-spacing: 0.06em; transition: background 140ms, border-color 140ms; }
@@ -1228,19 +1144,12 @@ footer.zs-footer { padding: 40px 0; border-top: 1px solid var(--zs-border); }
   /* Show line break in "Reply Rate" label so it stacks like "Meetings Booked" */
   .cd-label-break { display: inline; }
   .portal-metrics { grid-template-columns: repeat(2, minmax(0,1fr)); }
-  .adm-meet-grid  { grid-template-columns: minmax(0,1fr); }
   .adm-biz-grid   { grid-template-columns: minmax(0,1fr); }
   .cd-metrics     { grid-template-columns: repeat(2, minmax(0,1fr)); }
-  .cd-meet-grid   { grid-template-columns: minmax(0,1fr); }
-  .bl-grid        { grid-template-columns: minmax(0,1fr); }
-  .cd-cal-options { grid-template-columns: minmax(0,1fr); }
-  .adm-meetings-stats { gap: 12px; }
   /* Contain overflow at both portal levels */
   .portal-main { overflow-x: hidden; }
 
   /* Admin portal mobile fixes */
-  /* Ensure right column (flex child of grid) can shrink — prevents it expanding the grid */
-  .adm-biz-right-col { min-width: 0; }
   /* Wrap row so name/email get full first line, pill+button drop to second line */
   .adm-client-row { flex-wrap: wrap; align-items: flex-start; }
   /* Allow name + firm text to wrap on mobile so nothing is hidden behind ellipsis */
@@ -1259,15 +1168,8 @@ footer.zs-footer { padding: 40px 0; border-top: 1px solid var(--zs-border); }
   .adm-mobile-pill-row { display: flex; flex-direction: row; align-items: center; gap: 6px; flex-wrap: nowrap; margin-top: 5px; overflow: hidden; }
   .adm-mobile-pill-row .adm-billing-pill { margin: 0; }
   .adm-mobile-pill-row .adm-client-pill { font-size: 10px; padding: 2px 8px; }
-  /* Cap scroll container on mobile and always scroll — overrides the ≤4 client inline style
-     that removes the cap on desktop. Rows are taller on mobile due to wrapping so we need
-     a reliable cap to keep the tile a sensible height. */
-  /* ~520px fits 4 wrapped rows comfortably; 5th client triggers scroll */
-  .adm-client-scroll { max-height: 520px !important; overflow-y: auto !important; }
   /* Clip any remaining horizontal bleed within scrollable list containers */
-  .adm-client-scroll,
-  .adm-revenue-rows,
-  .adm-activity-list { overflow-x: hidden; }
+  .adm-revenue-rows { overflow-x: hidden; }
 
   /* Client nav — client logo slot mobile fixes */
   /* Pull out of absolute positioning so it sits naturally between logo and sign-out */
@@ -1277,13 +1179,6 @@ footer.zs-footer { padding: 40px 0; border-top: 1px solid var(--zs-border); }
   /* Shrink placeholder to fit between nav items on mobile — still tappable to upload */
   .client-logo-placeholder { font-size: 10px; padding: 4px 8px; white-space: nowrap; }
 
-  /* Client billing tab mobile fixes */
-  /* Collapse 4-column invoice row to 2-column so it fits within card width on narrow screens */
-  .bl-invoice-row { grid-template-columns: 1fr auto; row-gap: 2px; }
-  .bl-inv-date   { grid-column: 1; grid-row: 1; }
-  .bl-inv-desc   { grid-column: 1; grid-row: 2; }
-  .bl-inv-amount { grid-column: 2; grid-row: 1; text-align: right; }
-  .bl-inv-status { grid-column: 2; grid-row: 2; justify-self: end; }
   /* Prevent any remaining overflow from creating a horizontal scroll on the page */
   .portal-page { overflow-x: hidden; }
 }
