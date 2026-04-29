@@ -565,7 +565,7 @@ body { font-family: var(--zs-sans); color: var(--zs-ink-2); overflow-x: hidden; 
 .cd-period-option:hover { background: var(--zs-mist); color: var(--zs-ink); }
 .cd-period-option.active { font-weight: 600; color: var(--zs-ink); background: var(--zs-mist); }
 
-.cd-metrics { display: grid; grid-template-columns: repeat(4,1fr); gap: 14px; margin-bottom: 16px; }
+.cd-metrics { display: grid; grid-template-columns: repeat(3,1fr); gap: 14px; margin-bottom: 16px; }
 .cd-metric-card { background: #fff; border: 1px solid var(--zs-border); border-radius: 18px; padding: 24px 22px; }
 .cd-metric-label { font: 500 11px var(--zs-mono); letter-spacing: 0.08em; text-transform: uppercase; color: var(--zs-ink-5); margin-bottom: 10px; }
 .cd-metric-value { font: 700 clamp(30px,3.5vw,44px) var(--zs-sans); letter-spacing: -0.04em; color: var(--zs-ink); line-height: 1; margin-bottom: 6px; }

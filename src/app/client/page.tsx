@@ -163,10 +163,15 @@ function LogoUploadModal({
 
 /* ── Period stats interface ── */
 interface PeriodStats {
-  emails_sent: number | null;
-  replies: number | null;
-  reply_rate: number | null;
-  meetings_booked: number | null;
+  emails_sent:   number | null;
+  replies:       number | null;
+  reply_rate:    number | null;
+  opens:         number | null;
+  open_rate:     number | null;
+  bounces:       number | null;
+  bounce_rate:   number | null;
+  clicks:        number | null;
+  unsubscribes:  number | null;
 }
 
 interface ClientBillingRecord {
@@ -577,6 +582,7 @@ export default function ClientPage() {
 
             {/* ── Metric cards ── */}
             <div className="cd-metrics">
+              {/* Row 1 */}
               <div className="cd-metric-card">
                 <div className="cd-metric-label">Emails Sent</div>
                 <div className="cd-metric-value">{periodStats?.emails_sent ?? '—'}</div>
@@ -594,9 +600,40 @@ export default function ClientPage() {
                 </div>
                 <div className="cd-metric-period">{PERIOD_LABEL[period]}</div>
               </div>
+              {/* Row 2 */}
               <div className="cd-metric-card">
-                <div className="cd-metric-label">Meetings Booked</div>
-                <div className="cd-metric-value">{periodStats?.meetings_booked ?? '—'}</div>
+                <div className="cd-metric-label">Opens</div>
+                <div className="cd-metric-value">{periodStats?.opens ?? '—'}</div>
+                <div className="cd-metric-period">{PERIOD_LABEL[period]}</div>
+              </div>
+              <div className="cd-metric-card">
+                <div className="cd-metric-label">Open<br className="cd-label-break" /> Rate</div>
+                <div className="cd-metric-value">
+                  {periodStats?.open_rate != null ? `${Number(periodStats.open_rate).toFixed(1)}%` : '—'}
+                </div>
+                <div className="cd-metric-period">{PERIOD_LABEL[period]}</div>
+              </div>
+              <div className="cd-metric-card">
+                <div className="cd-metric-label">Bounces</div>
+                <div className="cd-metric-value">{periodStats?.bounces ?? '—'}</div>
+                <div className="cd-metric-period">{PERIOD_LABEL[period]}</div>
+              </div>
+              {/* Row 3 */}
+              <div className="cd-metric-card">
+                <div className="cd-metric-label">Bounce<br className="cd-label-break" /> Rate</div>
+                <div className="cd-metric-value">
+                  {periodStats?.bounce_rate != null ? `${Number(periodStats.bounce_rate).toFixed(1)}%` : '—'}
+                </div>
+                <div className="cd-metric-period">{PERIOD_LABEL[period]}</div>
+              </div>
+              <div className="cd-metric-card">
+                <div className="cd-metric-label">Clicks</div>
+                <div className="cd-metric-value">{periodStats?.clicks ?? '—'}</div>
+                <div className="cd-metric-period">{PERIOD_LABEL[period]}</div>
+              </div>
+              <div className="cd-metric-card">
+                <div className="cd-metric-label">Unsubscribes</div>
+                <div className="cd-metric-value">{periodStats?.unsubscribes ?? '—'}</div>
                 <div className="cd-metric-period">{PERIOD_LABEL[period]}</div>
               </div>
             </div>
