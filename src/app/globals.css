@@ -566,7 +566,7 @@ body { font-family: var(--zs-sans); color: var(--zs-ink-2); overflow-x: hidden; 
 .cd-period-option.active { font-weight: 600; color: var(--zs-ink); background: var(--zs-mist); }
 
 .cd-metrics { display: grid; grid-template-columns: repeat(4,1fr); gap: 14px; margin-bottom: 16px; }
-.cd-health-label { font: 700 11px var(--zs-mono); letter-spacing: 0.08em; text-transform: uppercase; color: var(--zs-ink-4); margin: 24px 0 14px; }
+.cd-health-label { font: 700 11px var(--zs-mono); letter-spacing: 0.08em; text-transform: uppercase; color: var(--zs-ink-4); margin: 24px 0 14px; text-align: center; }
 .cd-health-metrics { display: grid; grid-template-columns: repeat(3,1fr); gap: 14px; margin-bottom: 16px; }
 .cd-metric-card { background: #fff; border: 1px solid var(--zs-border); border-radius: 18px; padding: 24px 22px; }
 .cd-metric-label { font: 500 11px var(--zs-mono); letter-spacing: 0.08em; text-transform: uppercase; color: var(--zs-ink-5); margin-bottom: 10px; }
