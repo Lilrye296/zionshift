@@ -163,15 +163,13 @@ function LogoUploadModal({
 
 /* ── Period stats interface ── */
 interface PeriodStats {
-  emails_sent:   number | null;
-  replies:       number | null;
-  reply_rate:    number | null;
-  opens:         number | null;
-  open_rate:     number | null;
-  bounces:       number | null;
-  bounce_rate:   number | null;
-  clicks:        number | null;
-  unsubscribes:  number | null;
+  emails_sent:  number | null;
+  replies:      number | null;
+  reply_rate:   number | null;
+  hot_leads:    number;
+  bounces:      number | null;
+  bounce_rate:  number | null;
+  opt_outs:     number | null;
 }
 
 interface ClientBillingRecord {
@@ -379,17 +377,15 @@ export default function ClientPage() {
   useEffect(() => {
     if (!profile) return;
     // All periods show lifetime totals until period-scoped view is wired to Smartlead
-    // All metrics show — until Smartlead API is wired up
+    // Smartlead metrics show — until API is wired; hot_leads shows 0 until AI Reply Pipeline is built
     setPeriodStats({
       emails_sent:  null,
       replies:      null,
       reply_rate:   null,
-      opens:        null,
-      open_rate:    null,
+      hot_leads:    0,
       bounces:      null,
       bounce_rate:  null,
-      clicks:       null,
-      unsubscribes: null,
+      opt_outs:     null,
     });
   }, [period, profile]);
 
@@ -586,9 +582,8 @@ export default function ClientPage() {
               </div>
             </div>
 
-            {/* ── Metric cards ── */}
+            {/* ── Primary metric tiles ── */}
             <div className="cd-metrics">
-              {/* Row 1 */}
               <div className="cd-metric-card">
                 <div className="cd-metric-label">Emails Sent</div>
                 <div className="cd-metric-value">{periodStats?.emails_sent ?? '—'}</div>
@@ -606,25 +601,21 @@ export default function ClientPage() {
                 </div>
                 <div className="cd-metric-period">{PERIOD_LABEL[period]}</div>
               </div>
-              {/* Row 2 */}
               <div className="cd-metric-card">
-                <div className="cd-metric-label">Opens</div>
-                <div className="cd-metric-value">{periodStats?.opens ?? '—'}</div>
+                <div className="cd-metric-label">Hot Leads</div>
+                <div className="cd-metric-value">{periodStats?.hot_leads ?? 0}</div>
                 <div className="cd-metric-period">{PERIOD_LABEL[period]}</div>
               </div>
-              <div className="cd-metric-card">
-                <div className="cd-metric-label">Open<br className="cd-label-break" /> Rate</div>
-                <div className="cd-metric-value">
-                  {periodStats?.open_rate != null ? `${Number(periodStats.open_rate).toFixed(1)}%` : '—'}
-                </div>
-                <div className="cd-metric-period">{PERIOD_LABEL[period]}</div>
-              </div>
+            </div>
+
+            {/* ── Campaign Health ── */}
+            <p className="cd-health-label">Campaign Health</p>
+            <div className="cd-health-metrics">
               <div className="cd-metric-card">
                 <div className="cd-metric-label">Bounces</div>
                 <div className="cd-metric-value">{periodStats?.bounces ?? '—'}</div>
                 <div className="cd-metric-period">{PERIOD_LABEL[period]}</div>
               </div>
-              {/* Row 3 */}
               <div className="cd-metric-card">
                 <div className="cd-metric-label">Bounce<br className="cd-label-break" /> Rate</div>
                 <div className="cd-metric-value">
@@ -633,13 +624,8 @@ export default function ClientPage() {
                 <div className="cd-metric-period">{PERIOD_LABEL[period]}</div>
               </div>
               <div className="cd-metric-card">
-                <div className="cd-metric-label">Clicks</div>
-                <div className="cd-metric-value">{periodStats?.clicks ?? '—'}</div>
-                <div className="cd-metric-period">{PERIOD_LABEL[period]}</div>
-              </div>
-              <div className="cd-metric-card">
-                <div className="cd-metric-label">Unsubscribes</div>
-                <div className="cd-metric-value">{periodStats?.unsubscribes ?? '—'}</div>
+                <div className="cd-metric-label">Opt-Outs</div>
+                <div className="cd-metric-value">{periodStats?.opt_outs ?? '—'}</div>
                 <div className="cd-metric-period">{PERIOD_LABEL[period]}</div>
               </div>
             </div>
