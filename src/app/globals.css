@@ -900,8 +900,8 @@ footer.zs-footer { padding: 40px 0; border-top: 1px solid var(--zs-border); }
 .hl-modal-header { display: flex; align-items: flex-start; justify-content: space-between; padding: 24px 24px 18px; border-bottom: 1px solid var(--zs-border); flex-shrink: 0; gap: 12px; }
 .hl-modal-lead-name { font: 700 16px var(--zs-sans); color: var(--zs-ink); margin-bottom: 3px; }
 .hl-modal-lead-meta { font: 400 12px var(--zs-sans); color: var(--zs-ink-4); }
-.hl-modal-close { font-size: 18px; color: var(--zs-ink-4); background: none; border: none; cursor: pointer; padding: 4px 8px; border-radius: 6px; transition: background 140ms; line-height: 1; flex-shrink: 0; }
-.hl-modal-close:hover { background: var(--zs-mist); color: var(--zs-ink); }
+.hl-modal-close { width: 36px; height: 36px; display: flex; align-items: center; justify-content: center; background: var(--zs-mist); border: 1px solid var(--zs-border); cursor: pointer; color: var(--zs-ink-3); border-radius: 999px; transition: all 200ms; font-size: 15px; flex-shrink: 0; line-height: 1; }
+.hl-modal-close:hover { background: var(--zs-ink); color: #fff; transform: rotate(90deg); }
 .hl-modal-body { flex: 1; overflow-y: auto; padding: 20px 24px; display: flex; flex-direction: column; gap: 14px; }
 .hl-modal-loading { text-align: center; padding: 40px 20px; font: 400 13px var(--zs-sans); color: var(--zs-ink-4); }
 .hl-modal-partial-note { font: 400 12px var(--zs-sans); color: #92400e; background: #fffbeb; border: 1px solid #fde68a; border-radius: 8px; padding: 10px 14px; }

@@ -1018,7 +1018,14 @@ export default function AdminPage() {
                                   )}
                                 </div>
                                 {lead.lead_company && <div className="hl-row-company">{lead.lead_company}</div>}
-                                <div className="hl-row-email">{lead.lead_email}</div>
+                                <div className="hl-row-email">
+                                  {lead.lead_email}
+                                  {lead.created_at && (
+                                    <span style={{ marginLeft: 8, color: '#9CA3AF', fontSize: 12 }}>
+                                      {new Date(lead.created_at).toLocaleDateString('en-US', { month: 'short', day: 'numeric' })}
+                                    </span>
+                                  )}
+                                </div>
                               </div>
                               <div className="hl-menu-wrap" onClick={e => e.stopPropagation()}>
                                 <button
@@ -1073,12 +1080,12 @@ export default function AdminPage() {
                   Full conversation thread not yet available — showing the AI reply that triggered this hot lead.
                 </div>
               )}
-              {!myHlConvLoading && myHlConversation && myHlConversation.map(msg => (
+              {!myHlConvLoading && myHlConversation && myHlConversation.map((msg, idx) => (
                 <div key={msg.id} className={`hl-msg hl-msg--${msg.type}`}>
                   <div className="hl-msg-sender">
-                    {msg.type === 'outbound' ? 'AI Reply' : msg.sender}
+                    {msg.sender}
                   </div>
-                  {msg.subject && <div className="hl-msg-subject">Re: {msg.subject}</div>}
+                  {idx === 0 && msg.subject && <div className="hl-msg-subject">{msg.subject}</div>}
                   <div className="hl-msg-body">{msg.body}</div>
                   {msg.time && (
                     <div className="hl-msg-time">
