@@ -306,6 +306,8 @@ export default function AdminPage() {
       setClients(prev => prev.map(c => {
         if (c.id !== clientId) return c;
         if (field === 'smartlead_campaign_id') return { ...c, smartleadCampaignId: null };
+        if (field === 'booking_link')          return { ...c, bookingLink: null };
+        if (field === 'ai_reply_prompt')       return { ...c, aiReplyPrompt: null };
         return c;
       }));
       const label = field === 'smartlead_campaign_id' ? 'Campaign ID' : field === 'booking_link' ? 'Booking link' : 'AI reply prompt';
@@ -327,6 +329,11 @@ export default function AdminPage() {
         .from('clients')
         .update({ booking_link: bookingLinkInput.trim() })
         .eq('id', bookingLinkClient.id);
+      setClients(prev => prev.map(c =>
+        c.id === bookingLinkClient.id
+          ? { ...c, bookingLink: bookingLinkInput.trim() }
+          : c
+      ));
       showToast(`Booking link saved for ${bookingLinkClient.name}.`);
       setBookingLinkClient(null);
       setBookingLinkInput('');
@@ -346,6 +353,11 @@ export default function AdminPage() {
         .from('clients')
         .update({ ai_reply_prompt: promptInput.trim() })
         .eq('id', promptClient.id);
+      setClients(prev => prev.map(c =>
+        c.id === promptClient.id
+          ? { ...c, aiReplyPrompt: promptInput.trim() }
+          : c
+      ));
       showToast(`AI reply prompt saved for ${promptClient.name}.`);
       setPromptClient(null);
       setPromptInput('');
