@@ -178,6 +178,23 @@ export async function POST(req: NextRequest) {
       console.log(
         `[smartlead-webhook] Hot lead recorded — client: ${client.id}, lead: ${leadEmail}, link: ${bookingLink}`
       );
+
+      // ── 9. Suppress this lead so the AI never replies again ──────
+      // Booking link was dropped — conversation is now handed off to
+      // the client. Any future replies from the prospect are ignored
+      // by handle-reply because the lead is in suppressed_contacts.
+      const { error: suppressError } = await supabase
+        .from('suppressed_contacts')
+        .upsert(
+          { campaign_id: campaignId, lead_email: leadEmail, reason: 'booking_link_sent' },
+          { onConflict: 'campaign_id,lead_email' }
+        );
+
+      if (suppressError) {
+        console.error('[smartlead-webhook] Suppression insert error:', suppressError);
+      } else {
+        console.log(`[smartlead-webhook] Lead suppressed — no further AI replies: ${leadEmail}`);
+      }
     }
 
     return NextResponse.json({ received: true });
