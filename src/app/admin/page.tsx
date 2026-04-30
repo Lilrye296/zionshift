@@ -917,9 +917,9 @@ export default function AdminPage() {
             {myClientId && (
               <>
                 {/* Header row */}
-                <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginTop: 40, marginBottom: 12 }}>
+                <div style={{ position: 'relative', textAlign: 'center', marginTop: 40, marginBottom: 6 }}>
                   <p className="cd-health-label" style={{ margin: 0 }}>My Campaign</p>
-                  <div className="cd-period-dropdown" ref={myPeriodRef}>
+                  <div className="cd-period-dropdown" ref={myPeriodRef} style={{ position: 'absolute', right: 0, top: '50%', transform: 'translateY(-50%)' }}>
                     <button className="cd-period-btn" onClick={() => setMyPeriodOpen(o => !o)}>
                       {PERIOD_LABEL[myPeriod]}
                       <svg width="10" height="10" viewBox="0 0 10 10" fill="none" aria-hidden>
@@ -962,10 +962,10 @@ export default function AdminPage() {
                 </div>
 
                 {/* Hot Lead Conversations */}
-                <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 12 }}>
+                <div style={{ position: 'relative', textAlign: 'center', marginBottom: 8 }}>
                   <p className="cd-health-label" style={{ margin: 0 }}>Hot Lead Conversations</p>
                   {myHotLeads.length > 0 && (
-                    <span className="adm-count-chip">{myHotLeads.length} Total</span>
+                    <span className="adm-count-chip" style={{ position: 'absolute', right: 0, top: '50%', transform: 'translateY(-50%)' }}>{myHotLeads.length} Total</span>
                   )}
                 </div>
                 <div className="cd-card hl-card" style={{ marginBottom: 40 }}>
