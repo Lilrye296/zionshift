@@ -702,7 +702,7 @@ export default function AdminPage() {
                 {clients.length === 0 ? (
                   <p className="adm-empty-text">No clients yet. Send a payment link to get started.</p>
                 ) : (
-                  <div>
+                  <div className="adm-clients-list">
                     {clients.map((c, i) => (
                       <Fragment key={c.id}>
                         {i > 0 && <div className="adm-divider" />}
