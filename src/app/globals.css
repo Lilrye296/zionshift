@@ -824,6 +824,8 @@ footer.zs-footer { padding: 40px 0; border-top: 1px solid var(--zs-border); }
 
 /* Nav center label */
 .adm-center-label { position: absolute; left: 50%; transform: translateX(-50%); font: 600 13px var(--zs-mono); letter-spacing: 0.1em; text-transform: uppercase; color: var(--zs-ink-4); }
+.adm-settings-btn { display: flex; align-items: center; justify-content: center; background: none; border: 1px solid var(--zs-border); border-radius: 8px; padding: 7px; cursor: pointer; color: var(--zs-ink-4); transition: background 140ms, color 140ms; }
+.adm-settings-btn:hover { background: var(--zs-mist); color: var(--zs-ink); }
 
 /* Page layout wrapper */
 .adm-layout { display: flex; flex-direction: column; gap: 28px; }

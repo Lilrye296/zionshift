@@ -65,6 +65,13 @@ export default function AdminPage() {
   const [promptClient, setPromptClient]   = useState<ActiveClient | null>(null);
   const [promptInput, setPromptInput]     = useState('');
   const [promptSaving, setPromptSaving]   = useState(false);
+  const [settingsOpen, setSettingsOpen]       = useState(false);
+  const [settingsLoading, setSettingsLoading] = useState(false);
+  const [myClientId, setMyClientId]           = useState<string | null>(null);
+  const [myCampaignId, setMyCampaignId]       = useState('');
+  const [myBookingLink, setMyBookingLink]     = useState('');
+  const [myPrompt, setMyPrompt]               = useState('');
+  const [settingsSaving, setSettingsSaving]   = useState<'campaignId' | 'bookingLink' | 'prompt' | null>(null);
   const router = useRouter();
 
   // Auth guard + data fetch
@@ -409,6 +416,61 @@ export default function AdminPage() {
     setIntakeLoading(false);
   }
 
+  async function handleOpenSettings() {
+    setSettingsOpen(true);
+    setSettingsLoading(true);
+    try {
+      const supabase = createClient();
+      const { data: { user } } = await supabase.auth.getUser();
+      if (!user?.email) { setSettingsLoading(false); return; }
+      const { data: clientRow } = await supabase
+        .from('clients')
+        .select('id, smartlead_campaign_id, booking_link, ai_reply_prompt')
+        .eq('email', user.email)
+        .single();
+      if (clientRow) {
+        setMyClientId(clientRow.id);
+        setMyCampaignId(clientRow.smartlead_campaign_id ?? '');
+        setMyBookingLink(clientRow.booking_link ?? '');
+        setMyPrompt(clientRow.ai_reply_prompt ?? '');
+      }
+    } catch { /* silently fail */ }
+    setSettingsLoading(false);
+  }
+
+  async function handleSaveMySetting(
+    field: 'smartlead_campaign_id' | 'booking_link' | 'ai_reply_prompt',
+    value: string,
+    savingKey: 'campaignId' | 'bookingLink' | 'prompt',
+  ) {
+    if (!myClientId) return;
+    setSettingsSaving(savingKey);
+    try {
+      const supabase = createClient();
+      await supabase.from('clients').update({ [field]: value.trim() || null }).eq('id', myClientId);
+      const label = field === 'smartlead_campaign_id' ? 'Campaign ID' : field === 'booking_link' ? 'Booking link' : 'AI reply prompt';
+      showToast(`Your ${label} saved.`);
+    } catch {
+      showToast('Something went wrong. Please try again.');
+    }
+    setSettingsSaving(null);
+  }
+
+  async function handleClearMySetting(field: 'smartlead_campaign_id' | 'booking_link' | 'ai_reply_prompt') {
+    if (!myClientId) return;
+    try {
+      const supabase = createClient();
+      await supabase.from('clients').update({ [field]: null }).eq('id', myClientId);
+      if (field === 'smartlead_campaign_id') setMyCampaignId('');
+      if (field === 'booking_link') setMyBookingLink('');
+      if (field === 'ai_reply_prompt') setMyPrompt('');
+      const label = field === 'smartlead_campaign_id' ? 'Campaign ID' : field === 'booking_link' ? 'Booking link' : 'AI reply prompt';
+      showToast(`Your ${label} cleared.`);
+    } catch {
+      showToast('Something went wrong. Please try again.');
+    }
+  }
+
   async function handleSignOut() {
     if (process.env.NEXT_PUBLIC_SUPABASE_URL && process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY) {
       try {
@@ -446,9 +508,17 @@ export default function AdminPage() {
           {/* eslint-disable-next-line @next/next/no-img-element */}
           <a href="/"><img src="/logo.png" alt="ZionShift" className="portal-logo" /></a>
           <span className="adm-center-label">Admin</span>
-          <button className="btn btn-ghost" onClick={handleSignOut} style={{ fontSize: 13, padding: '8px 16px' }}>
-            Sign out
-          </button>
+          <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+            <button className="adm-settings-btn" onClick={handleOpenSettings} aria-label="My Settings" title="My Settings">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                <circle cx="12" cy="12" r="3"/>
+                <path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 2.83-2.83l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/>
+              </svg>
+            </button>
+            <button className="btn btn-ghost" onClick={handleSignOut} style={{ fontSize: 13, padding: '8px 16px' }}>
+              Sign out
+            </button>
+          </div>
         </div>
       </header>
 
@@ -989,6 +1059,119 @@ export default function AdminPage() {
               >
                 Clear AI reply prompt
               </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* ── My Settings Modal ── */}
+      {settingsOpen && (
+        <div className="modal-overlay" onClick={() => setSettingsOpen(false)}>
+          <div className="modal" style={{ maxWidth: 500 }} onClick={e => e.stopPropagation()}>
+            <button className="modal-close" onClick={() => setSettingsOpen(false)}>✕</button>
+            <div className="modal-scroll">
+              <p style={{ margin: '0 0 4px', fontSize: 11, fontWeight: 700, letterSpacing: '0.12em', textTransform: 'uppercase', color: '#9CA3AF' }}>My Account</p>
+              <h2 style={{ margin: '0 0 6px', fontSize: 20, fontWeight: 700, letterSpacing: '-0.03em', color: '#1A1715' }}>Settings</h2>
+              <p style={{ margin: '0 0 28px', fontSize: 14, color: '#6B7280', lineHeight: 1.6 }}>
+                Configure your own campaign, calendar link, and AI reply prompt.
+              </p>
+
+              {settingsLoading ? (
+                <div style={{ padding: '32px 0', textAlign: 'center', color: '#9CA3AF', fontSize: 14 }}>Loading…</div>
+              ) : (
+                <>
+                  {/* Campaign ID */}
+                  <div style={{ marginBottom: 28 }}>
+                    <label style={{ display: 'block', fontSize: 11, fontWeight: 700, color: '#9CA3AF', marginBottom: 6, textTransform: 'uppercase', letterSpacing: '0.08em' }}>
+                      Campaign ID
+                    </label>
+                    <input
+                      type="text"
+                      value={myCampaignId}
+                      onChange={e => setMyCampaignId(e.target.value)}
+                      placeholder="e.g. 123456"
+                      style={{ width: '100%', padding: '11px 14px', fontSize: 14, border: '1px solid #E5E5E5', borderRadius: 8, outline: 'none', boxSizing: 'border-box', background: '#FAFAFA', color: '#1A1715', marginBottom: 10, fontFamily: 'monospace' }}
+                    />
+                    <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+                      {myCampaignId ? (
+                        <button onClick={() => handleClearMySetting('smartlead_campaign_id')} style={{ background: 'none', border: 'none', fontSize: 13, color: '#DC2626', cursor: 'pointer', padding: 0 }}>
+                          Clear
+                        </button>
+                      ) : <span />}
+                      <button
+                        className="ccm-btn-connect"
+                        disabled={!myCampaignId.trim() || settingsSaving === 'campaignId'}
+                        onClick={() => handleSaveMySetting('smartlead_campaign_id', myCampaignId, 'campaignId')}
+                        style={{ opacity: !myCampaignId.trim() ? 0.5 : 1 }}
+                      >
+                        {settingsSaving === 'campaignId' ? 'Saving…' : 'Save'}
+                      </button>
+                    </div>
+                  </div>
+
+                  <div style={{ height: 1, background: '#F0EDE8', marginBottom: 28 }} />
+
+                  {/* Booking Link */}
+                  <div style={{ marginBottom: 28 }}>
+                    <label style={{ display: 'block', fontSize: 11, fontWeight: 700, color: '#9CA3AF', marginBottom: 6, textTransform: 'uppercase', letterSpacing: '0.08em' }}>
+                      Booking Link
+                    </label>
+                    <input
+                      type="url"
+                      value={myBookingLink}
+                      onChange={e => setMyBookingLink(e.target.value)}
+                      placeholder="https://cal.com/yourname/call"
+                      style={{ width: '100%', padding: '11px 14px', fontSize: 14, border: '1px solid #E5E5E5', borderRadius: 8, outline: 'none', boxSizing: 'border-box', background: '#FAFAFA', color: '#1A1715', marginBottom: 10 }}
+                    />
+                    <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+                      {myBookingLink ? (
+                        <button onClick={() => handleClearMySetting('booking_link')} style={{ background: 'none', border: 'none', fontSize: 13, color: '#DC2626', cursor: 'pointer', padding: 0 }}>
+                          Clear
+                        </button>
+                      ) : <span />}
+                      <button
+                        className="ccm-btn-connect"
+                        disabled={!myBookingLink.trim() || settingsSaving === 'bookingLink'}
+                        onClick={() => handleSaveMySetting('booking_link', myBookingLink, 'bookingLink')}
+                        style={{ opacity: !myBookingLink.trim() ? 0.5 : 1 }}
+                      >
+                        {settingsSaving === 'bookingLink' ? 'Saving…' : 'Save'}
+                      </button>
+                    </div>
+                  </div>
+
+                  <div style={{ height: 1, background: '#F0EDE8', marginBottom: 28 }} />
+
+                  {/* AI Reply Prompt */}
+                  <div>
+                    <label style={{ display: 'block', fontSize: 11, fontWeight: 700, color: '#9CA3AF', marginBottom: 6, textTransform: 'uppercase', letterSpacing: '0.08em' }}>
+                      AI Reply Prompt
+                    </label>
+                    <textarea
+                      value={myPrompt}
+                      onChange={e => setMyPrompt(e.target.value)}
+                      placeholder="Paste your full AI reply prompt here..."
+                      rows={12}
+                      style={{ width: '100%', padding: '11px 14px', fontSize: 13, border: '1px solid #E5E5E5', borderRadius: 8, outline: 'none', boxSizing: 'border-box', background: '#FAFAFA', color: '#1A1715', marginBottom: 10, resize: 'vertical', lineHeight: 1.7, fontFamily: 'inherit' }}
+                    />
+                    <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+                      {myPrompt ? (
+                        <button onClick={() => handleClearMySetting('ai_reply_prompt')} style={{ background: 'none', border: 'none', fontSize: 13, color: '#DC2626', cursor: 'pointer', padding: 0 }}>
+                          Clear
+                        </button>
+                      ) : <span />}
+                      <button
+                        className="ccm-btn-connect"
+                        disabled={!myPrompt.trim() || settingsSaving === 'prompt'}
+                        onClick={() => handleSaveMySetting('ai_reply_prompt', myPrompt, 'prompt')}
+                        style={{ opacity: !myPrompt.trim() ? 0.5 : 1 }}
+                      >
+                        {settingsSaving === 'prompt' ? 'Saving…' : 'Save'}
+                      </button>
+                    </div>
+                  </div>
+                </>
+              )}
             </div>
           </div>
         </div>
