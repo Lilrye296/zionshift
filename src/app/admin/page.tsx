@@ -96,7 +96,6 @@ export default function AdminPage() {
   const [promptInput, setPromptInput]     = useState('');
   const [promptSaving, setPromptSaving]   = useState(false);
   const [settingsOpen, setSettingsOpen]       = useState(false);
-  const [settingsLoading, setSettingsLoading] = useState(false);
   const [myClientId, setMyClientId]           = useState<string | null>(null);
   const [myCampaignId, setMyCampaignId]       = useState('');
   const [myBookingLink, setMyBookingLink]     = useState('');
@@ -131,13 +130,6 @@ export default function AdminPage() {
           .from('profiles').select('role').eq('id', user.id).single();
         if (profile?.role !== 'admin') { router.push('/client'); return; }
 
-        // Load admin's own client row for My Campaign section
-        const { data: adminClientRow } = await supabase
-          .from('clients')
-          .select('id')
-          .eq('email', user.email)
-          .maybeSingle();
-        if (adminClientRow?.id) setMyClientId(adminClientRow.id);
 
         const { data: clientsData } = await supabase
           .from('clients')
@@ -145,6 +137,16 @@ export default function AdminPage() {
           .order('created_at', { ascending: false });
 
         if (clientsData) {
+          // Populate admin's own settings from the already-fetched data
+          const adminRow = clientsData.find((c: { email: string }) => c.email === user.email) as
+            { id: string; smartlead_campaign_id: string | null; booking_link: string | null; ai_reply_prompt: string | null } | undefined;
+          if (adminRow) {
+            setMyClientId(adminRow.id);
+            setMyCampaignId(adminRow.smartlead_campaign_id ?? '');
+            setMyBookingLink(adminRow.booking_link ?? '');
+            setMyPrompt(adminRow.ai_reply_prompt ?? '');
+          }
+
           const mapped = clientsData.filter((c: { email: string }) => c.email !== user.email).map((c: {
             id: string; name: string; email: string; firm: string;
             status: string; mrr: number; since: string;
@@ -566,26 +568,8 @@ export default function AdminPage() {
     setMyHlConvLoading(false);
   }
 
-  async function handleOpenSettings() {
+  function handleOpenSettings() {
     setSettingsOpen(true);
-    setSettingsLoading(true);
-    try {
-      const supabase = createClient();
-      const { data: { user } } = await supabase.auth.getUser();
-      if (!user?.email) { setSettingsLoading(false); return; }
-      const { data: clientRow } = await supabase
-        .from('clients')
-        .select('id, smartlead_campaign_id, booking_link, ai_reply_prompt')
-        .eq('email', user.email)
-        .single();
-      if (clientRow) {
-        setMyClientId(clientRow.id);
-        setMyCampaignId(clientRow.smartlead_campaign_id ?? '');
-        setMyBookingLink(clientRow.booking_link ?? '');
-        setMyPrompt(clientRow.ai_reply_prompt ?? '');
-      }
-    } catch { /* silently fail */ }
-    setSettingsLoading(false);
   }
 
   async function handleSaveMySetting(
@@ -1412,10 +1396,7 @@ export default function AdminPage() {
                 Configure your own campaign, calendar link, and AI reply prompt.
               </p>
 
-              {settingsLoading ? (
-                <div style={{ padding: '32px 0', textAlign: 'center', color: '#9CA3AF', fontSize: 14 }}>Loading…</div>
-              ) : (
-                <>
+              <>
                   {/* Campaign ID */}
                   <div style={{ marginBottom: 28 }}>
                     <label style={{ display: 'block', fontSize: 11, fontWeight: 700, color: '#9CA3AF', marginBottom: 6, textTransform: 'uppercase', letterSpacing: '0.08em' }}>
@@ -1503,8 +1484,7 @@ export default function AdminPage() {
                       </button>
                     </div>
                   </div>
-                </>
-              )}
+              </>
             </div>
           </div>
         </div>
