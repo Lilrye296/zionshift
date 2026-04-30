@@ -166,7 +166,7 @@ interface PeriodStats {
   emails_sent:  number | null;
   replies:      number | null;
   reply_rate:   number | null;
-  hot_leads:    number;
+  hot_leads:    number | null;
   bounces:      number | null;
   bounce_rate:  number | null;
   opt_outs:     number | null;
@@ -411,7 +411,7 @@ export default function ClientPage() {
       emails_sent: null,
       replies:     null,
       reply_rate:  null,
-      hot_leads:   0,
+      hot_leads:   null,
       bounces:     null,
       bounce_rate: null,
       opt_outs:    null,
