@@ -107,6 +107,7 @@ export default function AdminPage() {
   const [myHotLeads, setMyHotLeads]           = useState<HotLead[]>([]);
   const [myHlSearch, setMyHlSearch]           = useState('');
   const [myHlMenuId, setMyHlMenuId]           = useState<string | null>(null);
+  const [myHlMenuPos, setMyHlMenuPos]         = useState<{top: number, right: number} | null>(null);
   const [myHlRemoveId, setMyHlRemoveId]       = useState<string | null>(null);
   const [myHlOpenLead, setMyHlOpenLead]       = useState<HotLead | null>(null);
   const [myHlConversation, setMyHlConversation] = useState<ConversationMessage[] | null>(null);
@@ -219,12 +220,6 @@ export default function AdminPage() {
       return () => document.removeEventListener('mousedown', handleClick);
     }
   }, [openDropdownId]);
-
-  // Lock body scroll when conversation modal is open
-  useEffect(() => {
-    document.body.style.overflow = myHlOpenLead ? 'hidden' : '';
-    return () => { document.body.style.overflow = ''; };
-  }, [myHlOpenLead]);
 
   // My Campaign — fetch metrics when client ID or period changes
   useEffect(() => {
@@ -1036,20 +1031,19 @@ export default function AdminPage() {
                               <div className="hl-menu-wrap" onClick={e => e.stopPropagation()}>
                                 <button
                                   className="hl-menu-btn"
-                                  onClick={() => setMyHlMenuId(myHlMenuId === lead.id ? null : lead.id)}
+                                  onClick={(e) => {
+                                    const rect = (e.currentTarget as HTMLElement).getBoundingClientRect();
+                                    if (myHlMenuId === lead.id) {
+                                      setMyHlMenuId(null);
+                                      setMyHlMenuPos(null);
+                                    } else {
+                                      setMyHlMenuId(lead.id);
+                                      setMyHlMenuPos({ top: rect.bottom + 6, right: window.innerWidth - rect.right });
+                                    }
+                                  }}
                                 >
                                   •••
                                 </button>
-                                {myHlMenuId === lead.id && (
-                                  <div className="hl-menu">
-                                    <button className="hl-menu-item" onClick={() => handleMyHlFollowedUp(lead.id)}>
-                                      {lead.status === 'followed_up' ? 'Undo Follow Up' : 'Mark as Followed Up'}
-                                    </button>
-                                    <button className="hl-menu-item hl-menu-item--danger" onClick={() => handleMyHlRemove(lead.id)}>
-                                      Remove Lead
-                                    </button>
-                                  </div>
-                                )}
                               </div>
                             </div>
                           </div>
@@ -1104,6 +1098,29 @@ export default function AdminPage() {
                 <div className="hl-modal-loading">No conversation data available yet.</div>
               )}
             </div>
+          </div>
+        </div>
+      )}
+
+      {/* ── My Hot Lead ••• Fixed Dropdown ── */}
+      {myHlMenuId && myHlMenuPos && (
+        <div
+          style={{ position: 'fixed', top: myHlMenuPos.top, right: myHlMenuPos.right, zIndex: 999 }}
+          onClick={e => e.stopPropagation()}
+        >
+          <div className="hl-menu">
+            {(() => {
+              const lead = myHotLeads.find(l => l.id === myHlMenuId);
+              if (!lead) return null;
+              return (<>
+                <button className="hl-menu-item" onClick={() => { handleMyHlFollowedUp(lead.id); setMyHlMenuId(null); setMyHlMenuPos(null); }}>
+                  {lead.status === 'followed_up' ? 'Undo Follow Up' : 'Mark as Followed Up'}
+                </button>
+                <button className="hl-menu-item hl-menu-item--danger" onClick={() => { handleMyHlRemove(lead.id); setMyHlMenuId(null); setMyHlMenuPos(null); }}>
+                  Remove Lead
+                </button>
+              </>);
+            })()}
           </div>
         </div>
       )}
