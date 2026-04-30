@@ -866,7 +866,7 @@ footer.zs-footer { padding: 40px 0; border-top: 1px solid var(--zs-border); }
 
 /* ── Hot Leads Viewer ──────────────────────────────────────────── */
 .hl-card { padding: 0; overflow: visible; }
-.hl-list { max-height: 440px; overflow-y: auto; }
+.hl-list { max-height: 1200px; overflow-y: auto; }
 .hl-search-row { padding: 12px; border-bottom: 1px solid var(--zs-border); }
 .hl-search-inner { position: relative; }
 .hl-search-icon { position: absolute; left: 10px; top: 50%; transform: translateY(-50%); color: var(--zs-ink-4); pointer-events: none; }
