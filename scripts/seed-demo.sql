@@ -40,7 +40,7 @@ BEGIN
     null,
     'https://cal.com/clearledger/discovery',
     'You are the AI booking assistant for ClearLedger Bookkeeping, a firm that specializes in bookkeeping for e-commerce and retail businesses. When a prospect replies with interest, your goal is to get them booked on a 20-minute discovery call. Be warm, professional, and concise. Address concerns about pricing, process, or past experiences directly and with empathy. Always end with a clear call to action using the booking link provided.',
-    '{"alltime":{"emails_sent":3840,"replies":96,"reply_rate":2.50,"bounces":54,"bounce_rate":1.41,"opt_outs":14},"month":{"emails_sent":1920,"replies":51,"reply_rate":2.66,"bounces":27,"bounce_rate":1.41,"opt_outs":7},"week":{"emails_sent":441,"replies":12,"reply_rate":2.72,"bounces":6,"bounce_rate":1.36,"opt_outs":2}}'::jsonb,
+    '{"alltime":{"emails_sent":1847,"replies":46,"reply_rate":2.49,"bounces":26,"bounce_rate":1.41,"opt_outs":7},"month":{"emails_sent":1312,"replies":35,"reply_rate":2.67,"bounces":18,"bounce_rate":1.37,"opt_outs":4},"week":{"emails_sent":298,"replies":8,"reply_rate":2.68,"bounces":4,"bounce_rate":1.34,"opt_outs":1}}'::jsonb,
     '2026-03-01 10:00:00+00'
   ) RETURNING id INTO v_id;
 
@@ -49,7 +49,7 @@ BEGIN
   INSERT INTO hot_leads (client_id, lead_name, lead_company, lead_email, status, booking_link, campaign_id, email_body, created_at, conversation)
   VALUES (
     v_id, 'Emma Richardson', 'Bloom & Thread Co.', 'emma@bloomthread.com',
-    'followed_up', 'https://cal.com/clearledger/discovery', null, null,
+    'followed_up', 'https://cal.com/clearledger/discovery', 'DEMO', null,
     '2026-04-28 14:32:00+00',
     $json${
       "messages": [
@@ -83,7 +83,7 @@ BEGIN
   INSERT INTO hot_leads (client_id, lead_name, lead_company, lead_email, status, booking_link, campaign_id, email_body, created_at, conversation)
   VALUES (
     v_id, 'Marcus Webb', 'Webb''s Hardware Supply', 'marcus@webbshardware.com',
-    'followed_up', 'https://cal.com/clearledger/discovery', null, null,
+    'followed_up', 'https://cal.com/clearledger/discovery', 'DEMO', null,
     '2026-04-22 16:47:00+00',
     $json${
       "messages": [
@@ -131,7 +131,7 @@ BEGIN
   INSERT INTO hot_leads (client_id, lead_name, lead_company, lead_email, status, booking_link, campaign_id, email_body, created_at, conversation)
   VALUES (
     v_id, 'Jennifer Park', 'Glow Republic', 'jennifer@glowrepublic.co',
-    'followed_up', 'https://cal.com/clearledger/discovery', null, null,
+    'followed_up', 'https://cal.com/clearledger/discovery', 'DEMO', null,
     '2026-04-18 13:55:00+00',
     $json${
       "messages": [
@@ -193,7 +193,7 @@ BEGIN
   INSERT INTO hot_leads (client_id, lead_name, lead_company, lead_email, status, booking_link, campaign_id, email_body, created_at, conversation)
   VALUES (
     v_id, 'Daniel Russo', 'Russo Wholesale Group', 'daniel@russogroup.com',
-    'followed_up', 'https://cal.com/clearledger/discovery', null, null,
+    'followed_up', 'https://cal.com/clearledger/discovery', 'DEMO', null,
     '2026-04-10 15:03:00+00',
     $json${
       "messages": [
@@ -241,7 +241,7 @@ BEGIN
   INSERT INTO hot_leads (client_id, lead_name, lead_company, lead_email, status, booking_link, campaign_id, email_body, created_at, conversation)
   VALUES (
     v_id, 'Aisha Thompson', 'Luxe by Aisha', 'aisha@luxebyaisha.com',
-    'followed_up', 'https://cal.com/clearledger/discovery', null, null,
+    'followed_up', 'https://cal.com/clearledger/discovery', 'DEMO', null,
     '2026-04-05 10:11:00+00',
     $json${
       "messages": [
@@ -289,7 +289,7 @@ BEGIN
   INSERT INTO hot_leads (client_id, lead_name, lead_company, lead_email, status, booking_link, campaign_id, email_body, created_at, conversation)
   VALUES (
     v_id, 'Tyler Brooks', 'Brooks Retail Partners', 'tyler@brooksretail.com',
-    'active', 'https://cal.com/clearledger/discovery', null, null,
+    'active', 'https://cal.com/clearledger/discovery', 'DEMO', null,
     '2026-04-29 09:20:00+00',
     $json${
       "messages": [
@@ -337,7 +337,7 @@ BEGIN
   INSERT INTO hot_leads (client_id, lead_name, lead_company, lead_email, status, booking_link, campaign_id, email_body, created_at, conversation)
   VALUES (
     v_id, 'Rachel Kim', 'PawVault Supplies', 'rachel@pawvault.com',
-    'followed_up', 'https://cal.com/clearledger/discovery', null, null,
+    'followed_up', 'https://cal.com/clearledger/discovery', 'DEMO', null,
     '2026-03-28 14:19:00+00',
     $json${
       "messages": [
