@@ -75,6 +75,7 @@ export default function AdminPage() {
   const [resentId, setResentId]             = useState<string | null>(null);
   const [toast, setToast]                   = useState<string | null>(null);
   const [openDropdownId, setOpenDropdownId] = useState<string | null>(null);
+  const [dropdownPos, setDropdownPos]       = useState<{top: number; right: number} | null>(null);
   const [intakeClient, setIntakeClient]     = useState<ActiveClient | null>(null);
   const [intakeData, setIntakeData]         = useState<Record<string, unknown> | null>(null);
   const [intakeLoading, setIntakeLoading]   = useState(false);
@@ -798,13 +799,22 @@ export default function AdminPage() {
                               <div className="adm-actions-wrap">
                                 <button
                                   className="adm-menu-btn"
-                                  onClick={() => setOpenDropdownId(id => id === c.id ? null : c.id)}
+                                  onClick={(e) => {
+                                    if (openDropdownId === c.id) {
+                                      setOpenDropdownId(null);
+                                      setDropdownPos(null);
+                                    } else {
+                                      const rect = (e.currentTarget as HTMLElement).getBoundingClientRect();
+                                      setDropdownPos({ top: rect.bottom + 6, right: window.innerWidth - rect.right });
+                                      setOpenDropdownId(c.id);
+                                    }
+                                  }}
                                   aria-label="Client actions"
                                 >
                                   •••
                                 </button>
-                                {openDropdownId === c.id && (
-                                  <div className="adm-actions-menu">
+                                {openDropdownId === c.id && dropdownPos && (
+                                  <div className="adm-actions-menu" style={{ position: 'fixed', top: dropdownPos.top, right: dropdownPos.right, left: 'auto' }}>
                                     <button className="adm-actions-item" onClick={() => { router.push(`/client?view=${c.id}`); setOpenDropdownId(null); }}>
                                       View Dashboard →
                                     </button>
