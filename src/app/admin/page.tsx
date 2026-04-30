@@ -220,6 +220,12 @@ export default function AdminPage() {
     }
   }, [openDropdownId]);
 
+  // Lock body scroll when conversation modal is open
+  useEffect(() => {
+    document.body.style.overflow = myHlOpenLead ? 'hidden' : '';
+    return () => { document.body.style.overflow = ''; };
+  }, [myHlOpenLead]);
+
   // My Campaign — fetch metrics when client ID or period changes
   useEffect(() => {
     if (!myClientId) return;

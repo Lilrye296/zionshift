@@ -403,6 +403,12 @@ export default function ClientPage() {
     load();
   }, [router, isAdminView]); // eslint-disable-line react-hooks/exhaustive-deps
 
+  // Lock body scroll when conversation modal is open
+  useEffect(() => {
+    document.body.style.overflow = hlOpenLead ? 'hidden' : '';
+    return () => { document.body.style.overflow = ''; };
+  }, [hlOpenLead]);
+
   // Period-scoped metrics — fetch from Smartlead via API whenever period or client changes
   useEffect(() => {
     if (!resolvedClientId) return;
