@@ -43,13 +43,44 @@ export async function GET(req: NextRequest) {
     return NextResponse.json({ error: 'Missing clientId.' }, { status: 400 });
   }
 
-  // ── 1. Look up client's Smartlead campaign ID ──────────────────
+  // ── 1. Look up client row ──────────────────────────────────────
   const supabase = supabaseAdmin();
   const { data: client } = await supabase
     .from('clients')
-    .select('smartlead_campaign_id')
+    .select('smartlead_campaign_id, demo_metrics')
     .eq('id', clientId)
     .single();
+
+  // ── 1a. Demo mode: return pre-set metrics, real hot_leads count ─
+  if (client?.demo_metrics) {
+    const dm  = client.demo_metrics as Record<string, Record<string, number>>;
+    const key = period === 'week' ? 'week' : period === 'month' ? 'month' : 'alltime';
+    const m   = dm[key] ?? {};
+
+    let hotLeads = 0;
+    try {
+      const dateRange = getDateRange(period);
+      let q = supabase
+        .from('hot_leads')
+        .select('*', { count: 'exact', head: true })
+        .eq('client_id', clientId);
+      if (dateRange) q = q.gte('created_at', `${dateRange.start}T00:00:00.000Z`);
+      const { count } = await q;
+      hotLeads = count ?? 0;
+    } catch { /* leave as 0 */ }
+
+    return NextResponse.json({
+      metrics: {
+        emails_sent:  m.emails_sent  ?? 0,
+        replies:      m.replies      ?? 0,
+        reply_rate:   m.reply_rate   ?? 0,
+        hot_leads:    hotLeads,
+        bounces:      m.bounces      ?? 0,
+        bounce_rate:  m.bounce_rate  ?? 0,
+        opt_outs:     m.opt_outs     ?? 0,
+      },
+    });
+  }
 
   if (!client?.smartlead_campaign_id) {
     // No campaign linked yet — return null so dashboard shows dashes

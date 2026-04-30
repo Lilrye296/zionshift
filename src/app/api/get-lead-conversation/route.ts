@@ -50,6 +50,12 @@ export async function GET(req: NextRequest) {
     return NextResponse.json({ error: 'Hot lead not found.' }, { status: 404 });
   }
 
+  // ── 2a. Demo mode: return pre-stored messages directly ────────
+  const storedMsgs = (lead.conversation as { messages?: unknown[] } | null)?.messages;
+  if (storedMsgs && Array.isArray(storedMsgs)) {
+    return NextResponse.json({ messages: storedMsgs });
+  }
+
   // ── 2. Try to get lead_id from stored conversation metadata ───
   const meta = (lead.conversation as { _meta?: { lead_id?: number | string } } | null)?._meta;
   const leadId = meta?.lead_id;
