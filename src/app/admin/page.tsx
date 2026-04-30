@@ -97,7 +97,7 @@ export default function AdminPage() {
           .order('created_at', { ascending: false });
 
         if (clientsData) {
-          const mapped = clientsData.map((c: {
+          const mapped = clientsData.filter((c: { email: string }) => c.email !== user.email).map((c: {
             id: string; name: string; email: string; firm: string;
             status: string; mrr: number; since: string;
             first_month_paid: boolean; setup_fee_paid: boolean;
