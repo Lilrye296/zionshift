@@ -962,7 +962,12 @@ export default function AdminPage() {
                 </div>
 
                 {/* Hot Lead Conversations */}
-                <p className="cd-health-label">Hot Lead Conversations</p>
+                <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 12 }}>
+                  <p className="cd-health-label" style={{ margin: 0 }}>Hot Lead Conversations</p>
+                  {myHotLeads.length > 0 && (
+                    <span className="adm-count-chip">{myHotLeads.length} Total</span>
+                  )}
+                </div>
                 <div className="cd-card hl-card" style={{ marginBottom: 40 }}>
                   <div className="hl-search-row">
                     <div className="hl-search-inner">
