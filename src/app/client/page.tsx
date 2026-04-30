@@ -266,6 +266,7 @@ export default function ClientPage() {
   const [hotLeads, setHotLeads]               = useState<HotLead[]>([]);
   const [hlSearch, setHlSearch]               = useState('');
   const [hlMenuId, setHlMenuId]               = useState<string | null>(null);
+  const [hlRemoveId, setHlRemoveId]           = useState<string | null>(null);
   const [hlOpenLead, setHlOpenLead]           = useState<HotLead | null>(null);
   const [hlConversation, setHlConversation]   = useState<ConversationMessage[] | null>(null);
   const [hlConvLoading, setHlConvLoading]     = useState(false);
@@ -497,16 +498,27 @@ export default function ClientPage() {
   }, []);
 
   async function handleHlFollowedUp(id: string) {
+    const lead = hotLeads.find(l => l.id === id);
+    const action = lead?.status === 'followed_up' ? 'unfollowed' : 'followed_up';
+    const newStatus = action === 'followed_up' ? 'followed_up' : 'active';
     await fetch('/api/update-hot-lead', {
       method: 'PATCH',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ id, action: 'followed_up' }),
+      body: JSON.stringify({ id, action }),
     });
-    setHotLeads(prev => prev.map(l => l.id === id ? { ...l, status: 'followed_up' } : l));
+    setHotLeads(prev => prev.map(l => l.id === id ? { ...l, status: newStatus } : l));
     setHlMenuId(null);
   }
 
-  async function handleHlRemove(id: string) {
+  function handleHlRemove(id: string) {
+    setHlRemoveId(id);
+    setHlMenuId(null);
+  }
+
+  async function handleHlConfirmRemove() {
+    if (!hlRemoveId) return;
+    const id = hlRemoveId;
+    setHlRemoveId(null);
     await fetch('/api/update-hot-lead', {
       method: 'PATCH',
       headers: { 'Content-Type': 'application/json' },
@@ -514,7 +526,6 @@ export default function ClientPage() {
     });
     setHotLeads(prev => prev.filter(l => l.id !== id));
     if (hlOpenLead?.id === id) setHlOpenLead(null);
-    setHlMenuId(null);
   }
 
   async function handleHlOpen(lead: HotLead) {
@@ -809,13 +820,13 @@ export default function ClientPage() {
                                 className="hl-menu-item"
                                 onClick={() => handleHlFollowedUp(lead.id)}
                               >
-                                {lead.status === 'followed_up' ? '✓ Followed Up' : 'Mark as Followed Up'}
+                                {lead.status === 'followed_up' ? 'Undo Follow Up' : 'Mark as Followed Up'}
                               </button>
                               <button
                                 className="hl-menu-item hl-menu-item--danger"
                                 onClick={() => handleHlRemove(lead.id)}
                               >
-                                Remove
+                                Remove Lead
                               </button>
                             </div>
                           )}
@@ -877,6 +888,36 @@ export default function ClientPage() {
                     {!hlConvLoading && (!hlConversation || hlConversation.length === 0) && (
                       <div className="hl-modal-loading">No conversation data available yet.</div>
                     )}
+                  </div>
+                </div>
+              </div>
+            )}
+
+            {/* ── Remove Lead Confirm Modal ── */}
+            {hlRemoveId && (
+              <div className="modal-overlay" onClick={() => setHlRemoveId(null)}>
+                <div className="modal" style={{ maxWidth: 400 }} onClick={e => e.stopPropagation()}>
+                  <button className="modal-close" onClick={() => setHlRemoveId(null)}>✕</button>
+                  <div className="modal-scroll">
+                    <div className="adm-delete-icon">⚠</div>
+                    <h2 style={{ margin: '0 0 8px', fontSize: 20, fontWeight: 700, letterSpacing: '-0.03em', color: '#1A1715' }}>Remove Lead</h2>
+                    <p style={{ margin: '0 0 28px', fontSize: 14, color: '#6B7280', lineHeight: 1.6 }}>
+                      Are you sure you want to remove <strong style={{ color: '#1A1715' }}>{hotLeads.find(l => l.id === hlRemoveId)?.lead_name || 'this lead'}</strong> from your hot leads? This cannot be undone.
+                    </p>
+                    <div style={{ display: 'flex', gap: 10, justifyContent: 'flex-end' }}>
+                      <button
+                        onClick={() => setHlRemoveId(null)}
+                        style={{ background: 'none', border: '1px solid #E5E5E5', borderRadius: 8, padding: '9px 18px', fontSize: 14, fontWeight: 500, cursor: 'pointer', color: '#6B7280' }}
+                      >
+                        Cancel
+                      </button>
+                      <button
+                        onClick={handleHlConfirmRemove}
+                        style={{ background: '#DC2626', border: 'none', borderRadius: 8, padding: '9px 18px', fontSize: 14, fontWeight: 600, cursor: 'pointer', color: '#fff' }}
+                      >
+                        Remove Lead
+                      </button>
+                    </div>
                   </div>
                 </div>
               </div>

@@ -30,6 +30,19 @@ export async function PATCH(req: NextRequest) {
     return NextResponse.json({ success: true });
   }
 
+  if (action === 'unfollowed') {
+    const { error } = await supabase
+      .from('hot_leads')
+      .update({ status: 'active' })
+      .eq('id', id);
+
+    if (error) {
+      console.error('[update-hot-lead] unfollowed error:', error);
+      return NextResponse.json({ error: error.message }, { status: 500 });
+    }
+    return NextResponse.json({ success: true });
+  }
+
   if (action === 'delete') {
     const { error } = await supabase
       .from('hot_leads')
