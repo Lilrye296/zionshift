@@ -23,6 +23,8 @@ interface ActiveClient {
   billingStatus: string | null;
   failedPaymentAt: string | null;
   smartleadCampaignId: string | null;
+  bookingLink: string | null;
+  aiReplyPrompt: string | null;
 }
 
 /* ── Helpers ────────────────────────────────────────────────────── */
@@ -91,7 +93,7 @@ export default function AdminPage() {
 
         const { data: clientsData } = await supabase
           .from('clients')
-          .select('id, name, email, firm, status, mrr, since, first_month_paid, setup_fee_paid, headshot_url, logo_url, campaign_status, warmup_started_at, billing_status, failed_payment_at, smartlead_campaign_id')
+          .select('id, name, email, firm, status, mrr, since, first_month_paid, setup_fee_paid, headshot_url, logo_url, campaign_status, warmup_started_at, billing_status, failed_payment_at, smartlead_campaign_id, booking_link, ai_reply_prompt')
           .order('created_at', { ascending: false });
 
         if (clientsData) {
@@ -102,7 +104,7 @@ export default function AdminPage() {
             headshot_url: string | null; logo_url: string | null;
             campaign_status: string | null; warmup_started_at: string | null;
             billing_status: string | null; failed_payment_at: string | null;
-            smartlead_campaign_id: string | null;
+            smartlead_campaign_id: string | null; booking_link: string | null; ai_reply_prompt: string | null;
           }) => {
             // Auto-flip warming → active after 14 days
             let campaignStatus = c.campaign_status ?? 'pending';
@@ -127,6 +129,8 @@ export default function AdminPage() {
               billingStatus: c.billing_status ?? null,
               failedPaymentAt: c.failed_payment_at ?? null,
               smartleadCampaignId: c.smartlead_campaign_id ?? null,
+              bookingLink: c.booking_link ?? null,
+              aiReplyPrompt: c.ai_reply_prompt ?? null,
             };
           });
 
@@ -676,12 +680,12 @@ export default function AdminPage() {
                                       {c.smartleadCampaignId ? 'Update Campaign ID' : 'Set Campaign ID'}
                                     </button>
                                     <div className="adm-actions-divider" />
-                                    <button className="adm-actions-item" onClick={() => { setBookingLinkClient(c); setBookingLinkInput(''); setOpenDropdownId(null); }}>
-                                      Set Booking Link
+                                    <button className="adm-actions-item" onClick={() => { setBookingLinkClient(c); setBookingLinkInput(c.bookingLink ?? ''); setOpenDropdownId(null); }}>
+                                      {c.bookingLink ? 'Update Booking Link' : 'Set Booking Link'}
                                     </button>
                                     <div className="adm-actions-divider" />
-                                    <button className="adm-actions-item" onClick={() => { setPromptClient(c); setPromptInput(''); setOpenDropdownId(null); }}>
-                                      Set AI Reply Prompt
+                                    <button className="adm-actions-item" onClick={() => { setPromptClient(c); setPromptInput(c.aiReplyPrompt ?? ''); setOpenDropdownId(null); }}>
+                                      {c.aiReplyPrompt ? 'Update AI Reply Prompt' : 'Set AI Reply Prompt'}
                                     </button>
                                     <div className="adm-actions-divider" />
                                     {c.campaignStatus !== 'paused' && c.campaignStatus !== 'cancelled' && (
@@ -1009,12 +1013,14 @@ export default function AdminPage() {
                 </button>
                 <button className="ccm-btn-cancel" onClick={() => { setBookingLinkClient(null); setBookingLinkInput(''); }}>Cancel</button>
               </div>
-              <button
-                onClick={() => handleClearField(bookingLinkClient.id, 'booking_link')}
-                style={{ marginTop: 12, background: 'none', border: 'none', fontSize: 13, color: '#DC2626', cursor: 'pointer', padding: 0 }}
-              >
-                Clear booking link
-              </button>
+              {bookingLinkClient.bookingLink && (
+                <button
+                  onClick={() => handleClearField(bookingLinkClient.id, 'booking_link')}
+                  style={{ marginTop: 12, background: 'none', border: 'none', fontSize: 13, color: '#DC2626', cursor: 'pointer', padding: 0 }}
+                >
+                  Clear booking link
+                </button>
+              )}
             </div>
           </div>
         </div>
@@ -1053,12 +1059,14 @@ export default function AdminPage() {
                 </button>
                 <button className="ccm-btn-cancel" onClick={() => { setPromptClient(null); setPromptInput(''); }}>Cancel</button>
               </div>
-              <button
-                onClick={() => handleClearField(promptClient.id, 'ai_reply_prompt')}
-                style={{ marginTop: 12, background: 'none', border: 'none', fontSize: 13, color: '#DC2626', cursor: 'pointer', padding: 0 }}
-              >
-                Clear AI reply prompt
-              </button>
+              {promptClient.aiReplyPrompt && (
+                <button
+                  onClick={() => handleClearField(promptClient.id, 'ai_reply_prompt')}
+                  style={{ marginTop: 12, background: 'none', border: 'none', fontSize: 13, color: '#DC2626', cursor: 'pointer', padding: 0 }}
+                >
+                  Clear AI reply prompt
+                </button>
+              )}
             </div>
           </div>
         </div>
