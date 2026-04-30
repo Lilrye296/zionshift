@@ -750,11 +750,16 @@ export default function ClientPage() {
 
 
             {/* ── Hot Leads Viewer ── */}
-            <p className="cd-health-label" style={{ marginTop: 32 }}>Hot Lead Conversations</p>
-            <div className="cd-card hl-card">
+            <div className="cd-card hl-card" style={{ marginTop: 32 }}>
 
-              {/* Search bar */}
+              {/* Card header — title left, search right */}
               <div className="hl-search-wrap">
+                <div className="hl-header-left">
+                  <span className="hl-header-title">Hot Lead Conversations</span>
+                  {hotLeads.length > 0 && (
+                    <span className="hl-header-count">{hotLeads.length}</span>
+                  )}
+                </div>
                 <div className="hl-search-inner">
                   <svg className="hl-search-icon" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round">
                     <circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/>
