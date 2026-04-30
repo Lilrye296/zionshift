@@ -905,10 +905,10 @@ footer.zs-footer { padding: 40px 0; border-top: 1px solid var(--zs-border); }
 
 /* Individual messages in conversation */
 .hl-msg { border-radius: 12px; padding: 14px 16px; }
-.hl-msg--outbound { background: #f8f8f7; border: 1px solid var(--zs-border); }
-.hl-msg--inbound { background: #fffbeb; border: 1px solid #fde68a; }
+.hl-msg--outbound { background: #eff6ff; border: 1px solid #bfdbfe; }
+.hl-msg--inbound { background: #f8f8f7; border: 1px solid var(--zs-border); }
 .hl-msg-sender { font: 700 10px var(--zs-mono); letter-spacing: 0.08em; text-transform: uppercase; color: var(--zs-ink-4); margin-bottom: 8px; }
-.hl-msg--inbound .hl-msg-sender { color: #92400e; }
+.hl-msg--outbound .hl-msg-sender { color: #1d4ed8; }
 .hl-msg-subject { font: 500 12px var(--zs-sans); color: var(--zs-ink-3); margin-bottom: 6px; }
 .hl-msg-body { font: 400 13px var(--zs-sans); color: var(--zs-ink); line-height: 1.75; white-space: pre-wrap; word-break: break-word; }
 .hl-msg-time { font: 400 11px var(--zs-sans); color: var(--zs-ink-4); margin-top: 10px; }

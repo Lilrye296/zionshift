@@ -856,7 +856,9 @@ export default function ClientPage() {
 
                     {!hlConvLoading && hlConversation && hlConversation.map(msg => (
                       <div key={msg.id} className={`hl-msg hl-msg--${msg.type}`}>
-                        <div className="hl-msg-sender">{msg.sender}</div>
+                        <div className="hl-msg-sender">
+                          {msg.type === 'outbound' ? 'AI Reply' : msg.sender}
+                        </div>
                         {msg.subject && (
                           <div className="hl-msg-subject">Re: {msg.subject}</div>
                         )}
