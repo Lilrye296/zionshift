@@ -750,12 +750,7 @@ export default function ClientPage() {
 
 
             {/* ── Hot Leads Viewer ── */}
-            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 12 }}>
-              <p className="cd-health-label" style={{ margin: 0 }}>Hot Lead Conversations</p>
-              {hotLeads.length > 0 && (
-                <span className="adm-count-chip">{hotLeads.length} Total</span>
-              )}
-            </div>
+            <p className="cd-health-label">Hot Lead Conversations</p>
             <div className="cd-card hl-card">
 
               {/* Search bar */}
@@ -771,6 +766,7 @@ export default function ClientPage() {
                     onChange={e => setHlSearch(e.target.value)}
                   />
                 </div>
+                <span className="adm-count-chip">{hotLeads.length} Total</span>
               </div>
 
               {/* List */}

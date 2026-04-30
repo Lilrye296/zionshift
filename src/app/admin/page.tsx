@@ -917,9 +917,11 @@ export default function AdminPage() {
             {myClientId && (
               <>
                 {/* Header row */}
-                <div style={{ position: 'relative', textAlign: 'center', marginTop: 40, marginBottom: 6 }}>
+                <div style={{ display: 'flex', alignItems: 'center', marginTop: 40, marginBottom: 4 }}>
+                  <div style={{ flex: 1 }} />
                   <p className="cd-health-label" style={{ margin: 0 }}>My Campaign</p>
-                  <div className="cd-period-dropdown" ref={myPeriodRef} style={{ position: 'absolute', right: 0, top: '50%', transform: 'translateY(-50%)' }}>
+                  <div style={{ flex: 1, display: 'flex', justifyContent: 'flex-end' }}>
+                  <div className="cd-period-dropdown" ref={myPeriodRef}>
                     <button className="cd-period-btn" onClick={() => setMyPeriodOpen(o => !o)}>
                       {PERIOD_LABEL[myPeriod]}
                       <svg width="10" height="10" viewBox="0 0 10 10" fill="none" aria-hidden>
@@ -939,6 +941,7 @@ export default function AdminPage() {
                         ))}
                       </div>
                     )}
+                  </div>
                   </div>
                 </div>
 
@@ -962,12 +965,7 @@ export default function AdminPage() {
                 </div>
 
                 {/* Hot Lead Conversations */}
-                <div style={{ position: 'relative', textAlign: 'center', marginBottom: 8 }}>
-                  <p className="cd-health-label" style={{ margin: 0 }}>Hot Lead Conversations</p>
-                  {myHotLeads.length > 0 && (
-                    <span className="adm-count-chip" style={{ position: 'absolute', right: 0, top: '50%', transform: 'translateY(-50%)' }}>{myHotLeads.length} Total</span>
-                  )}
-                </div>
+                <p className="cd-health-label" style={{ margin: '24px 0 4px' }}>Hot Lead Conversations</p>
                 <div className="cd-card hl-card" style={{ marginBottom: 40 }}>
                   <div className="hl-search-row">
                     <div className="hl-search-inner">
@@ -981,6 +979,7 @@ export default function AdminPage() {
                         onChange={e => setMyHlSearch(e.target.value)}
                       />
                     </div>
+                    <span className="adm-count-chip">{myHotLeads.length} Total</span>
                   </div>
 
                   {(() => {
