@@ -996,7 +996,7 @@ export default function AdminPage() {
                       </div>
                     );
                     return (
-                      <div ref={myHlMenuRef}>
+                      <div className="hl-list" ref={myHlMenuRef}>
                         {filtered.map((lead, i) => (
                           <div key={lead.id}>
                             {i > 0 && <div className="hl-divider" />}

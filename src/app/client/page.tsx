@@ -776,7 +776,7 @@ export default function ClientPage() {
                     : 'No results match your search.'}
                 </div>
               ) : (
-                <div ref={hlMenuRef}>
+                <div className="hl-list" ref={hlMenuRef}>
                   {filteredHotLeads.map((lead, i) => (
                     <div key={lead.id}>
                       {i > 0 && <div className="hl-divider" />}
