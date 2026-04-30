@@ -1,6 +1,6 @@
 'use client';
 
-import { Fragment, useEffect, useState } from 'react';
+import { Fragment, useEffect, useRef, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { createClient } from '@/utils/supabase/client';
 
@@ -34,7 +34,34 @@ function fmtDate(iso: string): string {
   return d.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
 }
 
+interface ConversationMessage {
+  id: number;
+  type: 'outbound' | 'inbound';
+  sender: string;
+  body: string;
+  time?: string;
+  subject?: string;
+}
+
+interface HotLead {
+  id: string;
+  lead_name: string | null;
+  lead_company: string | null;
+  lead_email: string;
+  status: string;
+  booking_link: string | null;
+  created_at: string;
+}
+
+interface MyMetrics {
+  emails_sent: number | null;
+  replies:     number | null;
+  hot_leads:   number | null;
+}
+
 /* ── Constants ──────────────────────────────────────────────────── */
+
+const PERIOD_LABEL = { week: 'This Week', month: 'This Month', alltime: 'All Time' };
 
 // $2k → $6k → $10k → then $10k increments to $100k
 const MRR_MILESTONES = [2000, 6000, 10000, 20000, 30000, 40000, 50000, 60000, 70000, 80000, 90000, 100000];
@@ -74,6 +101,18 @@ export default function AdminPage() {
   const [myBookingLink, setMyBookingLink]     = useState('');
   const [myPrompt, setMyPrompt]               = useState('');
   const [settingsSaving, setSettingsSaving]   = useState<'campaignId' | 'bookingLink' | 'prompt' | null>(null);
+  const [myMetrics, setMyMetrics]             = useState<MyMetrics | null>(null);
+  const [myPeriod, setMyPeriod]               = useState<'week' | 'month' | 'alltime'>('month');
+  const [myPeriodOpen, setMyPeriodOpen]       = useState(false);
+  const [myHotLeads, setMyHotLeads]           = useState<HotLead[]>([]);
+  const [myHlSearch, setMyHlSearch]           = useState('');
+  const [myHlMenuId, setMyHlMenuId]           = useState<string | null>(null);
+  const [myHlOpenLead, setMyHlOpenLead]       = useState<HotLead | null>(null);
+  const [myHlConversation, setMyHlConversation] = useState<ConversationMessage[] | null>(null);
+  const [myHlConvLoading, setMyHlConvLoading]   = useState(false);
+  const [myHlConvPartial, setMyHlConvPartial]   = useState(false);
+  const myHlMenuRef  = useRef<HTMLDivElement>(null);
+  const myPeriodRef  = useRef<HTMLDivElement>(null);
   const router = useRouter();
 
   // Auth guard + data fetch
@@ -90,6 +129,14 @@ export default function AdminPage() {
         const { data: profile } = await supabase
           .from('profiles').select('role').eq('id', user.id).single();
         if (profile?.role !== 'admin') { router.push('/client'); return; }
+
+        // Load admin's own client row for My Campaign section
+        const { data: adminClientRow } = await supabase
+          .from('clients')
+          .select('id')
+          .eq('email', user.email)
+          .maybeSingle();
+        if (adminClientRow?.id) setMyClientId(adminClientRow.id);
 
         const { data: clientsData } = await supabase
           .from('clients')
@@ -168,6 +215,55 @@ export default function AdminPage() {
       return () => document.removeEventListener('mousedown', handleClick);
     }
   }, [openDropdownId]);
+
+  // My Campaign — fetch metrics when client ID or period changes
+  useEffect(() => {
+    if (!myClientId) return;
+    setMyMetrics(null);
+    fetch(`/api/get-metrics?clientId=${myClientId}&period=${myPeriod}`)
+      .then(r => r.json())
+      .then(data => {
+        if (data.metrics) {
+          setMyMetrics({
+            emails_sent: data.metrics.emails_sent,
+            replies:     data.metrics.replies,
+            hot_leads:   data.metrics.hot_leads ?? 0,
+          });
+        }
+      })
+      .catch(() => {});
+  }, [myClientId, myPeriod]);
+
+  // My Campaign — fetch hot leads
+  useEffect(() => {
+    if (!myClientId) return;
+    fetch(`/api/get-hot-leads?clientId=${myClientId}`)
+      .then(r => r.json())
+      .then(data => setMyHotLeads(data.hotLeads ?? []))
+      .catch(() => setMyHotLeads([]));
+  }, [myClientId]);
+
+  // My Campaign — close ••• menu on outside click
+  useEffect(() => {
+    function handleClick(e: MouseEvent) {
+      if (myHlMenuRef.current && !myHlMenuRef.current.contains(e.target as Node)) {
+        setMyHlMenuId(null);
+      }
+    }
+    document.addEventListener('mousedown', handleClick);
+    return () => document.removeEventListener('mousedown', handleClick);
+  }, []);
+
+  // My Campaign — close period dropdown on outside click
+  useEffect(() => {
+    function handleClick(e: MouseEvent) {
+      if (myPeriodRef.current && !myPeriodRef.current.contains(e.target as Node)) {
+        setMyPeriodOpen(false);
+      }
+    }
+    document.addEventListener('mousedown', handleClick);
+    return () => document.removeEventListener('mousedown', handleClick);
+  }, []);
 
   function showToast(msg: string, ms = 5000) {
     setToast(msg);
@@ -430,6 +526,43 @@ export default function AdminPage() {
       setIntakeData(null);
     }
     setIntakeLoading(false);
+  }
+
+  async function handleMyHlFollowedUp(id: string) {
+    await fetch('/api/update-hot-lead', {
+      method: 'PATCH',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ id, action: 'followed_up' }),
+    });
+    setMyHotLeads(prev => prev.map(l => l.id === id ? { ...l, status: 'followed_up' } : l));
+    setMyHlMenuId(null);
+  }
+
+  async function handleMyHlRemove(id: string) {
+    await fetch('/api/update-hot-lead', {
+      method: 'PATCH',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ id, action: 'delete' }),
+    });
+    setMyHotLeads(prev => prev.filter(l => l.id !== id));
+    if (myHlOpenLead?.id === id) setMyHlOpenLead(null);
+    setMyHlMenuId(null);
+  }
+
+  async function handleMyHlOpen(lead: HotLead) {
+    setMyHlOpenLead(lead);
+    setMyHlConvLoading(true);
+    setMyHlConversation(null);
+    setMyHlConvPartial(false);
+    try {
+      const res  = await fetch(`/api/get-lead-conversation?hotLeadId=${lead.id}`);
+      const data = await res.json();
+      setMyHlConversation(data.messages ?? null);
+      setMyHlConvPartial(data.partial === true);
+    } catch {
+      setMyHlConversation(null);
+    }
+    setMyHlConvLoading(false);
   }
 
   async function handleOpenSettings() {
@@ -779,10 +912,179 @@ export default function AdminPage() {
               </div>
 
             </div>
+
+            {/* ── My Campaign ── */}
+            {myClientId && (
+              <>
+                {/* Header row */}
+                <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginTop: 40, marginBottom: 12 }}>
+                  <p className="cd-health-label" style={{ margin: 0 }}>My Campaign</p>
+                  <div className="cd-period-dropdown" ref={myPeriodRef}>
+                    <button className="cd-period-btn" onClick={() => setMyPeriodOpen(o => !o)}>
+                      {PERIOD_LABEL[myPeriod]}
+                      <svg width="10" height="10" viewBox="0 0 10 10" fill="none" aria-hidden>
+                        <path d="M2 3.5L5 6.5L8 3.5" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
+                      </svg>
+                    </button>
+                    {myPeriodOpen && (
+                      <div className="cd-period-menu">
+                        {(['week','month','alltime'] as const).map(opt => (
+                          <button
+                            key={opt}
+                            className={`cd-period-option${myPeriod === opt ? ' active' : ''}`}
+                            onClick={() => { setMyPeriod(opt); setMyPeriodOpen(false); }}
+                          >
+                            {PERIOD_LABEL[opt]}
+                          </button>
+                        ))}
+                      </div>
+                    )}
+                  </div>
+                </div>
+
+                {/* Three metric tiles */}
+                <div className="adm-my-metrics">
+                  <div className="cd-metric-card">
+                    <div className="cd-metric-label">Emails Sent</div>
+                    <div className="cd-metric-value">{myMetrics?.emails_sent ?? '—'}</div>
+                    <div className="cd-metric-period">{PERIOD_LABEL[myPeriod]}</div>
+                  </div>
+                  <div className="cd-metric-card">
+                    <div className="cd-metric-label">Replies</div>
+                    <div className="cd-metric-value">{myMetrics?.replies ?? '—'}</div>
+                    <div className="cd-metric-period">{PERIOD_LABEL[myPeriod]}</div>
+                  </div>
+                  <div className="cd-metric-card">
+                    <div className="cd-metric-label">Hot Leads</div>
+                    <div className="cd-metric-value">{myMetrics?.hot_leads ?? '—'}</div>
+                    <div className="cd-metric-period">{PERIOD_LABEL[myPeriod]}</div>
+                  </div>
+                </div>
+
+                {/* Hot Lead Conversations */}
+                <p className="cd-health-label">Hot Lead Conversations</p>
+                <div className="cd-card hl-card" style={{ marginBottom: 40 }}>
+                  <div className="hl-search-row">
+                    <div className="hl-search-inner">
+                      <svg className="hl-search-icon" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round">
+                        <circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/>
+                      </svg>
+                      <input
+                        className="hl-search"
+                        placeholder="Search leads..."
+                        value={myHlSearch}
+                        onChange={e => setMyHlSearch(e.target.value)}
+                      />
+                    </div>
+                  </div>
+
+                  {(() => {
+                    const filtered = myHotLeads.filter(lead => {
+                      if (!myHlSearch) return true;
+                      const q = myHlSearch.toLowerCase();
+                      return (
+                        (lead.lead_name    ?? '').toLowerCase().includes(q) ||
+                        (lead.lead_company ?? '').toLowerCase().includes(q) ||
+                        lead.lead_email.toLowerCase().includes(q)
+                      );
+                    });
+                    if (filtered.length === 0) return (
+                      <div className="hl-empty">
+                        {myHotLeads.length === 0
+                          ? 'No hot leads yet — when a prospect replies with interest, your AI handles it and the conversation appears here.'
+                          : 'No results match your search.'}
+                      </div>
+                    );
+                    return (
+                      <div ref={myHlMenuRef}>
+                        {filtered.map((lead, i) => (
+                          <div key={lead.id}>
+                            {i > 0 && <div className="hl-divider" />}
+                            <div className="hl-row" onClick={() => handleMyHlOpen(lead)}>
+                              <div className="hl-row-info">
+                                <div className="hl-row-top">
+                                  <span className="hl-row-name">{lead.lead_name || lead.lead_email}</span>
+                                  {lead.status === 'followed_up' && (
+                                    <span className="hl-pill-followed">Followed Up</span>
+                                  )}
+                                </div>
+                                {lead.lead_company && <div className="hl-row-company">{lead.lead_company}</div>}
+                                <div className="hl-row-email">{lead.lead_email}</div>
+                              </div>
+                              <div className="hl-menu-wrap" onClick={e => e.stopPropagation()}>
+                                <button
+                                  className="hl-menu-btn"
+                                  onClick={() => setMyHlMenuId(myHlMenuId === lead.id ? null : lead.id)}
+                                >
+                                  •••
+                                </button>
+                                {myHlMenuId === lead.id && (
+                                  <div className="hl-menu">
+                                    <button className="hl-menu-item" onClick={() => handleMyHlFollowedUp(lead.id)}>
+                                      {lead.status === 'followed_up' ? '✓ Followed Up' : 'Mark as Followed Up'}
+                                    </button>
+                                    <button className="hl-menu-item hl-menu-item--danger" onClick={() => handleMyHlRemove(lead.id)}>
+                                      Remove
+                                    </button>
+                                  </div>
+                                )}
+                              </div>
+                            </div>
+                          </div>
+                        ))}
+                      </div>
+                    );
+                  })()}
+                </div>
+              </>
+            )}
+
           </div>
 
         )}
       </main>
+
+      {/* ── My Conversation Modal ── */}
+      {myHlOpenLead && (
+        <div className="hl-modal-overlay" onClick={() => setMyHlOpenLead(null)}>
+          <div className="hl-modal" onClick={e => e.stopPropagation()}>
+            <div className="hl-modal-header">
+              <div>
+                <div className="hl-modal-lead-name">{myHlOpenLead.lead_name || myHlOpenLead.lead_email}</div>
+                <div className="hl-modal-lead-meta">
+                  {[myHlOpenLead.lead_company, myHlOpenLead.lead_email].filter(Boolean).join(' · ')}
+                </div>
+              </div>
+              <button className="hl-modal-close" onClick={() => setMyHlOpenLead(null)}>✕</button>
+            </div>
+            <div className="hl-modal-body">
+              {myHlConvLoading && <div className="hl-modal-loading">Loading conversation…</div>}
+              {!myHlConvLoading && myHlConvPartial && (
+                <div className="hl-modal-partial-note">
+                  Full conversation thread not yet available — showing the AI reply that triggered this hot lead.
+                </div>
+              )}
+              {!myHlConvLoading && myHlConversation && myHlConversation.map(msg => (
+                <div key={msg.id} className={`hl-msg hl-msg--${msg.type}`}>
+                  <div className="hl-msg-sender">
+                    {msg.type === 'outbound' ? 'AI Reply' : msg.sender}
+                  </div>
+                  {msg.subject && <div className="hl-msg-subject">Re: {msg.subject}</div>}
+                  <div className="hl-msg-body">{msg.body}</div>
+                  {msg.time && (
+                    <div className="hl-msg-time">
+                      {new Date(msg.time).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })}
+                    </div>
+                  )}
+                </div>
+              ))}
+              {!myHlConvLoading && (!myHlConversation || myHlConversation.length === 0) && (
+                <div className="hl-modal-loading">No conversation data available yet.</div>
+              )}
+            </div>
+          </div>
+        </div>
+      )}
 
       {/* ── Intake Form Modal ── */}
       {intakeClient && (
