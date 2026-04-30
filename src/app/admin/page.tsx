@@ -59,6 +59,12 @@ export default function AdminPage() {
   const [campaignIdClient, setCampaignIdClient] = useState<ActiveClient | null>(null);
   const [campaignIdInput, setCampaignIdInput]   = useState('');
   const [campaignIdSaving, setCampaignIdSaving] = useState(false);
+  const [bookingLinkClient, setBookingLinkClient]   = useState<ActiveClient | null>(null);
+  const [bookingLinkInput, setBookingLinkInput]     = useState('');
+  const [bookingLinkSaving, setBookingLinkSaving]   = useState(false);
+  const [promptClient, setPromptClient]   = useState<ActiveClient | null>(null);
+  const [promptInput, setPromptInput]     = useState('');
+  const [promptSaving, setPromptSaving]   = useState(false);
   const router = useRouter();
 
   // Auth guard + data fetch
@@ -279,6 +285,44 @@ export default function AdminPage() {
       showToast('Something went wrong. Please try again.');
     } finally {
       setCampaignIdSaving(false);
+    }
+  }
+
+  async function handleSaveBookingLink() {
+    if (!bookingLinkClient || !bookingLinkInput.trim()) return;
+    setBookingLinkSaving(true);
+    try {
+      const supabase = createClient();
+      await supabase
+        .from('clients')
+        .update({ booking_link: bookingLinkInput.trim() })
+        .eq('id', bookingLinkClient.id);
+      showToast(`Booking link saved for ${bookingLinkClient.name}.`);
+      setBookingLinkClient(null);
+      setBookingLinkInput('');
+    } catch {
+      showToast('Something went wrong. Please try again.');
+    } finally {
+      setBookingLinkSaving(false);
+    }
+  }
+
+  async function handleSavePrompt() {
+    if (!promptClient || !promptInput.trim()) return;
+    setPromptSaving(true);
+    try {
+      const supabase = createClient();
+      await supabase
+        .from('clients')
+        .update({ ai_reply_prompt: promptInput.trim() })
+        .eq('id', promptClient.id);
+      showToast(`AI reply prompt saved for ${promptClient.name}.`);
+      setPromptClient(null);
+      setPromptInput('');
+    } catch {
+      showToast('Something went wrong. Please try again.');
+    } finally {
+      setPromptSaving(false);
     }
   }
 
@@ -541,6 +585,14 @@ export default function AdminPage() {
                                     <div className="adm-actions-divider" />
                                     <button className="adm-actions-item" onClick={() => { setCampaignIdClient(c); setCampaignIdInput(c.smartleadCampaignId ?? ''); setOpenDropdownId(null); }}>
                                       {c.smartleadCampaignId ? 'Update Campaign ID' : 'Set Campaign ID'}
+                                    </button>
+                                    <div className="adm-actions-divider" />
+                                    <button className="adm-actions-item" onClick={() => { setBookingLinkClient(c); setBookingLinkInput(''); setOpenDropdownId(null); }}>
+                                      Set Booking Link
+                                    </button>
+                                    <div className="adm-actions-divider" />
+                                    <button className="adm-actions-item" onClick={() => { setPromptClient(c); setPromptInput(''); setOpenDropdownId(null); }}>
+                                      Set AI Reply Prompt
                                     </button>
                                     <div className="adm-actions-divider" />
                                     {c.campaignStatus !== 'paused' && c.campaignStatus !== 'cancelled' && (
@@ -821,6 +873,82 @@ export default function AdminPage() {
                   {campaignIdSaving ? 'Saving…' : 'Save Campaign ID'}
                 </button>
                 <button className="ccm-btn-cancel" onClick={() => { setCampaignIdClient(null); setCampaignIdInput(''); }}>Cancel</button>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* ── Set Booking Link Modal ── */}
+      {bookingLinkClient && (
+        <div className="modal-overlay" onClick={() => { setBookingLinkClient(null); setBookingLinkInput(''); }}>
+          <div className="modal" style={{ maxWidth: 420 }} onClick={e => e.stopPropagation()}>
+            <button className="modal-close" onClick={() => { setBookingLinkClient(null); setBookingLinkInput(''); }}>✕</button>
+            <div className="modal-scroll">
+              <p style={{ margin: '0 0 4px', fontSize: 11, fontWeight: 700, letterSpacing: '0.12em', textTransform: 'uppercase', color: '#9CA3AF' }}>AI Reply</p>
+              <h2 style={{ margin: '0 0 6px', fontSize: 20, fontWeight: 700, letterSpacing: '-0.03em', color: '#1A1715' }}>Set Booking Link</h2>
+              <p style={{ margin: '0 0 24px', fontSize: 14, color: '#6B7280', lineHeight: 1.6 }}>
+                Paste the calendar URL for <strong style={{ color: '#1A1715' }}>{bookingLinkClient.name}</strong>. This is the link the AI will send to interested prospects.
+              </p>
+              <label style={{ display: 'block', fontSize: 11, fontWeight: 700, color: '#9CA3AF', marginBottom: 6, textTransform: 'uppercase', letterSpacing: '0.08em' }}>
+                Calendar URL
+              </label>
+              <input
+                type="url"
+                value={bookingLinkInput}
+                onChange={e => setBookingLinkInput(e.target.value)}
+                placeholder="https://cal.com/theirname/call"
+                autoFocus
+                style={{ width: '100%', padding: '11px 14px', fontSize: 14, border: '1px solid #E5E5E5', borderRadius: 8, outline: 'none', boxSizing: 'border-box', background: '#FAFAFA', color: '#1A1715', marginBottom: 24 }}
+              />
+              <div className="ccm-actions">
+                <button
+                  className="ccm-btn-connect"
+                  disabled={!bookingLinkInput.trim() || bookingLinkSaving}
+                  onClick={handleSaveBookingLink}
+                  style={{ opacity: !bookingLinkInput.trim() ? 0.5 : 1 }}
+                >
+                  {bookingLinkSaving ? 'Saving…' : 'Save Booking Link'}
+                </button>
+                <button className="ccm-btn-cancel" onClick={() => { setBookingLinkClient(null); setBookingLinkInput(''); }}>Cancel</button>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* ── Set AI Reply Prompt Modal ── */}
+      {promptClient && (
+        <div className="modal-overlay" onClick={() => { setPromptClient(null); setPromptInput(''); }}>
+          <div className="modal" style={{ maxWidth: 560 }} onClick={e => e.stopPropagation()}>
+            <button className="modal-close" onClick={() => { setPromptClient(null); setPromptInput(''); }}>✕</button>
+            <div className="modal-scroll">
+              <p style={{ margin: '0 0 4px', fontSize: 11, fontWeight: 700, letterSpacing: '0.12em', textTransform: 'uppercase', color: '#9CA3AF' }}>AI Reply</p>
+              <h2 style={{ margin: '0 0 6px', fontSize: 20, fontWeight: 700, letterSpacing: '-0.03em', color: '#1A1715' }}>Set AI Reply Prompt</h2>
+              <p style={{ margin: '0 0 24px', fontSize: 14, color: '#6B7280', lineHeight: 1.6 }}>
+                Paste the full AI reply prompt for <strong style={{ color: '#1A1715' }}>{promptClient.name}</strong>. This is what Claude uses to reply to prospects on their behalf.
+              </p>
+              <label style={{ display: 'block', fontSize: 11, fontWeight: 700, color: '#9CA3AF', marginBottom: 6, textTransform: 'uppercase', letterSpacing: '0.08em' }}>
+                Prompt
+              </label>
+              <textarea
+                value={promptInput}
+                onChange={e => setPromptInput(e.target.value)}
+                placeholder="Paste the full AI reply prompt here..."
+                autoFocus
+                rows={14}
+                style={{ width: '100%', padding: '11px 14px', fontSize: 13, border: '1px solid #E5E5E5', borderRadius: 8, outline: 'none', boxSizing: 'border-box', background: '#FAFAFA', color: '#1A1715', marginBottom: 24, resize: 'vertical', lineHeight: 1.7, fontFamily: 'inherit' }}
+              />
+              <div className="ccm-actions">
+                <button
+                  className="ccm-btn-connect"
+                  disabled={!promptInput.trim() || promptSaving}
+                  onClick={handleSavePrompt}
+                  style={{ opacity: !promptInput.trim() ? 0.5 : 1 }}
+                >
+                  {promptSaving ? 'Saving…' : 'Save Prompt'}
+                </button>
+                <button className="ccm-btn-cancel" onClick={() => { setPromptClient(null); setPromptInput(''); }}>Cancel</button>
               </div>
             </div>
           </div>
