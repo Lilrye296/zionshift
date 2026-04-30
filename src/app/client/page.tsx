@@ -772,7 +772,7 @@ export default function ClientPage() {
               {filteredHotLeads.length === 0 ? (
                 <div className="hl-empty">
                   {hotLeads.length === 0
-                    ? 'No hot leads yet — they\'ll appear here when your AI drops a booking link.'
+                    ? 'No hot leads yet — when a prospect replies with interest, your AI handles it and the conversation appears here.'
                     : 'No results match your search.'}
                 </div>
               ) : (
