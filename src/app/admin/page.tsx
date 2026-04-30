@@ -1099,10 +1099,9 @@ export default function AdminPage() {
                         </button>
                       ) : <span />}
                       <button
-                        className="ccm-btn-connect"
                         disabled={!myCampaignId.trim() || settingsSaving === 'campaignId'}
                         onClick={() => handleSaveMySetting('smartlead_campaign_id', myCampaignId, 'campaignId')}
-                        style={{ opacity: !myCampaignId.trim() ? 0.5 : 1 }}
+                        style={{ background: '#1A1715', color: '#fff', border: 'none', borderRadius: 6, fontSize: 12, fontWeight: 600, padding: '6px 14px', cursor: !myCampaignId.trim() ? 'default' : 'pointer', opacity: !myCampaignId.trim() ? 0.4 : 1 }}
                       >
                         {settingsSaving === 'campaignId' ? 'Saving…' : 'Save'}
                       </button>
@@ -1130,10 +1129,9 @@ export default function AdminPage() {
                         </button>
                       ) : <span />}
                       <button
-                        className="ccm-btn-connect"
                         disabled={!myBookingLink.trim() || settingsSaving === 'bookingLink'}
                         onClick={() => handleSaveMySetting('booking_link', myBookingLink, 'bookingLink')}
-                        style={{ opacity: !myBookingLink.trim() ? 0.5 : 1 }}
+                        style={{ background: '#1A1715', color: '#fff', border: 'none', borderRadius: 6, fontSize: 12, fontWeight: 600, padding: '6px 14px', cursor: !myBookingLink.trim() ? 'default' : 'pointer', opacity: !myBookingLink.trim() ? 0.4 : 1 }}
                       >
                         {settingsSaving === 'bookingLink' ? 'Saving…' : 'Save'}
                       </button>
@@ -1161,10 +1159,9 @@ export default function AdminPage() {
                         </button>
                       ) : <span />}
                       <button
-                        className="ccm-btn-connect"
                         disabled={!myPrompt.trim() || settingsSaving === 'prompt'}
                         onClick={() => handleSaveMySetting('ai_reply_prompt', myPrompt, 'prompt')}
-                        style={{ opacity: !myPrompt.trim() ? 0.5 : 1 }}
+                        style={{ background: '#1A1715', color: '#fff', border: 'none', borderRadius: 6, fontSize: 12, fontWeight: 600, padding: '6px 14px', cursor: !myPrompt.trim() ? 'default' : 'pointer', opacity: !myPrompt.trim() ? 0.4 : 1 }}
                       >
                         {settingsSaving === 'prompt' ? 'Saving…' : 'Save'}
                       </button>
