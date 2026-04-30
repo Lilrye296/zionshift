@@ -1067,77 +1067,105 @@ export default function AdminPage() {
       {/* ── My Settings Modal ── */}
       {settingsOpen && (
         <div className="modal-overlay" onClick={() => setSettingsOpen(false)}>
-          <div className="modal" style={{ maxWidth: 460 }} onClick={e => e.stopPropagation()}>
+          <div className="modal" style={{ maxWidth: 500 }} onClick={e => e.stopPropagation()}>
             <button className="modal-close" onClick={() => setSettingsOpen(false)}>✕</button>
             <div className="modal-scroll">
-              <h2 style={{ margin: '0 0 4px', fontSize: 22, fontWeight: 700, letterSpacing: '-0.03em', color: '#1A1715' }}>Settings</h2>
-              <p style={{ margin: '0 0 28px', fontSize: 14, color: '#9CA3AF', lineHeight: 1.5 }}>Your campaign configuration</p>
+              <p style={{ margin: '0 0 4px', fontSize: 11, fontWeight: 700, letterSpacing: '0.12em', textTransform: 'uppercase', color: '#9CA3AF' }}>My Account</p>
+              <h2 style={{ margin: '0 0 6px', fontSize: 20, fontWeight: 700, letterSpacing: '-0.03em', color: '#1A1715' }}>Settings</h2>
+              <p style={{ margin: '0 0 28px', fontSize: 14, color: '#6B7280', lineHeight: 1.6 }}>
+                Configure your own campaign, calendar link, and AI reply prompt.
+              </p>
 
               {settingsLoading ? (
                 <div style={{ padding: '32px 0', textAlign: 'center', color: '#9CA3AF', fontSize: 14 }}>Loading…</div>
               ) : (
                 <>
-                  {/* ── Campaign ID ── */}
-                  <div style={{ marginBottom: 8, fontSize: 11, fontWeight: 700, color: '#9CA3AF', textTransform: 'uppercase', letterSpacing: '0.08em' }}>Campaign</div>
-                  <div style={{ background: '#FAFAF9', border: '1px solid #EEEBE6', borderRadius: 12, overflow: 'hidden', marginBottom: 24 }}>
-                    <div style={{ padding: '13px 16px' }}>
-                      <div style={{ fontSize: 11, color: '#9CA3AF', marginBottom: 5, fontWeight: 600, letterSpacing: '0.04em' }}>Smartlead Campaign ID</div>
-                      <input
-                        type="text"
-                        value={myCampaignId}
-                        onChange={e => setMyCampaignId(e.target.value)}
-                        placeholder="e.g. 123456"
-                        style={{ width: '100%', background: 'none', border: 'none', outline: 'none', fontSize: 14, color: '#1A1715', fontFamily: 'monospace', boxSizing: 'border-box', padding: 0 }}
-                      />
-                    </div>
-                    <div style={{ height: 1, background: '#EEEBE6' }} />
-                    <div style={{ padding: '9px 16px', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                      <button onClick={() => handleClearMySetting('smartlead_campaign_id')} style={{ background: 'none', border: 'none', fontSize: 13, color: '#DC2626', cursor: 'pointer', padding: 0, opacity: myCampaignId ? 1 : 0.3 }} disabled={!myCampaignId}>Clear</button>
-                      <button onClick={() => handleSaveMySetting('smartlead_campaign_id', myCampaignId, 'campaignId')} disabled={!myCampaignId.trim() || settingsSaving === 'campaignId'} style={{ background: 'none', border: 'none', fontSize: 13, fontWeight: 600, color: !myCampaignId.trim() ? '#9CA3AF' : '#1A1715', cursor: !myCampaignId.trim() ? 'default' : 'pointer', padding: 0 }}>
+                  {/* Campaign ID */}
+                  <div style={{ marginBottom: 28 }}>
+                    <label style={{ display: 'block', fontSize: 11, fontWeight: 700, color: '#9CA3AF', marginBottom: 6, textTransform: 'uppercase', letterSpacing: '0.08em' }}>
+                      Campaign ID
+                    </label>
+                    <input
+                      type="text"
+                      value={myCampaignId}
+                      onChange={e => setMyCampaignId(e.target.value)}
+                      placeholder="e.g. 123456"
+                      style={{ width: '100%', padding: '11px 14px', fontSize: 14, border: '1px solid #E5E5E5', borderRadius: 8, outline: 'none', boxSizing: 'border-box', background: '#FAFAFA', color: '#1A1715', marginBottom: 10, fontFamily: 'monospace' }}
+                    />
+                    <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+                      {myCampaignId ? (
+                        <button onClick={() => handleClearMySetting('smartlead_campaign_id')} style={{ background: 'none', border: 'none', fontSize: 13, color: '#DC2626', cursor: 'pointer', padding: 0 }}>
+                          Clear
+                        </button>
+                      ) : <span />}
+                      <button
+                        className="ccm-btn-connect"
+                        disabled={!myCampaignId.trim() || settingsSaving === 'campaignId'}
+                        onClick={() => handleSaveMySetting('smartlead_campaign_id', myCampaignId, 'campaignId')}
+                        style={{ opacity: !myCampaignId.trim() ? 0.5 : 1 }}
+                      >
                         {settingsSaving === 'campaignId' ? 'Saving…' : 'Save'}
                       </button>
                     </div>
                   </div>
 
-                  {/* ── Booking Link ── */}
-                  <div style={{ marginBottom: 8, fontSize: 11, fontWeight: 700, color: '#9CA3AF', textTransform: 'uppercase', letterSpacing: '0.08em' }}>Calendar</div>
-                  <div style={{ background: '#FAFAF9', border: '1px solid #EEEBE6', borderRadius: 12, overflow: 'hidden', marginBottom: 24 }}>
-                    <div style={{ padding: '13px 16px' }}>
-                      <div style={{ fontSize: 11, color: '#9CA3AF', marginBottom: 5, fontWeight: 600, letterSpacing: '0.04em' }}>Booking Link</div>
-                      <input
-                        type="url"
-                        value={myBookingLink}
-                        onChange={e => setMyBookingLink(e.target.value)}
-                        placeholder="https://cal.com/yourname/call"
-                        style={{ width: '100%', background: 'none', border: 'none', outline: 'none', fontSize: 14, color: '#1A1715', boxSizing: 'border-box', padding: 0 }}
-                      />
-                    </div>
-                    <div style={{ height: 1, background: '#EEEBE6' }} />
-                    <div style={{ padding: '9px 16px', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                      <button onClick={() => handleClearMySetting('booking_link')} style={{ background: 'none', border: 'none', fontSize: 13, color: '#DC2626', cursor: 'pointer', padding: 0, opacity: myBookingLink ? 1 : 0.3 }} disabled={!myBookingLink}>Clear</button>
-                      <button onClick={() => handleSaveMySetting('booking_link', myBookingLink, 'bookingLink')} disabled={!myBookingLink.trim() || settingsSaving === 'bookingLink'} style={{ background: 'none', border: 'none', fontSize: 13, fontWeight: 600, color: !myBookingLink.trim() ? '#9CA3AF' : '#1A1715', cursor: !myBookingLink.trim() ? 'default' : 'pointer', padding: 0 }}>
+                  <div style={{ height: 1, background: '#F0EDE8', marginBottom: 28 }} />
+
+                  {/* Booking Link */}
+                  <div style={{ marginBottom: 28 }}>
+                    <label style={{ display: 'block', fontSize: 11, fontWeight: 700, color: '#9CA3AF', marginBottom: 6, textTransform: 'uppercase', letterSpacing: '0.08em' }}>
+                      Booking Link
+                    </label>
+                    <input
+                      type="url"
+                      value={myBookingLink}
+                      onChange={e => setMyBookingLink(e.target.value)}
+                      placeholder="https://cal.com/yourname/call"
+                      style={{ width: '100%', padding: '11px 14px', fontSize: 14, border: '1px solid #E5E5E5', borderRadius: 8, outline: 'none', boxSizing: 'border-box', background: '#FAFAFA', color: '#1A1715', marginBottom: 10 }}
+                    />
+                    <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+                      {myBookingLink ? (
+                        <button onClick={() => handleClearMySetting('booking_link')} style={{ background: 'none', border: 'none', fontSize: 13, color: '#DC2626', cursor: 'pointer', padding: 0 }}>
+                          Clear
+                        </button>
+                      ) : <span />}
+                      <button
+                        className="ccm-btn-connect"
+                        disabled={!myBookingLink.trim() || settingsSaving === 'bookingLink'}
+                        onClick={() => handleSaveMySetting('booking_link', myBookingLink, 'bookingLink')}
+                        style={{ opacity: !myBookingLink.trim() ? 0.5 : 1 }}
+                      >
                         {settingsSaving === 'bookingLink' ? 'Saving…' : 'Save'}
                       </button>
                     </div>
                   </div>
 
-                  {/* ── AI Reply Prompt ── */}
-                  <div style={{ marginBottom: 8, fontSize: 11, fontWeight: 700, color: '#9CA3AF', textTransform: 'uppercase', letterSpacing: '0.08em' }}>AI Reply</div>
-                  <div style={{ background: '#FAFAF9', border: '1px solid #EEEBE6', borderRadius: 12, overflow: 'hidden' }}>
-                    <div style={{ padding: '13px 16px' }}>
-                      <div style={{ fontSize: 11, color: '#9CA3AF', marginBottom: 5, fontWeight: 600, letterSpacing: '0.04em' }}>Reply Prompt</div>
-                      <textarea
-                        value={myPrompt}
-                        onChange={e => setMyPrompt(e.target.value)}
-                        placeholder="Paste your full AI reply prompt here..."
-                        rows={10}
-                        style={{ width: '100%', background: 'none', border: 'none', outline: 'none', fontSize: 13, color: '#1A1715', boxSizing: 'border-box', resize: 'vertical', lineHeight: 1.75, fontFamily: 'inherit', padding: 0 }}
-                      />
-                    </div>
-                    <div style={{ height: 1, background: '#EEEBE6' }} />
-                    <div style={{ padding: '9px 16px', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                      <button onClick={() => handleClearMySetting('ai_reply_prompt')} style={{ background: 'none', border: 'none', fontSize: 13, color: '#DC2626', cursor: 'pointer', padding: 0, opacity: myPrompt ? 1 : 0.3 }} disabled={!myPrompt}>Clear</button>
-                      <button onClick={() => handleSaveMySetting('ai_reply_prompt', myPrompt, 'prompt')} disabled={!myPrompt.trim() || settingsSaving === 'prompt'} style={{ background: 'none', border: 'none', fontSize: 13, fontWeight: 600, color: !myPrompt.trim() ? '#9CA3AF' : '#1A1715', cursor: !myPrompt.trim() ? 'default' : 'pointer', padding: 0 }}>
+                  <div style={{ height: 1, background: '#F0EDE8', marginBottom: 28 }} />
+
+                  {/* AI Reply Prompt */}
+                  <div>
+                    <label style={{ display: 'block', fontSize: 11, fontWeight: 700, color: '#9CA3AF', marginBottom: 6, textTransform: 'uppercase', letterSpacing: '0.08em' }}>
+                      AI Reply Prompt
+                    </label>
+                    <textarea
+                      value={myPrompt}
+                      onChange={e => setMyPrompt(e.target.value)}
+                      placeholder="Paste your full AI reply prompt here..."
+                      rows={12}
+                      style={{ width: '100%', padding: '11px 14px', fontSize: 13, border: '1px solid #E5E5E5', borderRadius: 8, outline: 'none', boxSizing: 'border-box', background: '#FAFAFA', color: '#1A1715', marginBottom: 10, resize: 'vertical', lineHeight: 1.7, fontFamily: 'inherit' }}
+                    />
+                    <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+                      {myPrompt ? (
+                        <button onClick={() => handleClearMySetting('ai_reply_prompt')} style={{ background: 'none', border: 'none', fontSize: 13, color: '#DC2626', cursor: 'pointer', padding: 0 }}>
+                          Clear
+                        </button>
+                      ) : <span />}
+                      <button
+                        className="ccm-btn-connect"
+                        disabled={!myPrompt.trim() || settingsSaving === 'prompt'}
+                        onClick={() => handleSaveMySetting('ai_reply_prompt', myPrompt, 'prompt')}
+                        style={{ opacity: !myPrompt.trim() ? 0.5 : 1 }}
+                      >
                         {settingsSaving === 'prompt' ? 'Saving…' : 'Save'}
                       </button>
                     </div>
