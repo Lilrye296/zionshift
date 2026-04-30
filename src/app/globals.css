@@ -864,11 +864,7 @@ footer.zs-footer { padding: 40px 0; border-top: 1px solid var(--zs-border); }
 
 /* ── Hot Leads Viewer ──────────────────────────────────────────── */
 .hl-card { padding: 0; overflow: visible; }
-.hl-header { border-bottom: 1px solid var(--zs-border); }
-.hl-header-row { display: flex; align-items: center; justify-content: space-between; padding: 18px 20px 12px; }
-.hl-header-title { font-size: 15px; font-weight: 700; color: var(--zs-ink); letter-spacing: -0.02em; }
-.hl-header-count { font-size: 12px; font-weight: 600; color: var(--zs-ink-4); background: var(--zs-mist); border: 1px solid var(--zs-border); border-radius: 20px; padding: 2px 9px; }
-.hl-search-row { padding: 0 12px 12px; }
+.hl-search-row { padding: 12px; border-bottom: 1px solid var(--zs-border); }
 .hl-search-inner { position: relative; }
 .hl-search-icon { position: absolute; left: 10px; top: 50%; transform: translateY(-50%); color: var(--zs-ink-4); pointer-events: none; }
 .hl-search { width: 100%; box-sizing: border-box; font: 400 13px var(--zs-sans); color: var(--zs-ink); background: rgba(0,0,0,0.045); border: none; border-radius: 10px; padding: 8px 12px 8px 32px; outline: none; transition: background 160ms; }
