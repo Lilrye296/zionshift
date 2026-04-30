@@ -927,7 +927,7 @@ export default function AdminPage() {
             {myClientId && (
               <>
                 {/* Header row */}
-                <div style={{ display: 'flex', alignItems: 'center', marginTop: 40, marginBottom: 4 }}>
+                <div className="adm-my-campaign-header" style={{ display: 'flex', alignItems: 'center', marginTop: 40, marginBottom: 4 }}>
                   <div style={{ flex: 1 }} />
                   <p className="cd-health-label" style={{ margin: 0 }}>My Campaign</p>
                   <div style={{ flex: 1, display: 'flex', justifyContent: 'flex-end' }}>

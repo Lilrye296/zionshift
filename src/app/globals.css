@@ -1017,6 +1017,12 @@ footer.zs-footer { padding: 40px 0; border-top: 1px solid var(--zs-border); }
   .adm-client-since { font-size: 11px; display: block; }
   .adm-client-since::before { content: ''; }
   .adm-client-pill { font-size: 10px; padding: 2px 8px; }
+
+  /* My Campaign section — mobile only */
+  .adm-my-campaign-header { flex-direction: column !important; align-items: center !important; gap: 6px; }
+  .adm-my-campaign-header > div:first-child { display: none; }
+  .adm-my-campaign-header > div:last-child { flex: none !important; justify-content: center; }
+  .adm-my-metrics { grid-template-columns: 1fr !important; }
 }
 
 /* Admin impersonation banner — shown on client page when admin uses View → */
