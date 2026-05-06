@@ -19,8 +19,10 @@ const TONES          = ['Formal and Professional', 'Friendly and Conversational'
 /* ─── Types ──────────────────────────────────────────────────── */
 
 interface FormState {
-  firstName: string; lastName: string; businessName: string;
+  firstName: string; lastName: string; phone: string;
+  businessName: string; preferredName: string;
   cityState: string; yearsInBusiness: string; websiteUrl: string;
+  businessDescription: string;
   logo: File | null; headshot: File | null;
   industries: string[]; otherIndustry: string;
   employeeCount: string[]; revenueRange: string[]; geoFocus: string[]; regionalStates: string;
@@ -31,8 +33,10 @@ interface FormState {
 }
 
 const DEFAULT_FORM: FormState = {
-  firstName: '', lastName: '', businessName: '',
+  firstName: '', lastName: '', phone: '',
+  businessName: '', preferredName: '',
   cityState: '', yearsInBusiness: '', websiteUrl: '',
+  businessDescription: '',
   logo: null, headshot: null,
   industries: [], otherIndustry: '',
   employeeCount: [], revenueRange: [], geoFocus: [], regionalStates: '',
@@ -259,8 +263,19 @@ function Screen1({ form, set }: { form: FormState; set: (f: FormState) => void }
       </div>
 
       <div className="field">
+        <label>Phone number <span className="ob-optional">(optional)</span></label>
+        <input type="tel" value={form.phone} onChange={upd('phone')} placeholder="(555) 123-4567" />
+      </div>
+
+      <div className="field">
         <label>Business name <span className="ob-req">*</span></label>
-        <input type="text" value={form.businessName} onChange={upd('businessName')} placeholder="Smith Bookkeeping LLC" />
+        <input type="text" value={form.businessName} onChange={upd('businessName')} placeholder="Smith Contract Packaging LLC" />
+      </div>
+
+      <div className="field">
+        <label>Preferred name <span className="ob-optional">(optional)</span></label>
+        <input type="text" value={form.preferredName} onChange={upd('preferredName')} placeholder="Bob" />
+        <p className="ob-helper">If you go by a different name in business, tell us. This is the name we&apos;ll use in your email replies.</p>
       </div>
 
       <div className="ob-row-2">
@@ -278,6 +293,17 @@ function Screen1({ form, set }: { form: FormState; set: (f: FormState) => void }
         <label>Business website</label>
         <input type="url" value={form.websiteUrl} onChange={upd('websiteUrl')} placeholder="https://yourfirm.com" />
         <p className="ob-helper">Don&apos;t have one? Leave this blank.</p>
+      </div>
+
+      <div className="field">
+        <label>What does your business do? <span className="ob-req">*</span></label>
+        <textarea
+          value={form.businessDescription}
+          onChange={e => set({ ...form, businessDescription: e.target.value })}
+          rows={3}
+          placeholder="We make custom corrugated packaging for ecommerce DTC brands. Low minimums, sustainable materials, 2-week turnaround."
+        />
+        <p className="ob-helper">Be specific. Generic answers produce generic outreach.</p>
       </div>
 
       <div className="ob-row-2" style={{ marginTop: 20 }}>
@@ -575,11 +601,12 @@ function Screen6({ submitting, submitError, onSubmit }: {
 
 function validate(step: number, form: FormState): string | null {
   if (step === 1) {
-    if (!form.firstName.trim())      return 'First name is required.';
-    if (!form.lastName.trim())       return 'Last name is required.';
-    if (!form.businessName.trim())   return 'Business name is required.';
-    if (!form.cityState.trim())      return 'City & state is required.';
-    if (!form.yearsInBusiness.trim()) return 'Years in business is required.';
+    if (!form.firstName.trim())           return 'First name is required.';
+    if (!form.lastName.trim())            return 'Last name is required.';
+    if (!form.businessName.trim())        return 'Business name is required.';
+    if (!form.cityState.trim())           return 'City & state is required.';
+    if (!form.yearsInBusiness.trim())     return 'Years in business is required.';
+    if (!form.businessDescription.trim()) return 'Please tell us what your business does.';
   }
   if (step === 2) {
     if (form.industries.length === 0) return 'Select at least one industry.';
@@ -677,8 +704,10 @@ function OnboardInner() {
         body: JSON.stringify({
           token,
           firstName: form.firstName, lastName: form.lastName,
+          phone: form.phone, preferredName: form.preferredName,
           businessName: form.businessName, cityState: form.cityState,
           yearsInBusiness: form.yearsInBusiness, websiteUrl: form.websiteUrl,
+          businessDescription: form.businessDescription,
           logoBase64, logoExt, headshotBase64, headshotExt,
           industries: form.industries, otherIndustry: form.otherIndustry,
           employeeCount: form.employeeCount, revenueRange: form.revenueRange,

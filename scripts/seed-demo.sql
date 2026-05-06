@@ -40,7 +40,7 @@ BEGIN
     null,
     'https://cal.com/clearledger/discovery',
     'You are the AI booking assistant for ClearLedger Bookkeeping, a firm that specializes in bookkeeping for e-commerce and retail businesses. When a prospect replies with interest, your goal is to get them booked on a 20-minute discovery call. Be warm, professional, and concise. Address concerns about pricing, process, or past experiences directly and with empathy. Always end with a clear call to action using the booking link provided.',
-    '{"alltime":{"emails_sent":1847,"replies":46,"reply_rate":2.49,"bounces":26,"bounce_rate":1.41,"opt_outs":7},"month":{"emails_sent":1312,"replies":35,"reply_rate":2.67,"bounces":18,"bounce_rate":1.37,"opt_outs":4},"week":{"emails_sent":298,"replies":8,"reply_rate":2.68,"bounces":4,"bounce_rate":1.34,"opt_outs":1}}'::jsonb,
+    '{"alltime":{"emails_sent":2183,"replies":54,"reply_rate":2.47,"bounces":31,"bounce_rate":1.42,"opt_outs":8},"month":{"emails_sent":1247,"replies":31,"reply_rate":2.49,"bounces":17,"bounce_rate":1.36,"opt_outs":4},"week":{"emails_sent":298,"replies":7,"reply_rate":2.35,"bounces":4,"bounce_rate":1.34,"opt_outs":1}}'::jsonb,
     '2026-03-01 10:00:00+00'
   ) RETURNING id INTO v_id;
 
@@ -56,7 +56,7 @@ BEGIN
         {
           "id": 0,
           "type": "outbound",
-          "sender": "Cold Email — Sequence 1",
+          "sender": "Initial Cold Email",
           "body": "Hi Emma, quick question — are you still managing your own books for Bloom & Thread Co., or do you have someone handling that?\n\nWe work exclusively with Shopify and e-commerce brands to take bookkeeping completely off their plate — monthly reconciliations, inventory COGS tracking, sales tax prep, and clean P&Ls your accountant will actually love.\n\nMost of our clients save 8-12 hours a month and finally know exactly what their margins are by product.\n\nWorth a 20-minute call to see if we'd be a fit?\n\n— Sarah Mitchell, ClearLedger Bookkeeping",
           "time": "2026-04-28T09:00:00.000Z"
         },
@@ -90,7 +90,7 @@ BEGIN
         {
           "id": 0,
           "type": "outbound",
-          "sender": "Cold Email — Sequence 1",
+          "sender": "Initial Cold Email",
           "body": "Hi Marcus, noticed Webb's Hardware has multiple locations across the valley — multi-location retail is one of our specialties at ClearLedger.\n\nWe handle the bookkeeping so you're not stuck reconciling 3 different POS systems at the end of every month. Clean financials across all locations, inventory reconciliation, and P&Ls by location so you know which store is actually making money.\n\nWorth a 20-minute call?\n\n— Sarah Mitchell, ClearLedger",
           "time": "2026-04-22T09:00:00.000Z"
         },
@@ -138,7 +138,7 @@ BEGIN
         {
           "id": 0,
           "type": "outbound",
-          "sender": "Cold Email — Sequence 1",
+          "sender": "Initial Cold Email",
           "body": "Hi Jennifer, love what you're building with Glow Republic — DTC skincare is one of the more complex bookkeeping setups because of returns, COGS variability, and multi-channel revenue.\n\nWe specialize in exactly this. Clean monthly books, margin tracking by SKU, and sales tax compliance across every state you're shipping to.\n\nWorth a quick call?\n\n— Sarah Mitchell, ClearLedger",
           "time": "2026-04-18T09:00:00.000Z"
         },
@@ -200,7 +200,7 @@ BEGIN
         {
           "id": 0,
           "type": "outbound",
-          "sender": "Cold Email — Sequence 2",
+          "sender": "Initial Cold Email",
           "body": "Hi Daniel, just following up on my note from last week — wanted to make sure this didn't get buried.\n\nQuick version: we handle bookkeeping specifically for Amazon FBA sellers — COGS tracking, reimbursement reconciliation, fee breakdowns, and clean monthly P&Ls so you know your actual net margins by ASIN.\n\nWorth 20 minutes?\n\n— Sarah Mitchell, ClearLedger",
           "time": "2026-04-10T09:00:00.000Z"
         },
@@ -248,7 +248,7 @@ BEGIN
         {
           "id": 0,
           "type": "outbound",
-          "sender": "Cold Email — Sequence 1",
+          "sender": "Initial Cold Email",
           "body": "Hi Aisha, Luxe by Aisha is gorgeous — congrats on building something so elevated.\n\nQuick question: do you have someone handling the bookkeeping side, or is that still on your plate?\n\nWe work with online fashion brands specifically — returns management, inventory COGS, seasonal cash flow planning. The financial side, so you can stay focused on the creative side.\n\n20-minute call?\n\n— Sarah Mitchell, ClearLedger",
           "time": "2026-04-05T09:00:00.000Z"
         },
@@ -296,7 +296,7 @@ BEGIN
         {
           "id": 0,
           "type": "outbound",
-          "sender": "Cold Email — Sequence 1",
+          "sender": "Initial Cold Email",
           "body": "Hi Tyler, running multiple retail locations means your books are probably 3x more complex than a single-store operation — separate P&Ls, inter-location inventory, and consolidating everything at month-end.\n\nWe handle all of that. Clean books per location, consolidated financials for the whole operation, no more month-end chaos.\n\nWorth a quick 20-minute call?\n\n— Sarah Mitchell, ClearLedger",
           "time": "2026-04-29T09:00:00.000Z"
         },
@@ -344,7 +344,7 @@ BEGIN
         {
           "id": 0,
           "type": "outbound",
-          "sender": "Cold Email — Sequence 1",
+          "sender": "Initial Cold Email",
           "body": "Hi Rachel, PawVault is doing impressive things in a competitive space — DTC pet supply runs on tight margins, which makes clean bookkeeping more important than most categories.\n\nWe work with DTC brands on monthly reconciliations, COGS tracking, and real-time margin visibility. Most founders we work with had no idea what their actual profitability was until month one with us.\n\nWorth a 20-minute call?\n\n— Sarah Mitchell, ClearLedger",
           "time": "2026-03-28T09:00:00.000Z"
         },

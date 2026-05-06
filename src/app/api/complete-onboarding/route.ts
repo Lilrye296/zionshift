@@ -18,7 +18,9 @@ export async function POST(req: NextRequest) {
     const body = await req.json();
     const {
       token,
-      firstName, lastName, businessName, cityState, yearsInBusiness, websiteUrl,
+      firstName, lastName, phone, preferredName,
+      businessName, cityState, yearsInBusiness, websiteUrl,
+      businessDescription,
       logoBase64, logoExt, headshotBase64, headshotExt,
       industries, otherIndustry, employeeCount, revenueRange, geoFocus,
       differentiator, painPoint, transformation, tone, avoidances,
@@ -108,7 +110,9 @@ export async function POST(req: NextRequest) {
       await supabase.from('onboarding_responses').insert({
         email,
         response_data: {
-          firstName, lastName, businessName, cityState, yearsInBusiness, websiteUrl,
+          firstName, lastName, phone, preferredName,
+          businessName, cityState, yearsInBusiness, websiteUrl,
+          businessDescription,
           industries, otherIndustry, employeeCount, revenueRange, geoFocus,
           differentiator, painPoint, transformation, tone, avoidances,
           bookingLink,
@@ -195,8 +199,10 @@ export async function POST(req: NextRequest) {
         <p style="margin:0 0 10px;font-size:11px;font-weight:700;letter-spacing:0.12em;text-transform:uppercase;color:#9CA3AF;">About Them</p>
         <div style="padding:20px 24px;background:#FAFAF9;border-radius:10px;border:1px solid #EEEBE6;margin-bottom:20px;">
           <table style="width:100%;border-collapse:collapse;">
-            <tr><td style="padding:5px 0;font-size:12px;font-weight:600;color:#9CA3AF;width:42%;">Name</td><td style="padding:5px 0;font-size:14px;color:#1A1715;">${firstName} ${lastName}</td></tr>
+            <tr><td style="padding:5px 0;font-size:12px;font-weight:600;color:#9CA3AF;width:42%;">Name</td><td style="padding:5px 0;font-size:14px;color:#1A1715;">${firstName} ${lastName}${preferredName ? ` (goes by ${preferredName})` : ''}</td></tr>
+            <tr><td style="padding:5px 0;font-size:12px;font-weight:600;color:#9CA3AF;">Phone</td><td style="padding:5px 0;font-size:14px;color:#1A1715;">${phone || '—'}</td></tr>
             <tr><td style="padding:5px 0;font-size:12px;font-weight:600;color:#9CA3AF;">Business</td><td style="padding:5px 0;font-size:14px;color:#1A1715;">${businessName}</td></tr>
+            <tr><td style="padding:5px 0;font-size:12px;font-weight:600;color:#9CA3AF;">What They Do</td><td style="padding:5px 0;font-size:14px;color:#1A1715;">${businessDescription || '—'}</td></tr>
             <tr><td style="padding:5px 0;font-size:12px;font-weight:600;color:#9CA3AF;">Location</td><td style="padding:5px 0;font-size:14px;color:#1A1715;">${cityState}</td></tr>
             <tr><td style="padding:5px 0;font-size:12px;font-weight:600;color:#9CA3AF;">Years in Business</td><td style="padding:5px 0;font-size:14px;color:#1A1715;">${yearsInBusiness}</td></tr>
             <tr><td style="padding:5px 0;font-size:12px;font-weight:600;color:#9CA3AF;">Website</td><td style="padding:5px 0;font-size:14px;color:#1A1715;">${websiteUrl || '—'}</td></tr>
