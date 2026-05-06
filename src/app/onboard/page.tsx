@@ -290,9 +290,8 @@ function Screen1({ form, set }: { form: FormState; set: (f: FormState) => void }
       </div>
 
       <div className="field">
-        <label>Business website</label>
+        <label>Business website <span className="ob-optional">(optional)</span></label>
         <input type="url" value={form.websiteUrl} onChange={upd('websiteUrl')} placeholder="https://yourfirm.com" />
-        <p className="ob-helper">Don&apos;t have one? Leave this blank.</p>
       </div>
 
       <div className="field">
